@@ -18,6 +18,9 @@ The software in this repository is maintained by:
 - [Timm Linder](http://www.timmlinder.com), Social Robotics Lab, Albert-Ludwigs-Universität Freiburg
 - [Stefan Breuers](http://www.vision.rwth-aachen.de/people/stefan-breuers), Computer Vision Group, RWTH Aachen University
 
+This work has been supported by the EC under contract number FP7-ICT-600877 (SPENCER).
 If you use the software contained in this repository for your research, please cite the following publication:
 
 > TODO
+
+
