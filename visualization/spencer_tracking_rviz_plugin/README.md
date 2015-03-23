@@ -1,10 +1,10 @@
-RVIZ PLUGIN FOR VISUALIZATION OF DETECTED AND TRACKED PERSONS, GROUPS, SOCIAL RELATIONS, ACTIVITIES AND HUMAN ATTRIBUTES
-========================================================================================================================
-Author: (C)2013-2014 Timm Linder, Social Robotics Laboratory, Albert-Ludwigs-University Freiburg, Germany
+RViz plugins for visualization of detected and tracked persons, groups, social relations, activities and human attributes
+-------------------------------------------------------------------------------------------------------------------------
+Author: ©2013-2015 Timm Linder, Social Robotics Laboratory, Albert-Ludwigs-University Freiburg, Germany
 
 E-mail: linder@cs.uni-freiburg.de
 
-Adds the following display types to Rviz:
+This ROS package adds the following display types to RViz:
 
 - Detected persons (spencer_tracking_msgs/DetectedPersons)
 - Tracked persons (spencer_tracking_msgs/TrackedPersons)
@@ -35,4 +35,4 @@ Known issues
 ------------
 Rviz may crash with a segfault when exiting. This usually can be ignored.
 Person visuals in the tracked groups and human attributes display do not support walking animations.
-However, these displays can be combined with the tracked persons display (which does support animations) but disabling their person visuals.
+However, these displays can be combined with the tracked persons display (which does support animations) by disabling their person visuals.
