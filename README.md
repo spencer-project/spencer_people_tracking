@@ -16,7 +16,7 @@ Videos of the people detection and tracking system in action can be found on the
 The software in this repository is maintained by:
 
 - [Timm Linder](http://www.timmlinder.com), Social Robotics Lab, Albert-Ludwigs-Universität Freiburg
-- [Stefan Breuers](www.vision.rwth-aachen.de/people/stefan-breuers), Computer Vision Group, RWTH Aachen University
+- [Stefan Breuers](http://www.vision.rwth-aachen.de/people/stefan-breuers), Computer Vision Group, RWTH Aachen University
 
 If you use the software contained in this repository for your research, please cite the following publication:
 
