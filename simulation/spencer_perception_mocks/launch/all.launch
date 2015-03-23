@@ -1,0 +1,25 @@
+<!-- This launch file will execute *all* mock components of the perception layer, unless one of them is deactivated using the following parameters on the command line -->
+<!-- Use e.g. "roslaunch spencer_perception_mocks all.launch spokespersons:=false" to run without spokespersons mock component -->
+<launch>
+    <arg name="visualization" default="true"/>
+
+    <arg name="detected_and_tracked_persons" default="true"/>
+    <arg name="spokespersons" default="true"/>
+    <arg name="human_attributes" default="true"/>
+    <arg name="social_relations" default="true"/>
+    <arg name="tracked_groups" default="true"/>
+    <arg name="social_activities" default="true"/>
+    <arg name="driving_robot" default="true"/>
+
+    <node name="mock_detected_and_tracked_persons" type="detected_and_tracked_persons.py" pkg="spencer_perception_mocks" if="$(arg detected_and_tracked_persons)"/>
+    <node name="mock_spokespersons" type="spokespersons.py" pkg="spencer_perception_mocks" if="$(arg spokespersons)"/>
+    <node name="mock_human_attributes" type="human_attributes.py" pkg="spencer_perception_mocks" if="$(arg human_attributes)"/>
+    <node name="mock_social_relations" type="social_relations.py" pkg="spencer_perception_mocks" if="$(arg social_relations)"/>
+    <node name="mock_tracked_groups" type="tracked_groups.py" pkg="spencer_perception_mocks" if="$(arg tracked_groups)"/>
+    <node name="mock_social_activities" type="social_activities.py" pkg="spencer_perception_mocks" if="$(arg social_activities)"/>
+   
+    <node name="mock_driving_robot" type="driving_robot.py" pkg="spencer_perception_mocks" if="$(arg driving_robot)"/>
+
+    <node name="spencer_perception_mocks_rviz" type="rviz" pkg="rviz" if="$(arg visualization)"
+        args="-d $(find spencer_perception_mocks)/launch/visualization.rviz"/>
+</launch>

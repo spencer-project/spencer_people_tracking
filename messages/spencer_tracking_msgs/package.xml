@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>spencer_tracking_msgs</name>
+  <version>0.0.0</version>
+  <description>Messages used for Person Detection and Tracking</description>
+
+  <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
+  <maintainer email="breuers@vision.rwth-aachen.de">Stefan Breuers</maintainer>
+  <maintainer email="beyer@vision.rwth-aachen.de">Lucas Beyer</maintainer>
+  
+  <license>TODO</license>
+  
+  <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
+  <author email="breuers@vision.rwth-aachen.de">Stefan Breuers</author>
+  <author email="beyer@vision.rwth-aachen.de">Lucas Beyer</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  
+  <run_depend>message_runtime</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  
+</package>
