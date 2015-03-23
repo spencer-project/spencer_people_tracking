@@ -1,5 +1,5 @@
-MOCK PERCEPTION COMPONENTS OF THE SPENCER PLATFORM
-==================================================
+Mock perception components of the SPENCER platform
+--------------------------------------------------
 
 The scripts in this package publish dummy data for (almost) all perception components of the SPENCER platform.
 This data can be used for easy testing as long as not all components have been implemented, or just to save
