@@ -1,0 +1,33 @@
+<!-- Use this launch file for SICK LMS200-style sensors with 0.5 deg angular resolution -->
+<launch>
+    <arg name="suffix" default=""/>
+    <arg name="laser" default="laser"/>
+    <arg name="detected_persons" default="detected_persons"/>
+    <arg name="detection_id_increment" default="1"/>
+    <arg name="detection_id_offset" default="0"/>
+    
+    <arg name="min_avg_distance_from_sensor" default="0"/>
+    <arg name="max_avg_distance_from_sensor" default="20"/>
+    <arg name="min_points_per_segment" default="3"/>
+    <arg name="max_points_per_segment" default="50"/>
+
+    <arg name="pose_variance" default="0.2"/>
+    <arg name="adaboost_threshold" default="0.0"/> <!-- decision threshold for the signum function -->
+
+    <include file="$(find srl_laser_detectors)/launch/adaboost_detector_with_ahc.launch">
+        <arg name="model" value="$(find srl_laser_detectors)/models/lms200_0.50deg_height70cm_ahc.adaboost"/>
+        <arg name="suffix" value="$(arg suffix)"/>
+        <arg name="laser" value="$(arg laser)"/>
+        <arg name="detected_persons" value="$(arg detected_persons)"/>
+        <arg name="detection_id_increment" default="$(arg detection_id_increment)"/>
+        <arg name="detection_id_offset" default="$(arg detection_id_offset)"/>
+
+        <arg name="min_avg_distance_from_sensor" value="$(arg min_avg_distance_from_sensor)"/>
+        <arg name="max_avg_distance_from_sensor" value="$(arg max_avg_distance_from_sensor)"/>
+        <arg name="min_points_per_segment" value="$(arg min_points_per_segment)"/>
+        <arg name="max_points_per_segment" value="$(arg max_points_per_segment)"/>
+
+        <arg name="pose_variance" value="$(arg pose_variance)"/>
+        <arg name="adaboost_threshold" value="$(arg adaboost_threshold)"/>
+    </include>
+</launch>

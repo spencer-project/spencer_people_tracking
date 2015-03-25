@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>srl_laser_features</name>
+  <version>1.0.0</version>
+  <description>Features that can be calculated on segments of laser range data, based upon the features described in Matthias Luber's PhD thesis</description>
+
+  <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
+  
+  <license>BSD</license>
+  
+  <author>Kai O. Arras</author>
+  <author>Matthias Luber</author>
+  <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  
+</package>

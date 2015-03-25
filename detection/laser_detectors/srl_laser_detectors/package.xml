@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>srl_laser_detectors</name>
+  <version>1.0.0</version>
+  <description>Person detectors for laser range data</description>
+
+  <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
+  
+  <license>BSD</license>
+  
+  <author>Matthias Luber</author>
+  <author>Kai O. Arras</author>
+  <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>srl_laser_segmentation</build_depend>
+  <build_depend>srl_laser_features</build_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>spencer_tracking_msgs</build_depend>
+  <build_depend>spencer_diagnostics</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>srl_laser_segmentation</run_depend>
+  <run_depend>srl_laser_features</run_depend>
+  <run_depend>message_filters</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>spencer_tracking_msgs</run_depend>
+  <run_depend>spencer_diagnostics</run_depend>
+  
+</package>

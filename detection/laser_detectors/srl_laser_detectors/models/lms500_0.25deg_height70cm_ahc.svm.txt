@@ -1,0 +1,7 @@
+Test results (detection metrics): 
+ Accuracy=0.914 Precision=0.741 Recall=0.615 F1-Measure=0.672 FP-Rate=0.031
+ TP=463 TN=4319 FP=162 FN=290
+
+
+Trained on rathausgasse.log (kindercar_2013-10-01-18-46-41)
+using default parameters, RBF kernel (note that linear kernel didn't work well at all)

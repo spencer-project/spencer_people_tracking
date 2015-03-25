@@ -1,0 +1,8 @@
+Test results (detection metrics): 
+ Accuracy=0.918 Precision=0.794 Recall=0.626 F1-Measure=0.700 FP-Rate=0.025
+ TP=531 TN=4581 FP=138 FN=317
+
+Testing took 1204 ms
+
+Trained on rathausgasse.log (kindercar_2013-10-01-18-46-41)
+Only 50 weak classifiers instead of 500 (leads to lower recall)

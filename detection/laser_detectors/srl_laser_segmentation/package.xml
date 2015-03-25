@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>srl_laser_segmentation</name>
+  <version>1.0.0</version>
+  <description>Messages and algorithms + ROS nodes for segmentation and annotation of laserscans</description>
+
+  <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
+  
+  <license>BSD</license>
+  
+  <author>Matthias Luber</author>
+  <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+
+  <run_depend>message_runtime</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>spencer_tracking_msgs</run_depend>
+
+</package>

@@ -1,0 +1,8 @@
+Test results (detection metrics): 
+ Accuracy=0.943 Precision=0.891 Recall=0.757 F1-Measure=0.819 FP-Rate=0.016
+ TP=1499 TN=9489 FP=183 FN=480
+
+Testing took 462 ms (11651 test segments)
+NOTE: This is about 5x faster than Adaboost at 0.25 deg angular resolution!
+
+Trained on fr_mainstation1_cut.lab dataset (first 20.000 positive class samples)
