@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/cudaHOG
+
+Name: cudaHOG
+Description: A library used to detect pedestrians by analising rgba images.
+Version: 1.1_b
+Cflags: -I${includedir}
+Libs: -L${libdir} -lcudaHOG
+

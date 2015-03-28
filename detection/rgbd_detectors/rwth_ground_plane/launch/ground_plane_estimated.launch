@@ -1,0 +1,15 @@
+<launch>
+    <arg name="config_file" default="$(find rwth_ground_plane)/config/config_Asus.inp" />
+    <arg name="queue_size" default="5" />
+    <arg name="camera_namespace" default="/head_xtion" />
+    <arg name="ground_plane" default="/ground_plane" />
+
+
+    <node pkg="rwth_ground_plane" type="ground_plane_estimated" name="ground_plane" output="screen">
+        <param name="config_file" value="$(arg config_file)" type="string"/>
+        <param name="queue_size" value="$(arg queue_size)" type="int"/>
+        <param name="camera_namespace" value="$(arg camera_namespace)" type="string"/>
+        <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
+    </node>
+
+</launch> 

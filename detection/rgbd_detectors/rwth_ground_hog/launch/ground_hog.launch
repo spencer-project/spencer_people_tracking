@@ -1,0 +1,15 @@
+<launch>
+    <arg name="model" default="$(find rwth_ground_hog)/model/config" />
+    <arg name="camera_namespace" default="/head_xtion" />
+    <arg name="detections" default="/groundHOG/detections" />
+    <arg name="result_image" default="/groundHOG/image" />
+
+    <node pkg="rwth_ground_hog" type="groundHOG" name="groundHOG" output="screen">
+        <param name="model" value="$(arg model)" type="string"/>
+        <param name="ground_plane" value="" type="string"/>
+        <param name="camera_namespace" value="$(arg camera_namespace)" type="string"/>
+        <param name="detections" value="$(arg detections)" type="string"/>
+        <param name="result_image" value="$(arg result_image)" type="string"/>
+    </node>
+
+</launch> 

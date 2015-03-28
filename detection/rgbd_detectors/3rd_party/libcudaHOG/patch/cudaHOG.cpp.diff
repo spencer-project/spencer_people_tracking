@@ -1,0 +1,28 @@
+--- cudaHOG.cpp	2012-07-10 09:27:01.000000000 +0100
++++ cudaHOG.cpp	2013-08-13 09:50:36.413358001 +0100
+@@ -822,7 +830,10 @@
+ 
+ 	int res = test_image(all_dets);
+ 
+-	detections = all_dets[0];
++    if(all_dets.size() > 0)
++        detections = all_dets[0];
++
++
+ 
+ 	return res;
+ }
+@@ -845,9 +856,10 @@
+ 
+ 	int res =  hog_process_image_multiscale(imgWidth, imgHeight, g_roi, &cntBlocks, &cntSVM, timings, detections);
+ 	release_image();
+-
+-	printf("HOG Blocks: %d\n", cntBlocks);
+-	printf("SVM evaluations: %d\n", cntSVM);
++    if( PRINT_DEBUG_INFO ) {
++        printf("HOG Blocks: %d\n", cntBlocks);
++        printf("SVM evaluations: %d\n", cntSVM);
++    }
+ 
+ 	if( res )
+ 		return 1;

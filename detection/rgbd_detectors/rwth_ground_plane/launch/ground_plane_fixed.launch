@@ -1,0 +1,13 @@
+<launch>
+    <arg name="param_file" default="$(find rwth_ground_plane)/config/fixed_gp.yaml" />
+    <arg name="ptu_state" default="/ptu/state" />
+    <arg name="ground_plane" default="/ground_plane" />
+
+
+    <node pkg="rwth_ground_plane" type="ground_plane_fixed" name="ground_plane" output="screen">
+        <rosparam command="load" file="$(arg param_file)"/>
+        <param name="ptu_state" value="$(arg ptu_state)" type="string"/>
+        <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
+    </node>
+
+</launch> 

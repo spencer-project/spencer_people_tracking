@@ -1,0 +1,12 @@
+<launch>
+    <arg name="param_file" default="$(find rwth_ground_plane)/config/fixed_gp.yaml" />
+    <arg name="ground_plane" default="/ground_plane" />
+    <arg name="rate" default="30.0"/>
+
+    <node pkg="rwth_ground_plane" type="ground_plane_really_fixed" name="ground_plane" output="screen">
+        <rosparam command="load" file="$(arg param_file)"/>
+        <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
+        <param name="rate" value="$(arg rate)"/>
+    </node>
+
+</launch>

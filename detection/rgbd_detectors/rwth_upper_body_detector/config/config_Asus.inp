@@ -1,0 +1,69 @@
+#=====================================
+# Distance Range Accepted Detections
+#=====================================
+distance_range_accepted_detections = 7 # up to what distance detections are kept. All detections after that distance are rejected
+
+#=====================================
+# ROI
+#=====================================
+inc_width_ratio = 0.2
+inc_height_ratio = 0.0
+region_size_threshold = 10
+
+#======================
+# Freespace 
+#======================
+# parameteters for occupancy Map computation
+
+# these parameter define the number of bins for the occupancy histogram
+freespace_scaleZ = 20; 
+freespace_scaleX = 20;
+
+freespace_minX = -3;
+freespace_minZ = 0;
+freespace_maxX = 3;
+freespace_maxZ = 7;
+freespace_threshold = 500
+freespace_max_depth_to_cons = 7
+
+#====================================
+# Detector
+#====================================
+# parameters upper body detector
+evaluation_NMS_threshold_LM = 0.25 # lowering this parameter will reduce the number of false positives! Keep in mind this is distance!
+evaluation_inc_height_ratio = 0.2  # parameter for increasing the size of ROI which is then scanned by the depth template
+
+# <<< these parameters are only relevant if you want to perform multi-scaling, evaluation_nr_scales > 1
+evaluation_stride = 3 
+evaluation_scale_stride = 1.03
+evaluation_nr_scales = 1
+evaluation_inc_cropped_height = 20
+evaluation_greedy_NMS_overlap_threshold = 0.3
+evaluation_greedy_NMS_threshold = 0.25
+# >>>
+
+# scanning corridor, which means for each ROI we scan it with the depth template starting from min_height (in meters) for up to max_height
+max_height = 2.1
+min_height = 1.0
+
+#======================
+# World scale
+#======================
+WORLD_SCALE = 1.0
+
+#===========================
+# height and width of images
+#===========================
+dImWidth = 640
+dImHeight = 480
+
+#====================================
+# Number of Frames / offset
+#====================================
+numberFrames = 1000000
+nOffset = 0
+
+#====================================
+# Size of Template
+#====================================
+template_size = 30

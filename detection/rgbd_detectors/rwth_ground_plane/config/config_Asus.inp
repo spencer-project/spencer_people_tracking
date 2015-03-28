@@ -1,0 +1,7 @@
+#=======GP-Estimation========================================================================================================================
+nrInter_ransac = 30
+
+# When dropping all 3D points to the ground plane a 2D histogram is build and all bins are rejected 
+# that have at least 500 points - since these bins correspond to objects vertical on the GP 
+numberOfPoints_reconAsObstacle = 500
+
