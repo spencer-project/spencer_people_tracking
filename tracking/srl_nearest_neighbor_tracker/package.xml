@@ -1,0 +1,29 @@
+<package>
+  <name>srl_nearest_neighbor_tracker</name>
+  <version>1.0.0</version>
+  <description>
+    Nearest-neighbor person tracker
+  </description>
+
+  <maintainer email="linder@cs.uni-freiburg.de">Timm Linder</maintainer>
+
+  <license>BSD</license>
+  
+  <author>Timm Linder</author>
+  <author>Fabian Girrbach</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>tf</build_depend>
+  <build_depend>spencer_tracking_msgs</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>tf_conversions</build_depend>
+  <build_depend>spencer_diagnostics</build_depend>
+
+  <run_depend>tf</run_depend>
+  <run_depend>spencer_tracking_msgs</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  <run_depend>tf_conversions</run_depend>
+  <run_depend>spencer_diagnostics</run_depend>
+
+</package>

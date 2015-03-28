@@ -1,0 +1,34 @@
+<!-- 
+Test script for the nearest-neighbor tracker which loads an annotated logfile, visualizes the laser segments, detections and groundtruth tracks,
+and uses detections from a laser detector as an input to the tracker.
+
+Supply a different logfile, if desired, by passing in a filename, e.g.
+roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=123.log
+-->
+<launch>
+    <!-- Optional command-line arguments -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_aspekt1.lab"/>
+    <arg name="rate" default="0.1"/>
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+        <arg name="visualization" value="false"/>
+        <arg name="filename" value="$(arg filename)"/>
+        <arg name="rate" value="$(arg rate)"/>
+    </include>
+
+    <!-- Laser segmentation which serves as an input to the person detector -->
+    <node name="laser_segmentation" type="ahc_segmentation" pkg="srl_laser_segmentation" args="_distance_threshold:=0.4 _linkage:='single'" output="screen"/> 
+    <node name="visualize_segments" type="visualize_segmentation.py" pkg="srl_laser_segmentation" output="screen"/>
+
+    <!-- Person detector -->
+    <node name="laser_detector" type="blob_detector" pkg="srl_laser_detectors" args="_min_points:=4 _max_points:=25 _min_width:=0.2 _max_width:=0.7 _max_range:=20.0 _use_median_for_pose:=true" output="screen">
+        <remap from="detected_persons" to="/spencer/perception/detected_persons"/>
+    </node>
+
+    <!-- The nearest-neighbor tracker itself -->
+    <node name="nnt" type="nnt_node" pkg="srl_nearest_neighbor_tracker" output="screen"/> <!-- launch-prefix="gdb -ex run -args " -->
+
+    <!-- Visualization -->
+    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find srl_nearest_neighbor_tracker)/launch/visualization_with_detector.rviz"/>
+</launch>
