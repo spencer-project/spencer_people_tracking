@@ -1,0 +1,43 @@
+<!-- Fuses front and rear laser by simple aggregation. -->
+<launch>
+    <group ns="/spencer/perception_internal/detected_person_association">
+        <!-- 
+            We need to fuse the following topics, which are already aggregated over front and rear sensor array:
+            - composite/lasers_aggregated
+            - composite/rgbd_upper_body_aggregated
+            - composite/rgbd_ground_hog_aggregated
+        -->
+
+        <!-- Fuse lasers with upper-body. Both have reliable depth estimates, so we can fuse in Euclidean space -->
+        <node name="fuse_lasers_and_rgbd_upper_body" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/EuclideanNNFuserNodelet detected_person_association_nodelet_manager" output="screen">
+            <param name="detection_id_increment" value="20"/>
+            <param name="detection_id_offset" value="11"/>
+            <rosparam param="input_topics">
+                - composite/lasers_aggregated
+                - composite/rgbd_upper_body_aggregated
+            </rosparam>
+            <remap from="output" to="composite/lasers_upper_body_fused"/>
+        </node>
+
+        <!-- Output intermediate fused composites as DetectedPersons for visualization purposes -->
+        <node name="convert_fused_lasers_upper_body_to_detections" type="composite_detections_to_detections.py" pkg="spencer_detected_person_association">
+            <remap from="/spencer/perception/detected_persons_composite" to="composite/lasers_upper_body_fused"/>
+            <remap from="/spencer/perception/detected_persons" to="lasers_upper_body_fused"/>
+        </node>  
+
+        <!-- Fuse result with groundHOG, which has unreliable depth estimates, thus we should fuse in polar space -->
+        <node name="fuse_lasers_upper_body_and_ground_hog" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/PolarNNFuserNodelet detected_person_association_nodelet_manager" output="screen">
+            <param name="detection_id_increment" value="20"/>
+            <param name="detection_id_offset" value="12"/>
+            <param name="fused_radial_weight_for_topic1" value="0.95"/>
+            <param name="fused_radial_weight_for_topic2" value="0.05"/>
+            <rosparam param="input_topics">
+                - composite/lasers_upper_body_fused
+                - composite/rgbd_ground_hog_aggregated
+            </rosparam>
+            <remap from="output" to="composite/lasers_upper_body_ground_hog_fused"/>
+        </node>
+
+    </group>
+
+</launch>

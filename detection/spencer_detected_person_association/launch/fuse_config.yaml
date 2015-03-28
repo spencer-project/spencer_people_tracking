@@ -1,0 +1,46 @@
+### FIXME: It might be better to use a ROS nodelet tree for this!
+### FIXME: First associate e.g. front HOG + laser, afterwards aggregate front & rear! (Otherwise association is more costly, and remember it is O(n²!))
+subscription_method: synchronize_all
+disabled_topic_regex: [ '.*rgbd_rear.*']
+common_frame_id: base_footprint
+inputs:
+#
+# Fuse aggregated HOG and already fused upper-body+laser
+- type: fuse_nn_in_polar_coordinates
+  range_weights: [ 1.0, 100.0 ]  # normalized automatically to sum up to 1.0
+  angular_weights: [ 1.0, 2.0 ]  # used to determine the resulting pose as a weighted average
+  max_arc_distance: 0.4
+  max_range_difference: 3.0  # large tolerance required because HOG depth estimates are sometimes awfully bad
+  inputs:
+  #
+  # Aggregate front+rear HOG
+  - type: aggregate
+    inputs:
+      - type: topic
+        topic: /spencer/perception_internal/detected_persons/rgbd_front_top/hog
+      - type: topic
+        topic: /spencer/perception_internal/detected_persons/rgbd_rear_top/hog
+  #
+  # Fuse laser and upper-body
+  - type: fuse_nn_in_polar_coordinates
+    range_weights: [ 3.0, 1.0 ]
+    angular_weights: [ 1.0, 1.0 ]
+    max_arc_distance: 0.4
+    max_range_difference: 0.4
+    inputs:
+    #
+    # Aggregate front+rear laser
+    - type: aggregate
+      inputs:
+        - type: topic
+          topic: /spencer/perception_internal/detected_persons/laser_front
+        - type: topic
+          topic: /spencer/perception_internal/detected_persons/laser_rear
+    #
+    # Aggregate front+rear upper-body
+    - type: aggregate
+      inputs:
+        - type: topic
+          topic: /spencer/perception_internal/detected_persons/rgbd_front_top/upper_body
+        - type: topic
+          topic: /spencer/perception_internal/detected_persons/rgbd_rear_top/upper_body

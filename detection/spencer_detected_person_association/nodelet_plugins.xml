@@ -1,0 +1,31 @@
+<library path="lib/libspencer_detected_person_association">
+    <class name="spencer_detected_person_association/AggregateDetectionsNodelet" type="spencer_detected_person_association::AggregateDetectionsNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Aggregates multiple spencer_tracking_msgs/CompositeDetectedPerson input messages into a joint spencer_tracking_msgs/CompositeDetectedPerson output message without
+            performing any data association. Thus assumes that the sensor fields of the individual input messages are non-overlapping.
+        </description>
+    </class>
+
+    <class name="spencer_detected_person_association/EuclideanNNFuserNodelet" type="spencer_detected_person_association::EuclideanNNFuserNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Fuses multiple spencer_tracking_msgs/CompositeDetectedPersons messages into a joint spencer_tracking_msgs/CompositeDetectedPerson message
+            by associating detections received on different topics based upon their distance to each other, using Euclidean distance in X, Y.
+            The input messages must be in the same coordinate frame (header.frame_id), which can be ensured via ConvertToCompositeDetectionsNodelet.
+        </description>
+    </class>
+
+    <class name="spencer_detected_person_association/PolarNNFuserNodelet" type="spencer_detected_person_association::PolarNNFuserNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Fuses multiple spencer_tracking_msgs/CompositeDetectedPersons messages into a joint spencer_tracking_msgs/CompositeDetectedPerson message
+            by associating detections received on different topics based upon their angular and radial distances in polar space.
+            The input messages must be in the same coordinate frame (header.frame_id), which can be ensured via ConvertToCompositeDetectionsNodelet.
+        </description>
+    </class>
+
+    <class name="spencer_detected_person_association/ConvertToCompositeDetectionsNodelet" type="spencer_detected_person_association::ConvertToCompositeDetectionsNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Converts spencer_tracking_msgs/DetectedPersons messages into spencer_tracking_msgs/CompositeDetectedPerson messages,
+            optionally transforming the pose into a common coordinate frame.
+        </description>
+    </class>
+</library>

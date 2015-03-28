@@ -1,0 +1,29 @@
+<!-- Fuses front and rear high-recall (low-confidence) laser detectors by simple aggregation. -->
+<launch>
+    <arg name="common_frame_id" default="base_footprint"/>
+
+    <group ns="/spencer/perception_internal/detected_person_association">
+        <!-- Convert DetectedPersons topics into CompositeDetectedPersons, and transform poses into common coordinate frame -->
+        <node name="convert_to_composite_laser_front_high_recall" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/ConvertToCompositeDetectionsNodelet detected_person_association_nodelet_manager" output="screen">
+            <remap from="input" to="/spencer/perception_internal/detected_persons/laser_front_high_recall"/>
+            <remap from="output" to="composite/laser_front_high_recall"/>
+            <param name="common_frame_id" value="$(arg common_frame_id)"/>
+        </node>
+
+        <node name="convert_to_composite_laser_rear_high_recall" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/ConvertToCompositeDetectionsNodelet detected_person_association_nodelet_manager" output="screen">
+            <remap from="input" to="/spencer/perception_internal/detected_persons/laser_rear_high_recall"/>
+            <remap from="output" to="composite/laser_rear_high_recall"/>
+            <param name="common_frame_id" value="$(arg common_frame_id)"/>
+        </node> 
+
+        <!-- Aggregate front and rear lasers -->
+        <node name="aggregate_high_recall_lasers" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/AggregateDetectionsNodelet detected_person_association_nodelet_manager" output="screen">
+            <rosparam param="input_topics">
+                - composite/laser_front_high_recall
+                - composite/laser_rear_high_recall
+            </rosparam>
+            <remap from="output" to="composite/lasers_high_recall_aggregated"/>
+        </node>
+    </group>
+
+</launch>

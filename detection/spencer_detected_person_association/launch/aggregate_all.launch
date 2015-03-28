@@ -1,0 +1,26 @@
+<launch>
+    <arg name="rgbd" default="true"/>
+
+    <!-- Nodelet manager for all detected person association-related nodelets -->
+    <group ns="/spencer/perception_internal/detected_person_association">
+        <node name="detected_person_association_nodelet_manager" pkg="nodelet" type="nodelet" args="manager" output="screen" required="true"/>
+    </group>
+
+    <!-- FIXME: First associate e.g. front HOG + laser, afterwards aggregate front & rear! (Otherwise association is more costly, and remember it is O(n²!)) -->
+    <!-- That also allows to spread the association load across two laptops -->
+
+    <!-- Aggregate laser detections -->
+    <include file="$(find spencer_detected_person_association)/launch/aggregate_lasers.launch"/>
+
+    <!-- Aggregate high-recall laser detectors -->
+    <include file="$(find spencer_detected_person_association)/launch/aggregate_high_recall_lasers.launch"/>
+
+    
+    <!-- Aggregate RGB-D detections (optional) -->
+    <group if="$(arg rgbd)">
+        <include file="$(find spencer_detected_person_association)/launch/aggregate_rgbd_upper_body.launch"/>
+        <include file="$(find spencer_detected_person_association)/launch/aggregate_rgbd_ground_hog.launch"/>
+    </group>
+
+
+</launch>

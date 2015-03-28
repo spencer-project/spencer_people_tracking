@@ -1,0 +1,30 @@
+<!-- Fuses front and rear RGB-D upper body detections by simple aggregation. -->
+<launch>
+    <arg name="common_frame_id" default="base_footprint"/>
+    
+    <group ns="/spencer/perception_internal/detected_person_association">
+        <!-- Convert DetectedPersons topics into CompositeDetectedPersons, and transform poses into common coordinate frame -->
+        <node name="convert_to_composite_rgbd_upper_body_front" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/ConvertToCompositeDetectionsNodelet detected_person_association_nodelet_manager" output="screen">
+            <remap from="input" to="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/>
+            <remap from="output" to="composite/rgbd_upper_body_front"/>
+            <param name="common_frame_id" value="$(arg common_frame_id)"/>
+        </node>
+
+        <node name="convert_to_composite_rgbd_upper_body_rear" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/ConvertToCompositeDetectionsNodelet detected_person_association_nodelet_manager" output="screen">
+            <remap from="input" to="/spencer/perception_internal/detected_persons/rgbd_rear_top/upper_body"/>
+            <remap from="output" to="composite/rgbd_upper_body_rear"/>
+            <param name="common_frame_id" value="$(arg common_frame_id)"/>
+        </node> 
+
+        <!-- Aggregate front and rear lasers -->
+        <node name="aggregate_rgbd_upper_body" pkg="nodelet" type="nodelet" args="load spencer_detected_person_association/AggregateDetectionsNodelet detected_person_association_nodelet_manager" output="screen">
+            <rosparam param="input_topics">
+                - composite/rgbd_upper_body_front
+                - composite/rgbd_upper_body_rear
+            </rosparam>
+            <remap from="output" to="composite/rgbd_upper_body_aggregated"/>
+        </node>
+
+    </group>
+
+</launch>
