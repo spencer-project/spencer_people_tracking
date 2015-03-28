@@ -41,22 +41,22 @@ For detection-to-detection fusion, we have implemented a series of nodelets whic
 
 ![Example multi-modal people tracking architecture](/../screenshots/screenshots/multimodal-architecture.png?raw=true "Example multi-modal people tracking architecture")
 
-In case of detection-to-track fusion (currently not implemented), it is still advisable to publish a [CompositeDetectedPerson](/master/messages/spencer_tracking_msgs/msg/CompositeDetectedPerson.msg) message (via [CompositeDetectedPersons](/master/messages/spencer_tracking_msgs/msg/CompositeDetectedPersons.msg)) for each set of detections associated with a track, such that later on it is possible to go back to the original detections from a track, and lookup associated image bounding boxes etc. via the associated detection_id.
+In case of detection-to-track fusion (currently not implemented), it is still advisable to publish a [CompositeDetectedPerson](/messages/spencer_tracking_msgs/msg/CompositeDetectedPerson.msg) message (via [CompositeDetectedPersons](/messages/spencer_tracking_msgs/msg/CompositeDetectedPersons.msg)) for each set of detections associated with a track, such that later on it is possible to go back to the original detections from a track, and lookup associated image bounding boxes etc. via the associated detection_id.
 
 ##### Person and group tracking
-For person and group tracking, we currently provide exemplary code based upon a nearest-neighbor standard filter data association, which is robust enough in most use cases (especially if multi-modal detectors are being used). The [person tracker](/tracking/persons/srl_nearest_neighbor_tracker) has been enhanced with a track initiation logic and 4 different IMM-based motion models (constant velocity with low process noise, high process noise, coordinated turn and Brownian motion) to make tracking more robust. The [group tracker](/tracking/groups/spencer_group_tracking) relies on [social/spatial relations](/tracking/groups/spencer_social_relations) determined via the same coherent motion indicator features as described in [1].
+For person and group tracking, we currently provide exemplary code based upon a nearest-neighbor standard filter data association, which is robust enough in most use cases (especially if multi-modal detectors are being used). The [person tracker](/tracking/people/srl_nearest_neighbor_tracker) has been enhanced with a track initiation logic and 4 different IMM-based motion models (constant velocity with low process noise, high process noise, coordinated turn and Brownian motion) to make tracking more robust. The [group tracker](/tracking/groups/spencer_group_tracking) relies on [social/spatial relations](/tracking/groups/spencer_social_relations) determined via the same coherent motion indicator features as described in [1].
 
 Internally, we have already integrated more advanced methods, including a track-oriented multi-hypothesis person tracker [2], and a hypothesis-oriented multi-model multi-hypothesis person and group tracker [1]. These components use exactly the same ROS message definitions, however, they are not yet publicly available. The components available here were originally implemented as baseline methods for comparison.
 
 ##### Filtering of tracked persons & tracking metrics
 
-The [spencer_tracking_utils](/tracking/persons/spencer_tracking_utils) package contains a number of standalone ROS nodes that can filter an incoming set of [TrackedPerson](/messages/spencer_tracking_msgs/msg/TrackedPerson.msg) messages based upon different criteria, e.g. distance to the sensor/robot, visually confirmed tracks only, etc.
+The [spencer_tracking_utils](/tracking/people/spencer_tracking_utils) package contains a number of standalone ROS nodes that can filter an incoming set of [TrackedPerson](/messages/spencer_tracking_msgs/msg/TrackedPerson.msg) messages based upon different criteria, e.g. distance to the sensor/robot, visually confirmed tracks only, etc.
 
-In [spencer_tracking_metrics](/tracking/persons/spencer_tracking_metrics), we have wrapped publicly available implementations of different tracking metrics, such as CLEAR-MOT and OSPA, such that they are compatible with our message definitions. These are useful for evaluating tracking performance for a given groundtruth.
+In [spencer_tracking_metrics](/tracking/people/spencer_tracking_metrics), we have wrapped publicly available implementations of different tracking metrics, such as CLEAR-MOT and OSPA, such that they are compatible with our message definitions. These are useful for evaluating tracking performance for a given groundtruth.
 
 ##### Visualization
 
-The [srl_tracking_exporters](/visualization/srl_tracking_exporters) package contains a useful Python script for rendering track trajectories, detections and robot odometry from a 2D top-down perspective as scalable vector graphics (SVGs). These can optionally be animated to visualize the evolution of one or multiple tracks over time.
+The [srl_tracking_exporter](/visualization/srl_tracking_exporter) package contains a useful Python script for rendering track trajectories, detections and robot odometry from a 2D top-down perspective as scalable vector graphics (SVGs). These can optionally be animated to visualize the evolution of one or multiple tracks over time.
 
 One major highlight of our framework is a reusable and highly configurable set of [custom RViz plugins](/visualization/spencer_tracking_rviz_plugin) for the visualization of:
 - Detected persons
@@ -120,7 +120,7 @@ As we currently do not yet provide any pre-built Debian packages, we suggest to 
 
 ##### Note on CUDA SDK for the groundHOG detector
 
-The cudaHOG library used by the groundHOG detector requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/master/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
+The cudaHOG library used by the groundHOG detector requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
 
 
 #### Credits, license & how to cite
