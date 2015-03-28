@@ -7,11 +7,11 @@ find_package(catkin REQUIRED COMPONENTS rospy roscpp message_filters spencer_tra
 FIND_PACKAGE(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
-add_service_files(
-  FILES
-  LookupTrackId.srv
-  LookupTrackIds.srv
-)
+#add_service_files(
+#  FILES
+#  LookupTrackId.srv
+#  LookupTrackIds.srv
+#)
 
 #catkin_python_setup()
 
