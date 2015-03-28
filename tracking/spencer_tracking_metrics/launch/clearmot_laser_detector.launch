@@ -1,0 +1,39 @@
+<launch>
+    <!-- NOTE: People tracker must be run manually on standard topics. -->
+    <!-- E.g. roslaunch spencer_people_tracking_launch people_tracking.launch -->
+
+    <param name="/use_sim_time" value="true"/>
+
+    <arg name="bagfile"/>
+    <arg name="playback_rate" default="0.3"/>
+    <arg name="max_distance" default="10.0"/> <!-- should set online_detection to true for this, or use same value as used for offline detections in bagfile -->
+
+    <arg name="online_detection" default="false"/> <!-- if true, do not use detections from bagfile -->
+    <arg name="adaboost_model" default="lms200"/>
+
+    <node name="rosbag_play" type="play" pkg="rosbag" args="$(arg bagfile) -r $(arg playback_rate) --clock --pause" output="screen">
+        <remap from="/spencer/perception/detected_persons" to="/unused/detected_persons_from_bagfile" if="$(arg online_detection)"/>
+        <remap from="/spencer/perception_internal/detected_person_association/lasers_fused_high_recall" to="/unused/lasers_fused_high_recall_from_bagfile" if="$(arg online_detection)"/>
+    </node>
+
+    <node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen">
+        <param name="approximate_sync" value="true"/>
+        <param name="sync_slop" value="0.05"/> <!-- inversely proportional to frame rate of detector on used bagfile -->
+        <param name="syncQueueSize" value="500"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="matching_threshold" value="1.0"/>
+        <remap from="/groundtruth" to="/tracks_with_simulated_occlusions"/>
+    </node>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch" if="$(arg online_detection)">
+        <arg name="adaboost_model" value="$(arg adaboost_model)"/>
+        <arg name="laser_max_distance" value="$(arg max_distance)"/>
+    </include>
+
+    <include file="$(find spencer_tracking_utils)/launch/simulate_occluded_tracks_via_lasers.launch">
+        <arg name="max_distance" value="$(arg max_distance)"/>
+        <arg name="input_tracks" value="/pedsim_to_spencer/tracked_persons"/>
+        <arg name="output_tracks" value="/tracks_with_simulated_occlusions"/>
+    </include>
+
+</launch>

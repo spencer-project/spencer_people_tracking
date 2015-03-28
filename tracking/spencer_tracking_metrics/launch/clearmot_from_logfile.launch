@@ -1,0 +1,42 @@
+<launch>
+    <!-- NOTE: People tracker must be run manually on standard topics. -->
+    <!-- E.g. roslaunch spencer_people_tracking_launch people_tracking.launch -->
+
+    <param name="/use_sim_time" value="true"/>
+
+    <arg name="playback_rate" default="1.0"/>
+    <arg name="max_distance" default="10.0"/> <!-- should set online_detection to true for this, or use same value as used for offline detections in bagfile -->
+
+    <arg name="online_detection" default="true"/> <!-- if true, do not use detections from bagfile -->
+    <arg name="adaboost_model" default="lms200"/>
+    <arg name="rear" default="false"/>
+
+    <arg name="fixed_sensor" default="true"/>
+
+    <remap from="/laser" to="/spencer/sensors/laser_front/echo0"/>
+    
+    <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+        <arg name="filename" value="/home/linder/Datasets/old/fr_mainstation1_cut_trimmed.lab"/>
+        <arg name="visualization" value="false"/>
+        <arg name="rate" value="$(arg playback_rate)"/>
+        <arg name="timing_mode" value="0"/>
+    </include>
+
+    <node name="tf_odom_base_footprint" if="$(arg fixed_sensor)" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 odom base_footprint 1"/>
+
+    <node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen">
+        <param name="approximate_sync" value="true"/>
+        <param name="sync_slop" value="0.05"/> <!-- inversely proportional to frame rate of detector on used bagfile -->
+        <param name="syncQueueSize" value="100"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="matching_threshold" value="1.0"/>
+        <remap from="/groundtruth" to="/groundtruth/tracked_persons"/>
+    </node>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch" if="$(arg online_detection)">
+        <arg name="rear" value="$(arg rear)"/>
+        <arg name="adaboost_model" value="$(arg adaboost_model)"/>
+        <arg name="laser_max_distance" value="$(arg max_distance)"/>
+    </include>
+
+</launch>

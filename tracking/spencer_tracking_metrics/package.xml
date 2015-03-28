@@ -1,0 +1,29 @@
+<package>
+  <name>spencer_tracking_metrics</name>
+  <version>0.0.1</version>
+  <description>
+     Wrappers for CLEAR MOT and OSPA (multi-object tracking) metrics which use the SPENCER message definitions
+  </description>
+
+  <maintainer email="linder@cs.uni-freiburg.de">Timm Linder</maintainer>
+
+  <license>TODO</license>
+  
+  <author>Timm Linder</author>
+  <author>Fabian Girrbach</author>
+  <author>Other authors (for actual CLEAR MOT and OSPA implementations)</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>spencer_tracking_msgs</build_depend>
+
+  <run_depend>rospy</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>message_filters</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>spencer_tracking_msgs</run_depend>
+</package>
