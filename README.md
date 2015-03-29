@@ -106,11 +106,19 @@ Videos of the people detection and tracking system in action can be found on the
 - [Group Guidance Scenario Prototype](https://www.youtube.com/watch?v=V5PYFf9A-PU) (2D laser only)
 - ... (more to come soon!)
 
+#### Runtime performance
+
+On the SPENCER robot platform, which is equipped with front and rear RGB-D sensors (Asus Xtion Pro Live) and two SICK LMS500 laser scanners, we distributed the people and group detection & tracking system over two high-end gaming laptops (Intel Core i7-4700MQ, nVidia GeForce 765M). The detectors for the frontal sensors were executed on one laptop along with the detection-fusion pipeline. The detectors for the rear-facing sensors and the people and group tracking modules were executed on the second laptop. Both laptops were connected with each other and the rest of the platform via gigabit ethernet.
+
+With this configuration, the components run in real-time at 20-25 Hz (with visualization off-loaded to a separate computer), even in crowded environments where more than 30 persons are concurrently visible.
+
 #### Installation
 
-The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo. We recommend installation of ROS and the required depencencies of our components via:
+The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo.
 
 ##### Required dependencies
+
+We recommend installation of ROS and the required depencencies of our components via:
 
 ###### Using ROS Hydro on Ubuntu 12.04 (Precise)
 
