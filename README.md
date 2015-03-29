@@ -57,6 +57,10 @@ The [spencer_tracking_utils](/tracking/people/spencer_tracking_utils) package co
 
 In [spencer_tracking_metrics](/tracking/people/spencer_tracking_metrics), we have wrapped publicly available implementations of different tracking metrics, such as CLEAR-MOT and OSPA, such that they are compatible with our message definitions. These are useful for evaluating tracking performance for a given groundtruth.
 
+##### Import of old annotated logfiles
+
+The [srl_tracking_logfile_import](/tracking/people/srl_tracking_logfile_import) package provides a Python script for importing old 2D laserscan logfiles in CARMEN format that have been annotated with groundtruth person tracks, such as [these datasets](http://www2.informatik.uni-freiburg.de/~luber/people_tracker/logfiles/logfiles.html).
+
 ##### Visualization
 
 The [srl_tracking_exporter](/visualization/srl_tracking_exporter) package contains a useful Python script for rendering track trajectories, detections and robot odometry from a 2D top-down perspective as scalable vector graphics (SVGs). These can optionally be animated to visualize the evolution of one or multiple tracks over time.
@@ -111,12 +115,12 @@ The people and group detection and tracking framework has been tested on Ubuntu 
 ###### Using ROS Hydro on Ubuntu 12.04 (Precise)
 
     sudo apt-get install ros-hydro-desktop-full
-    sudo apt-get install libeigen3-dev libsvm-dev ros-hydro-openni-launch ros-hydro-openni2-launch ros-hydro-cmake-modules 
+    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-hydro-openni-launch ros-hydro-openni2-launch ros-hydro-cmake-modules ros-hydro-eigen-conversions
 
 ###### Using ROS Indigo on Ubuntu 14.04 (Trusty)
 
     sudo apt-get install ros-indigo-desktop-full
-    sudo apt-get install libeigen3-dev libsvm-dev ros-indigo-openni-launch ros-indigo-openni2-launch ros-indigo-cmake-modules 
+    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-indigo-openni-launch ros-indigo-openni2-launch ros-indigo-cmake-modules ros-indigo-eigen-conversions
 ##### Building our ROS packages
 
 As we currently do not yet provide any pre-built Debian packages, we suggest to [create a new catkin workspace](http://wiki.ros.org/catkin/workspaces) for our framework, and then clone the content of this repository into the `src` folder of this new workspace. Then, build the workspace using the normal methods (catkin_make / catkin build).
