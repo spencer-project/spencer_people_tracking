@@ -114,9 +114,11 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 #### Installation
 
-The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo. We recommend installation of ROS and the required depencencies of our components via:
+The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo.
 
 ##### Required dependencies
+
+We recommend installation of ROS and the required depencencies of our components via:
 
 ###### Using ROS Hydro on Ubuntu 12.04 (Precise)
 
