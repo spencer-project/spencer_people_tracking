@@ -10,7 +10,7 @@
 
 The aim of the EU FP7 research project SPENCER is to develop algorithms for service robots that can guide groups of people through highly dynamic and crowded pedestrian environments, such as airports or shopping malls, while behaving in a socially compliant manner by e.g. not crossing in between families or couples. Exemplary situations that such a robot could encounter are visualized in below image on the right. To this end, robust and computationally efficient components for the perception of humans in the robot's surroundings need to be developed.
 
-![SPENCER Use-Case](/../screenshots/screenshots/spencer-use-case-2.jpg?raw=true "SPENCER Use-Case") &nbsp;&nbsp;&nbsp; ![SPENCER Use-Case](/../screenshots/screenshots/use-case-1-bw.png?raw=true "SPENCER Use-Case")
+![SPENCER Use-Case](/../screenshots/screenshots/spencer-use-case-2.jpg?raw=true "SPENCER Use-Case") &nbsp;&nbsp; ![SPENCER Use-Case](/../screenshots/screenshots/use-case-1-bw.png?raw=true "SPENCER Use-Case")
 
 
 #### Architecture
