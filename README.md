@@ -25,7 +25,10 @@ The entire communication between different stages of our pipeline occurs via ROS
 
 ##### Message definitions
 
-We provide a set of reusable ROS message type definitions, which we have successfully applied across various people detection and tracking scenarios, over different sensor modalities and tracking approaches. Most relevant messages can be found inside the [spencer_tracking_msgs](/messages/spencer_tracking_msgs) package. We highly encourage reuse of these messages to benefit from our rich infrastructure of detection, tracking, filtering and visualization components.
+We provide a set of reusable ROS message type definitions, which we have successfully applied across various people detection and tracking scenarios, over different sensor modalities and tracking approaches. Most relevant messages can be found inside the [spencer_tracking_msgs](/messages/spencer_tracking_msgs) package. 
+
+We highly encourage reuse of these messages to benefit from our rich infrastructure of detection, tracking, filtering and visualization components! Existing detection and tracking algorithms can often easily be integrated by publishing additional messages in our format, or by writing a simple C++ or Python node that converts between message formats.
+
 
 ##### People detection
 
