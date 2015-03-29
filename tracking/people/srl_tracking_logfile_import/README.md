@@ -24,4 +24,4 @@ The resulting `TrackedPersons` messages can then, for instance, be used as a gro
 
 ##### Credits
 
-(C)2014-2015 Timm Linder, Social Robotics Laboratory, University of Freiburg
+©2014-2015 Timm Linder, Social Robotics Laboratory, University of Freiburg
