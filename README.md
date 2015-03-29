@@ -1,5 +1,5 @@
 ### SPENCER Multi-Modal People Detection & Tracking Framework
-###### Multi-modal ROS-based people detection and tracking framework for mobile robots developed within the context of the EU FP7 project [SPENCER](http://www.spencer.eu).
+###### Multi-modal ROS-based people and group detection & tracking framework for mobile robots developed within the context of the EU FP7 project [SPENCER](http://www.spencer.eu).
 
 ![Tracked persons projected into the front RGB-D camera](/../screenshots/screenshots/full-system-3-front-cam-edited.png?raw=true "Tracked persons projected into the front RGB-D camera")
 
