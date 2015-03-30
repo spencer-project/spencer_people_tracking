@@ -1,0 +1,73 @@
+analyzers:
+  battery:
+    type: diagnostic_aggregator/GenericAnalyzer
+    path: Battery
+    startswith: battery
+    timeout: 120
+
+  computers:
+    type: diagnostic_aggregator/AnalyzerGroup
+    path: Computers
+    analyzers:
+      cpu:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: PC1
+        expected: ['pc1 CPU Temperature',
+                   'pc1 CPU Usage']
+
+  drive_system:
+    type: diagnostic_aggregator/AnalyzerGroup
+    path: Drive system
+    analyzers:
+      software_emergency_stop:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Software emergency stop
+        expected: 'driving_controller/software_emergency_stop'
+        remove_prefix: driving_controller
+      ant:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: ANT
+        startswith: driving_controller/ant
+        find_and_remove_prefix: driving_controller ant
+      timeouts:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Timeouts
+        startswith: driving_controller/timeouts
+        find_and_remove_prefix: driving_controller timeouts
+      wheel_encoders:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Wheel encoders
+        startswith: driving_controller/wheel_encoders
+        find_and_remove_prefix: driving_controller wheel_encoders
+      topics:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Topics
+        regex: 'driving_controller.*topic.*'
+
+  collision_checker:
+    type: diagnostic_aggregator/AnalyzerGroup
+    path: Collision checks
+    analyzers:
+      laser:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Laser
+        startswith: laser_collision_checker
+
+  perception:
+    type: diagnostic_aggregator/AnalyzerGroup
+    path: Perception
+    analyzers:
+      detection_topics:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Person detectors
+        regex: '.*spencer/perception_internal/detected_persons.*topic.*'
+        remove_prefix:
+          - 'spencer perception_internal people_detection laser_front laser_detector:  spencer perception_internal detected_persons '
+          - 'spencer perception_internal people_detection rgbd_front_top groundHOG:  spencer perception_internal detected_persons '
+          - 'spencer perception_internal people_detection rgbd_front_top upper_body_detector:  spencer perception_internal detected_persons '
+      tracking_topics:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: People tracking
+        regex: '.*spencer/perception/tracked_persons.*topic.*'
+        remove_prefix:
+          - 'srl_nearest_neighbor_tracker:  spencer perception '

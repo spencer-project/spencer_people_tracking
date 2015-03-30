@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>spencer_diagnostics</name>
+  <version>0.0.1</version>
+  <description>
+    Easy-to-use diagnostic tools (e.g. MonitoredPublisher) that publish diagnostic_msgs/DiagnosticArray messages which can be processed
+    by diagnostic_aggregator and displayed by rqt_runtime_monitor or rqt_robot_monitor.
+  </description>
+
+  <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
+  <license>BSD</license>
+
+  <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>diagnostic_updater</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>diagnostic_updater</run_depend>
+
+</package>
