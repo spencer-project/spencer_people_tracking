@@ -1,0 +1,42 @@
+<launch>
+    <arg name="upper_body" default="true"/>
+    <arg name="hog" default="true"/>
+    <arg name="publish_gp" default="false"/>
+
+    <arg name="detection_id_increment" default="20"/>
+
+    <group ns="/spencer/perception_internal/people_detection">
+
+        <!-- RWTH fixed groundplane -->
+        <include file="$(find rwth_ground_plane)/launch/ground_plane_really_fixed.launch" if="$(arg publish_gp)">
+            <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane"/>
+            <arg name="rate" value="30.0"/> <!-- limits how fast upper-body and HOG detector can run -->     
+        </include>
+
+        <!-- Front RGB-D upper body -->
+        <include file="$(find rwth_upper_body_detector)/launch/upper_body_detector.launch" ns="rgbd_rear_top" if="$(arg upper_body)">
+            <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/rgbd_rear_top/upper_body"/>
+            <arg name="camera_namespace" value="/spencer/sensors/rgbd_rear_top"/>
+            <arg name="upper_body_detections" value="upper_body_detector/detections" />
+            <arg name="upper_body_bb_centres" value="upper_body_detector/bounding_box_centres" />
+            <arg name="upper_body_image" value="image" />
+            <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane" />
+            <arg name="detection_id_offset" value="5"/>
+            <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
+        </include>
+
+        <!-- Front RGB-D HOG -->
+        <include file="$(find rwth_ground_hog)/launch/ground_hog_with_GP.launch" ns="rgbd_rear_top" if="$(arg hog)">
+            <arg name="world_scale" value="0.001"/>
+            <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/rgbd_rear_top/hog"/>
+            <arg name="camera_namespace" value="/spencer/sensors/rgbd_rear_top"/>
+            <arg name="detections" value="hog/detections" />
+            <arg name="result_image" value="hog/image" />
+            <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane" />
+            <arg name="detection_id_offset" value="6"/>
+            <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
+        </include>
+       
+    </group>
+
+</launch>

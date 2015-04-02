@@ -1,0 +1,94 @@
+<launch>
+
+    <group ns="/spencer/perception_internal/people_tracking/post_processing/">
+
+        <!-- Fix orientation of non-moving targets (assume previous orientation while it was still moving, or face towards sensor if unknown) -->
+        <node name="fix_orientation_of_non_moving_targets" pkg="spencer_tracking_utils" type="fix_orientation_of_non_moving_targets">
+            <param name="min_required_avg_velocity" value="0.15"/>
+            <remap from="input_tracks" to="/spencer/perception/tracked_persons"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+        </node>
+
+        <!-- Filter out non-moving targets -->
+        <node name="filter_non_moving_targets" pkg="spencer_tracking_utils" type="filter_non_moving_targets">
+            <param name="num_frames_to_observe" value="12"/>
+            <param name="max_timespan_to_observe" value="10.0"/>
+            <param name="min_required_avg_velocity" value="0.35"/>
+            <param name="delete_unseen_tracks_after_num_frames" value="15"/>
+            <remap from="input_tracks" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_moving"/>
+        </node>
+
+        <!-- Filter tracks which have been confirmed by HOG -->
+        <node name="filter_tracks_confirmed_by_HOG" pkg="spencer_tracking_utils" type="filter_visually_confirmed_tracks">
+            <rosparam param="min_matches_per_modality">
+                mono: 10
+            </rosparam>
+            <remap from="input_tracks" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_confirmed_by_HOG"/>
+            <remap from="composite_detected_persons" to="/spencer/perception/detected_persons_composite"/>
+        </node>
+
+        <!-- Filter tracks which have been confirmed by RGB-D (upper-body detector) -->
+        <node name="filter_tracks_confirmed_by_upper_body" pkg="spencer_tracking_utils" type="filter_visually_confirmed_tracks">
+            <rosparam param="min_matches_per_modality">
+                rgbd: 5
+            </rosparam>
+            <remap from="input_tracks" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_confirmed_by_upper_body"/>
+            <remap from="composite_detected_persons" to="/spencer/perception/detected_persons_composite"/>
+        </node>
+
+        <!-- Filter tracks which have been visually confirmed by ANY visual detector -->
+        <node name="filter_tracked_persons_confirmed_by_HOG_or_upper_body" pkg="spencer_tracking_utils" type="filter_tracks_logically">
+            <param name="logic_op" value="OR"/>
+            <remap from="input_tracks1" to="/spencer/perception/tracked_persons_confirmed_by_HOG"/>
+            <remap from="input_tracks2" to="/spencer/perception/tracked_persons_confirmed_by_upper_body"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body"/>
+        </node>
+
+        <!-- Filter tracks which have NOT been visually confirmed by ANY detector -->
+        <node name="filter_tracked_persons_not_confirmed_by_HOG_or_upper_body" pkg="spencer_tracking_utils" type="filter_tracks_logically">
+            <param name="logic_op" value="XOR"/>
+            <remap from="input_tracks1" to="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body"/>
+            <remap from="input_tracks2" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_not_confirmed_by_HOG_or_upper_body"/>
+        </node>
+
+
+        <!-- Filter tracks which have been visually confirmed by ALL visual detectors -->
+        <node name="filter_tracked_persons_confirmed_by_HOG_and_upper_body" pkg="spencer_tracking_utils" type="filter_tracks_logically">
+            <param name="logic_op" value="AND"/>
+            <remap from="input_tracks1" to="/spencer/perception/tracked_persons_confirmed_by_HOG"/>
+            <remap from="input_tracks2" to="/spencer/perception/tracked_persons_confirmed_by_upper_body"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_confirmed_by_HOG_and_upper_body"/>
+        </node>
+
+        <!-- Filter tracks which have NOT been visually confirmed by ALL detectors -->
+        <node name="filter_tracked_persons_not_confirmed_by_HOG_and_upper_body" pkg="spencer_tracking_utils" type="filter_tracks_logically">
+            <param name="logic_op" value="XOR"/>
+            <remap from="input_tracks1" to="/spencer/perception/tracked_persons_confirmed_by_HOG_and_upper_body"/>
+            <remap from="input_tracks2" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_not_confirmed_by_HOG_and_upper_body"/>
+        </node>
+
+
+        <!-- Filter tracks which have been visually confirmed by ANY detector OR are moving -->
+        <node name="filter_tracked_persons_confirmed_by_HOG_or_upper_body_or_moving" pkg="spencer_tracking_utils" type="filter_tracks_logically">
+            <param name="logic_op" value="OR"/>
+            <remap from="input_tracks1" to="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body"/>
+            <remap from="input_tracks2" to="/spencer/perception/tracked_persons_moving"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body_or_moving"/>
+        </node>
+
+        <!-- Filter tracks which have NOT been visually confirmed by ANY detector OR are moving -->
+        <node name="filter_tracked_persons_not_confirmed_by_HOG_or_upper_body_or_moving" pkg="spencer_tracking_utils" type="filter_tracks_logically">
+            <param name="logic_op" value="XOR"/>
+            <remap from="input_tracks1" to="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body_or_moving"/>
+            <remap from="input_tracks2" to="/spencer/perception/tracked_persons_orientation_fixed"/>
+            <remap from="output_tracks" to="/spencer/perception/tracked_persons_not_confirmed_by_HOG_or_upper_body_or_moving"/>
+        </node>
+
+    </group>
+
+</launch>
