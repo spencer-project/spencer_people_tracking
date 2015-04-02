@@ -47,6 +47,6 @@
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/group_tracking.launch"/> 
 
     <!-- RViz visualization -->
-    <node name="tracking_visualization_rviz" pkg="rviz" type="rviz" args="-d $(find spencer_people_tracking_launch)/rviz/visually-confirmed-tracks.rviz" if="$(arg visualization)"/>
+    <node name="tracking_visualization_rviz" pkg="rviz" type="rviz" args="-d $(find spencer_people_tracking_launch)/rviz/tracking-single-rgbd-sensor.rviz" if="$(arg visualization)"/>
 
 </launch>
