@@ -16,5 +16,5 @@ In contrast to the original implementation in PCL, the following features have b
 
 #### Credits
 
-Original implementation in PCL by Matteo Munaro, IAS Lab, University of Padova.
-ROS wrapper for SPENCER by Timm Linder, Social Robotics Laboratory, University of Freiburg.
+Original implementation in PCL by Matteo Munaro, IAS Lab, University of Padova.  
+ROS wrapper for SPENCER by Timm Linder, Social Robotics Laboratory, University of Freiburg.  
