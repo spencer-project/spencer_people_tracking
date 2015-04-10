@@ -67,14 +67,25 @@ namespace spencer_tracking_rviz_plugin {
         virtual void setMeanCovariance(const Ogre::Vector3& mean, const Ogre::Matrix3& cov) {
             int numberOfPoints;
             double *xs, *ys;
+            double determinant = cov[0][0]*cov[1][1] - cov[1][0]*cov[0][1];
 
-            if(!std::isfinite(cov.Determinant())) {
-                ROS_INFO_STREAM("Covariance matrix has non-finite values in ProbabilityEllipseCovarianceVisual::setMeanCovariance(): " << cov);
+            m_line->clear();
+
+            if(!std::isfinite(determinant)) {
+                ROS_WARN_STREAM_THROTTLE(5.0, "Covariance matrix has non-finite values in ProbabilityEllipseCovarianceVisual::setMeanCovariance(): " << cov);
+                return;
             }
-            else {
+
+            if(std::abs(cov[0][1] - cov[1][0]) > 0.00001)
+            {
+                ROS_WARN_STREAM_THROTTLE(5.0, "Covariance matrix is not symmetric in ProbabilityEllipseCovarianceVisual::setMeanCovariance(): " << cov);
+                return;
+            }
+
+            if(determinant > 0 && cov[0][0] > 0 /* positive definite? */ || std::abs(determinant-0.00001) == 0.0 && (cov[0][0] > 0 || cov[1][1] > 0) /* positive semidefinite? */)
+            {
                 calc_prob_elli_99(mean.x, mean.y, cov[0][0], cov[1][1], cov[0][1], numberOfPoints, xs, ys);
 
-                m_line->clear();
                 m_line->setMaxPointsPerLine(numberOfPoints);
 
                 for(int i = 0; i < numberOfPoints; i++) {
@@ -82,6 +93,10 @@ namespace spencer_tracking_rviz_plugin {
                     m_line->addPoint(vertex);
                 }
             }
+            else {
+                ROS_WARN_STREAM_THROTTLE(5.0, "Covariance matrix is not positive (semi-)definite in ProbabilityEllipseCovarianceVisual::setMeanCovariance(): " << cov);
+            }
+            
         }
 
     private:

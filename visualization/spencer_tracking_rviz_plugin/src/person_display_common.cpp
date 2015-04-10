@@ -56,6 +56,8 @@ PersonDisplayCommonProperties::PersonDisplayCommonProperties(rviz::Display* disp
 
     z_offset = new rviz::FloatProperty( "Z offset", 0.0, "Offset of all visualizations on the z (height) axis", m_display, SLOT(stylesChanged()), this);
 
+    use_actual_z_position = new rviz::BoolProperty( "Use Z position from message", true, "Use Z position from message (otherwise place above ground plane)", z_offset, SLOT(stylesChanged()), this);
+
     m_excluded_person_ids_property = new rviz::StringProperty( "Excluded person IDs", "", "Comma-separated list of person IDs whose visualization should be hidden", m_display, SLOT(stylesChanged()), this );
     m_included_person_ids_property = new rviz::StringProperty( "Included person IDs", "", "Comma-separated list of person IDs whose visualization should be visible. Overrides excluded IDs.", m_display, SLOT(stylesChanged()), this );
 

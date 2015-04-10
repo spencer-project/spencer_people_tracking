@@ -22,8 +22,11 @@ void TrackedPersonsDisplay::onInitialize()
     m_realFixedFrame = "odom";
     QObject::connect(m_commonProperties->style, SIGNAL(changed()), this, SLOT(personVisualTypeChanged()) );
 
-    m_occlusion_alpha_property = new rviz::FloatProperty( "Occlusion alpha", 0.5, "Alpha multiplier for occluded tracks", this, SLOT(stylesChanged()) );
+    m_occlusion_alpha_property = new rviz::FloatProperty( "Occlusion alpha", 0.3, "Alpha multiplier for occluded tracks", this, SLOT(stylesChanged()) );
     m_occlusion_alpha_property->setMin( 0.0 );
+
+    m_missed_alpha_property = new rviz::FloatProperty( "Missed alpha", 0.5, "Alpha multiplier for missed tracks", this, SLOT(stylesChanged()) );
+    m_missed_alpha_property->setMin( 0.0 );
 
     m_history_length_property = new rviz::IntProperty( "History size", 100, "Number of prior track positions to display.", this, SLOT(stylesChanged()));
     m_history_length_property->setMin( 1 );
@@ -35,8 +38,10 @@ void TrackedPersonsDisplay::onInitialize()
 
     m_show_deleted_property   = new rviz::BoolProperty( "Show DELETED tracks", false, "Show tracks which have been marked as deleted", this, SLOT(stylesChanged()));
     m_show_occluded_property  = new rviz::BoolProperty( "Show OCCLUDED tracks", true, "Show tracks which could not be matched to an detection due to sensor occlusion", this, SLOT(stylesChanged()));
+    m_show_missed_property   = new rviz::BoolProperty( "Show MISSED tracks", true, "Show tracks which could not be matched to an detection but should be observable by the sensor", this, SLOT(stylesChanged()));
     m_show_matched_property   = new rviz::BoolProperty( "Show MATCHED tracks", true, "Show tracks which could be matched to an detection", this, SLOT(stylesChanged()));
-    
+
+
     m_render_history_property           = new rviz::BoolProperty( "Render history", true, "Render prior track positions", this, SLOT(stylesChanged()));
     m_render_history_as_line_property   = new rviz::BoolProperty( "History as line", true, "Display history as line instead of dots", this, SLOT(stylesChanged()));
     m_render_person_property            = new rviz::BoolProperty( "Render person visual", true, "Render person visualization", this, SLOT(stylesChanged()));
@@ -49,7 +54,7 @@ void TrackedPersonsDisplay::onInitialize()
     m_history_min_point_distance_property = new rviz::FloatProperty( "Min. history point distance", 0.4, "Minimum distance between history points before a new one is placed", this, SLOT(stylesChanged()) );
     m_history_line_width_property = new rviz::FloatProperty( "Line width", 0.05, "Line width of history", m_render_history_as_line_property, SLOT(stylesChanged()), this );
     m_covariance_line_width_property = new rviz::FloatProperty( "Line width", 0.1, "Line width of covariance ellipses", m_render_covariances_property, SLOT(stylesChanged()), this );
-    
+
 
     // TODO: Implement functionality
     //m_render_state_prediction_property  = new rviz::BoolProperty( "Render state prediction", true, "Render state prediction from Kalman filter", this, SLOT( updateRenderFlags() ));
@@ -66,8 +71,8 @@ TrackedPersonsDisplay::~TrackedPersonsDisplay()
 // Clear the visuals by deleting their objects.
 void TrackedPersonsDisplay::reset()
 {
-  PersonDisplayCommon::reset();
-  m_cachedTracks.clear();
+    PersonDisplayCommon::reset();
+    m_cachedTracks.clear();
 }
 
 void TrackedPersonsDisplay::update(float wall_dt, float ros_dt)
@@ -117,6 +122,7 @@ void TrackedPersonsDisplay::stylesChanged()
 
         if (trackedPersonVisual->isDeleted) trackVisible &= m_show_deleted_property->getBool();
         else if(trackedPersonVisual->isOccluded) trackVisible &= m_show_occluded_property->getBool();
+        else if(trackedPersonVisual->isMissed) trackVisible &= m_show_missed_property->getBool();
         else trackVisible &= m_show_matched_property->getBool();
 
         trackedPersonVisual->sceneNode->setVisible(trackVisible);
@@ -128,6 +134,7 @@ void TrackedPersonsDisplay::stylesChanged()
         Ogre::ColourValue trackColor = getColorFromId(trackId);
         trackColor.a *= m_commonProperties->alpha->getFloat(); // general alpha
         if(trackedPersonVisual->isOccluded) trackColor.a *= m_occlusion_alpha_property->getFloat(); // occlusion alpha
+        if(trackedPersonVisual->isMissed) trackColor.a *= m_missed_alpha_property->getFloat(); // occlusion alpha
 
         // Update person color
         Ogre::ColourValue personColor = trackColor;
@@ -162,20 +169,25 @@ void TrackedPersonsDisplay::stylesChanged()
         }
 
         // Update text colors, font size and visibility
+        const double personHeight = trackedPersonVisual->personVisual ? trackedPersonVisual->personVisual->getHeight() : 0;
         Ogre::ColourValue fontColor = m_commonProperties->font_color_style->getOptionInt() == FONT_COLOR_CONSTANT ? m_commonProperties->constant_font_color->getOgreColor() : trackColor;
         fontColor.a = m_commonProperties->alpha->getFloat();
 
         trackedPersonVisual->detectionIdText->setCharacterHeight(0.18 * m_commonProperties->font_scale->getFloat());
         trackedPersonVisual->detectionIdText->setVisible(!trackedPersonVisual->isOccluded && m_render_detection_ids_property->getBool() && trackVisible);
         trackedPersonVisual->detectionIdText->setColor(fontColor);
+        trackedPersonVisual->detectionIdText->setPosition(Ogre::Vector3(0,0, -trackedPersonVisual->detectionIdText->getCharacterHeight()));
 
         trackedPersonVisual->stateText->setCharacterHeight(0.18 * m_commonProperties->font_scale->getFloat());
         trackedPersonVisual->stateText->setVisible(m_render_track_state_property->getBool() && trackVisible);
         trackedPersonVisual->stateText->setColor(fontColor);
-
+        trackedPersonVisual->stateText->setPosition(Ogre::Vector3(0,0, personHeight + trackedPersonVisual->stateText->getCharacterHeight()));
+            
+        const double stateTextOffset = m_render_track_state_property->getBool() ? 1.2*trackedPersonVisual->stateText->getCharacterHeight() : 0;
         trackedPersonVisual->idText->setCharacterHeight(0.25 * m_commonProperties->font_scale->getFloat());
         trackedPersonVisual->idText->setVisible(m_render_ids_property->getBool() && trackVisible);
         trackedPersonVisual->idText->setColor(fontColor);
+        trackedPersonVisual->idText->setPosition(Ogre::Vector3(0,0, personHeight + trackedPersonVisual->idText->getCharacterHeight() + stateTextOffset));
 
         // Update velocity arrow color
         double arrowAlpha = m_render_velocities_property->getBool() ? trackColor.a : 0.0;
@@ -254,7 +266,19 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
         }
 
         // These values need to be remembered for later use in stylesChanged()
-        trackedPersonVisual->isOccluded = trackedPersonIt->is_occluded;
+        if(trackedPersonIt->is_occluded && !trackedPersonIt->is_matched){
+            trackedPersonVisual->isOccluded = true;
+            trackedPersonVisual->isMissed = false;
+        }
+        else if(!trackedPersonIt->is_occluded && !trackedPersonIt->is_matched){
+            trackedPersonVisual->isOccluded = false;
+            trackedPersonVisual->isMissed = true;
+        }
+        else {
+            trackedPersonVisual->isOccluded = false;
+            trackedPersonVisual->isMissed = false;
+        }
+
         trackedPersonVisual->isDeleted = false;
         trackedPersonVisual->numCyclesNotSeen = 0;
 
@@ -289,13 +313,13 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
 
         const float MIN_HISTORY_ENTRY_DISTANCE = m_history_min_point_distance_property->getFloat(); // in meters
         if((trackedPersonVisual->positionOfLastHistoryEntry - newHistoryEntryPosition).length() > MIN_HISTORY_ENTRY_DISTANCE)
-        {          
+        {
             // General history
             shared_ptr<TrackedPersonHistoryEntry> newHistoryEntry(new TrackedPersonHistoryEntry);
             newHistoryEntry->trackId = trackedPersonIt->track_id;
             newHistoryEntry->position = newHistoryEntryPosition; // used by history lines (below) even if no shape is set
             newHistoryEntry->wasOccluded = trackedPersonIt->is_occluded;
-            trackedPersonVisual->history.push_back(newHistoryEntry);        
+            trackedPersonVisual->history.push_back(newHistoryEntry);
 
             // Always need to reset history line since history is like a queue, oldest element has to be removed but BillboardLine doesn't offer that functionality
             trackedPersonVisual->historyLine.reset(new rviz::BillboardLine(context_->getSceneManager(), trackedPersonVisual->historyLineSceneNode.get()) );
@@ -336,22 +360,22 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
             // Detection ID
             ss.str(""); ss << "det " << trackedPersonIt->detection_id;
             trackedPersonVisual->detectionIdText->setCaption(ss.str());
-            trackedPersonVisual->detectionIdText->setPosition(Ogre::Vector3(0,0, -trackedPersonVisual->detectionIdText->getCharacterHeight()));
-
+           
             // Track state
             ss.str("");
 
-            if(trackedPersonIt->is_occluded) ss << "OCCLUDED";
-            else ss << "MATCHED";
+            if(trackedPersonIt->is_occluded && !trackedPersonIt->is_matched)
+                ss << "OCCLUDED";
+            else if (!trackedPersonIt->is_occluded && !trackedPersonIt->is_matched)
+                ss << "MISSED";
+            else
+                ss << "MATCHED";
 
             trackedPersonVisual->stateText->setCaption(ss.str());
-            trackedPersonVisual->stateText->setPosition(Ogre::Vector3(0,0, personHeight + trackedPersonVisual->stateText->getCharacterHeight()));
-
+            
             // Track ID
-            const double stateTextOffset = m_render_track_state_property->getBool() ? trackedPersonVisual->stateText->getCharacterHeight() * 1.1 : 0;
             ss.str(""); ss << trackedPersonIt->track_id;
             trackedPersonVisual->idText->setCaption(ss.str());
-            trackedPersonVisual->idText->setPosition(Ogre::Vector3(0,0, personHeight + trackedPersonVisual->idText->getCharacterHeight() + stateTextOffset));
         }
 
         //

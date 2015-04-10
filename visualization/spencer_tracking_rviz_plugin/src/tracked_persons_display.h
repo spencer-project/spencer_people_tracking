@@ -40,7 +40,7 @@ namespace spencer_tracking_rviz_plugin
 
         Ogre::Matrix4 lastObservedPose;
 
-        bool isOccluded, isDeleted, hasZeroVelocity;
+        bool isOccluded, isDeleted, isMissed, hasZeroVelocity;
         int numCyclesNotSeen;
     };
 
@@ -96,11 +96,13 @@ namespace spencer_tracking_rviz_plugin
 
         // User-editable property variables.
         rviz::FloatProperty* m_occlusion_alpha_property;
+        rviz::FloatProperty* m_missed_alpha_property;
         rviz::IntProperty*   m_history_length_property;
         rviz::IntProperty*   m_delete_after_ncycles_property;
 
         rviz::BoolProperty* m_show_deleted_property;
         rviz::BoolProperty* m_show_occluded_property;
+        rviz::BoolProperty* m_show_missed_property;
         rviz::BoolProperty* m_show_matched_property;
     
         rviz::BoolProperty* m_render_person_property;

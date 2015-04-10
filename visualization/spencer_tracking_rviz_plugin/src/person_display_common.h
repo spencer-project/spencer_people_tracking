@@ -84,6 +84,8 @@ namespace spencer_tracking_rviz_plugin
         rviz::FloatProperty* z_offset;
         rviz::FloatProperty* scaling_factor;
 
+        rviz::BoolProperty* use_actual_z_position;
+
         rviz::EnumProperty*  font_color_style;
         rviz::ColorProperty* constant_font_color;
         rviz::FloatProperty* font_scale;
@@ -232,7 +234,9 @@ namespace spencer_tracking_rviz_plugin
             }
 
             const double zVariance = covXYZinTargetFrame[2][2];
-            positionInTargetFrame.z = isfinite(zVariance) &&  zVariance >= 0 && zVariance < m_veryLargeVariance ? positionInTargetFrame.z - personVisualHeight/2.0: 0.0;
+            bool useActualZPosition = m_commonProperties->use_actual_z_position->getBool() && isfinite(zVariance) && zVariance >= 0 && zVariance < m_veryLargeVariance;
+
+            positionInTargetFrame.z = useActualZPosition ? positionInTargetFrame.z - personVisualHeight/2.0: 0.0;
             positionInTargetFrame.z += m_commonProperties->z_offset->getFloat();
 
             sceneNode->setPosition(positionInTargetFrame);

@@ -29,6 +29,7 @@ void TrackedGroupsDisplay::onInitialize()
     m_render_history_property = new rviz::BoolProperty( "Render history", true, "Render group affiliation history", this, SLOT(stylesChanged()));
     
     m_single_person_groups_in_constant_color_property  = new rviz::BoolProperty( "Single-person groups in constant color", true, "Render single-person groups in constant color", this, SLOT(stylesChanged()));
+    m_hide_ids_of_single_person_groups_property = new rviz::BoolProperty( "Hide IDs of single-person groups", false, "Hide IDs of single-person groups", m_render_ids_property, SLOT(stylesChanged()), this);
 
     m_history_length_property = new rviz::IntProperty( "Global history size", 10000, "Global number of group affiliation history entries to display.", this, SLOT(stylesChanged()));
     m_history_length_property->setMin( 1 );
@@ -162,7 +163,8 @@ void TrackedGroupsDisplay::updateGroupVisualStyles(shared_ptr<GroupVisual>& grou
     Ogre::ColourValue fontColor = m_commonProperties->font_color_style->getOptionInt() == FONT_COLOR_CONSTANT ? m_commonProperties->constant_font_color->getOgreColor() : groupColor;
     fontColor.a = m_commonProperties->alpha->getFloat();
     if(hideGroup) fontColor.a = 0;
-    groupVisual->idText->setVisible(m_render_ids_property->getBool());
+    bool groupIdVisible = groupVisual->personCount > 1 ? true : !m_hide_ids_of_single_person_groups_property->getBool();
+    groupVisual->idText->setVisible(m_render_ids_property->getBool() && groupIdVisible);
     groupVisual->idText->setCharacterHeight(0.23 * m_commonProperties->font_scale->getFloat());
     groupVisual->idText->setColor(fontColor);
     groupVisual->idText->setPosition(m_frameTransform * Ogre::Vector3(

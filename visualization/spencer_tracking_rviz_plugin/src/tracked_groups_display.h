@@ -88,6 +88,7 @@ namespace spencer_tracking_rviz_plugin
         rviz::BoolProperty* m_render_ids_property;
         rviz::BoolProperty* m_render_history_property;
         rviz::BoolProperty* m_single_person_groups_in_constant_color_property;
+        rviz::BoolProperty* m_hide_ids_of_single_person_groups_property;
 
         rviz::IntProperty*   m_history_length_property;
 
