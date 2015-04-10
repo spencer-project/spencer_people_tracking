@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>pcl_people_detector</name>
+  <version>0.0.0</version>
+  <description>ROS wrapper for the ground-based people detector from the PCL library, based upon the implementation provided by M. Munaro, F. Basso and E. Menegatti. "Tracking people within groups with RGB-D data". In Proceedings of the International Conference on Intelligent Robots and Systems (IROS) 2012, Vilamoura (Portugal), 2012.</description>
+
+  <url type="website">http://view.pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php#ground-based-rgbd-people-detection</url>
+
+  <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
+
+  <license>BSD</license>
+  
+  <author>Matteo Munaro</author>
+  <author>Timm Linder</author>
+  <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend> 
+  <build_depend>pcl_conversions</build_depend> 
+  <build_depend>eigen_conversions</build_depend> 
+  <build_depend>tf_conversions</build_depend> 
+  <build_depend>cmake_module</build_depend>
+  <build_depend>spencer_tracking_msgs</build_depend> 
+  <build_depend>spencer_vision_msgs</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>pcl_conversions</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  <run_depend>tf_conversions</run_depend>
+  <run_depend>cmake_modules</run_depend>
+  <run_depend>spencer_tracking_msgs</run_depend>
+  <run_depend>spencer_vision_msgs</run_depend>
+
+</package>
