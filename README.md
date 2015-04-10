@@ -36,7 +36,7 @@ We have integrated the following person detection modules:
 - A reimplementation of a boosted [2D laser segment classifier](/detection/laser_detectors/srl_laser_detectors), based upon the method by Arras et al. [3]
 - An [RGB-D upper-body detector](/detection/rgbd_detectors/rwth_upper_body_detector) described more closely in [2], which slides a normalized depth template over ROIs in the depth image
 - A monocular-vision full-body HOG detector ([groundHOG](/detection/monocular_detectors/rwth_ground_hog)) [2], which based upon a given ground plane estimate determines the image corridor in which pedestrians can be expected. This detector is GPU-accelerated using CUDA. The contained [cudaHOG](/detection/monocular_detectors/3rd_party) library requires manual compilation and a recent CUDA SDK as well as an nVidia graphics card.
-- An RGB-D detector from the [PCL library](http://pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php), which extracts candidate ROIs on a groundplane and then applies a linear HOG classifier [4] *(code will be added shortly)*
+- An [RGB-D detector](/detection/rgbd_detectors/pcl_people_detector) from the [PCL library](http://pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php), which extracts candidate ROIs on a groundplane and then applies a linear HOG classifier [4]
 
 ##### Multi-modal detection and fusion
 
@@ -47,7 +47,9 @@ For detection-to-detection fusion, we have implemented a series of nodelets whic
 In case of detection-to-track fusion (currently not implemented), it is still advisable to publish a [CompositeDetectedPerson](/messages/spencer_tracking_msgs/msg/CompositeDetectedPerson.msg) message (via [CompositeDetectedPersons](/messages/spencer_tracking_msgs/msg/CompositeDetectedPersons.msg)) for each set of detections associated with a track, such that later on it is possible to go back to the original detections from a track, and lookup associated image bounding boxes etc. via the associated detection_id.
 
 ##### Person and group tracking
-For person and group tracking, we currently provide exemplary code based upon a nearest-neighbor standard filter data association, which is robust enough in most use cases (especially if multi-modal detectors are being used). The [person tracker](/tracking/people/srl_nearest_neighbor_tracker) has been enhanced with a track initiation logic and 4 different IMM-based motion models (constant velocity with low process noise, high process noise, coordinated turn and Brownian motion) to make tracking more robust. The [group tracker](/tracking/groups/spencer_group_tracking) relies on [social/spatial relations](/tracking/groups/spencer_social_relations) determined via the same coherent motion indicator features as described in [1].
+For person and group tracking, we currently provide exemplary code based upon a nearest-neighbor standard filter data association, which is robust enough in most use cases (especially if multi-modal detectors are being used). The [person tracker](/tracking/people/srl_nearest_neighbor_tracker) has been enhanced with a track initiation logic and 4 different IMM-based motion models (constant velocity with low process noise, high process noise, coordinated turn and Brownian motion) to make tracking more robust. *NOTE: The IMM version of the tracker will be added shortly.*
+
+The [group tracker](/tracking/groups/spencer_group_tracking) relies on [social/spatial relations](/tracking/groups/spencer_social_relations) determined via the same coherent motion indicator features as described in [1].
 
 Internally, we have already integrated more advanced methods, including a track-oriented multi-hypothesis person tracker [2], and a hypothesis-oriented multi-model multi-hypothesis person and group tracker [1]. These components use exactly the same ROS message definitions, however, they are not yet publicly available. The components available here were originally implemented as baseline methods for comparison.
 
@@ -104,7 +106,7 @@ Videos of the people detection and tracking system in action can be found on the
 
 - [Single Person Guidance Scenario Prototype](https://www.youtube.com/watch?v=DQm55LLmvgg) (2D laser only)
 - [Group Guidance Scenario Prototype](https://www.youtube.com/watch?v=V5PYFf9A-PU) (2D laser only)
-- ... (more to come soon!)
+- ... (more to come soon – we are currently editing a video where we track people in a crowded airport environment!)
 
 #### Runtime performance
 
