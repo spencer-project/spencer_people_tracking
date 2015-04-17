@@ -22,3 +22,14 @@ roslaunch:
 ```
 roslaunch rwth_upper_body_detector upper_body_detector.launch [parameter_name:=value]
 ```
+
+### Credits
+
+This package is derived from:
+[strands-project/strands_perception_people/upper_body_detector](https://github.com/strands-project/strands_perception_people/tree/indigo-devel/upper_body_detector)
+
+Original author: Dennis Mitzel, Computer Vision Group, RWTH Aachen  
+ROS integration: Christian Dondrup (@cdondrup), LCAS, University of Lincoln  
+SPENCER integration: Stefan Breuers, Computer Vision Group, RWTH Aachen  
+
+
