@@ -104,9 +104,10 @@ The following screenshots show our system in action, while playing back recorded
 
 Videos of the people detection and tracking system in action can be found on the [SPENCER YouTube Channel](https://www.youtube.com/user/spencereuproject):
 
+- [Real-Time Multi-Modal People Tracking in a Crowded Airport Environment](https://www.youtube.com/watch?v=r2fGCrekGj8) (RGB-D and 2D laser)
 - [Single Person Guidance Scenario Prototype](https://www.youtube.com/watch?v=DQm55LLmvgg) (2D laser only)
 - [Group Guidance Scenario Prototype](https://www.youtube.com/watch?v=V5PYFf9A-PU) (2D laser only)
-- ... (more to come soon – we are currently working on a video where we perform large-scale people-tracking in a crowded airport environment!)
+
 
 #### Runtime performance
 
