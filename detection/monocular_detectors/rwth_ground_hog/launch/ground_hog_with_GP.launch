@@ -9,9 +9,11 @@
     <arg name="detection_id_offset" default="0"/>
     <arg name="detection_id_increment" default="1"/>
     <arg name="world_scale" default="1"/>
+    <arg name="score_thresh" default="0.0"/>
 
     <node pkg="rwth_ground_hog" type="groundHOG" name="groundHOG" output="screen">
         <param name="world_scale" value="$(arg world_scale)"/>
+        <param name="score_thresh" value="$(arg score_thresh)"/>
         <param name="model" value="$(arg model)" type="string"/>
         <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
         <param name="queue_size" value="$(arg queue_size)" type="int"/>

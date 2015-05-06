@@ -39,6 +39,7 @@ ros::Publisher pub_message;
 image_transport::Publisher pub_result_image;
 spencer_diagnostics::MonitoredPublisher pub_detected_persons;
 double worldScale; // for computing 3D positions from BBoxes
+double score_thresh; // threshold for HOG detections
 
 int detection_id_increment, detection_id_offset, current_detection_id; // added for multi-sensor use in SPENCER
 double pose_variance; // used in output spencer_tracking_msgs::DetectedPerson.pose.covariance
@@ -48,21 +49,21 @@ void render_bbox_2D(GroundHOGDetections& detections, QImage& image, int r, int g
 {
 
     QPainter painter(&image);
-
     QColor qColor;
-    qColor.setRgb(r, g, b);
-
     QPen pen;
-    pen.setColor(qColor);
-    pen.setWidth(lineWidth);
-
-    painter.setPen(pen);
 
     for(int i = 0; i < detections.pos_x.size(); i++){
         int x =(int) detections.pos_x[i];
         int y =(int) detections.pos_y[i];
         int w =(int) detections.width[i];
         int h =(int) detections.height[i];
+        float score = detections.score[i];
+
+        qColor.setRgb(min(255,(int)(score*100)), 0, 0);
+        pen.setColor(qColor);
+        pen.setWidth(lineWidth+(int)score);
+        painter.setPen(pen);
+        pen.setColor(qColor);
 
         painter.drawLine(x,y, x+w,y);
         painter.drawLine(x,y, x,y+h);
@@ -97,7 +98,7 @@ void imageCallback(const Image::ConstPtr &msg)
     detections.header = msg->header;
     for(unsigned int i=0;i<detHog.size();i++)
     {
-
+        float score = detHog[i].score;
         float scale = detHog[i].scale;
 
         float width = (w - 32.0f)*scale;
@@ -105,8 +106,8 @@ void imageCallback(const Image::ConstPtr &msg)
         float x = (detHog[i].x + 16.0f*scale);
         float y = (detHog[i].y + 16.0f*scale);
 
-        detections.scale.push_back(detHog[i].scale);
-        detections.score.push_back(detHog[i].score);
+        detections.scale.push_back(scale);
+        detections.score.push_back(score);
         detections.pos_x.push_back(x);
         detections.pos_y.push_back(y);
         detections.width.push_back(width);
@@ -245,6 +246,8 @@ void imageGroundPlaneCallback(const ImageConstPtr &color, const CameraInfoConstP
     for(unsigned int i=0;i<detHog.size();i++)
     {
 
+        float score = detHog[i].score;
+        if (score < score_thresh) continue;
         float scale = detHog[i].scale;
 
         float width = (WINDOW_WIDTH - 32.0f)*scale;
@@ -252,8 +255,8 @@ void imageGroundPlaneCallback(const ImageConstPtr &color, const CameraInfoConstP
         float x = (detHog[i].x + 16.0f*scale);
         float y = (detHog[i].y + 16.0f*scale);
 
-        detections.scale.push_back(detHog[i].scale);
-        detections.score.push_back(detHog[i].score);
+        detections.scale.push_back(scale);
+        detections.score.push_back(score);
         detections.pos_x.push_back(x);
         detections.pos_y.push_back(y);
         detections.width.push_back(width);
@@ -289,6 +292,8 @@ void imageGroundPlaneCallback(const ImageConstPtr &color, const CameraInfoConstP
 
         for(unsigned int i=0;i<detHog.size();i++)
         {
+            float score = detHog[i].score;
+            if (score < score_thresh) continue;
             float scale = detHog[i].scale;
 
             // FIXME: Is it correct to use these offsets for computing 3D position!?
@@ -316,7 +321,7 @@ void imageGroundPlaneCallback(const ImageConstPtr &color, const CameraInfoConstP
 
             const double LARGE_VARIANCE = 999999999;
             detected_person.pose.covariance[0*6 + 0] = pose_variance;
-            detected_person.pose.covariance[1*6 + 1] = LARGE_VARIANCE; // up axis (since this is in sensor frame!)
+            detected_person.pose.covariance[1*6 + 1] = pose_variance; // up axis (since this is in sensor frame!)
             detected_person.pose.covariance[2*6 + 2] = pose_variance;
             detected_person.pose.covariance[3*6 + 3] = LARGE_VARIANCE;
             detected_person.pose.covariance[4*6 + 4] = LARGE_VARIANCE;
@@ -383,6 +388,7 @@ int main(int argc, char **argv)
 
     private_node_handle_.param("camera_namespace", camera_ns, string("/head_xtion"));
     private_node_handle_.param("ground_plane", ground_plane, string(""));
+    private_node_handle_.param("score_thresh", score_thresh, 0.0);
 
     // For SPENCER DetectedPersons message
     private_node_handle_.param("world_scale", worldScale, 1.0); // default for ASUS sensors
@@ -391,7 +397,7 @@ int main(int argc, char **argv)
     private_node_handle_.param("pose_variance",    pose_variance, 0.05);
     current_detection_id = detection_id_offset;
 
-    string image_color = camera_ns + "/rgb/image_color";
+    string image_color = camera_ns + "/rgb/image_rect_color";
     string camera_info = camera_ns + "/rgb/camera_info";
 
 
