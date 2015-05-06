@@ -38,7 +38,7 @@
             
             <!-- Kalman filter noise -->
             <param name="use_process_noise" value="true"/>
-            <param name="process_noise_level" value="0.01"/>  <!-- increase noise level for better reaction to sudden maneuvers (and less precise matching...) -->
+            <param name="process_noise_level" value="0.1"/>  <!-- increase noise level for better reaction to sudden maneuvers (and less precise matching...) -->
             <param name="qsxx" value="0.0081"/>  <!-- only used when use_process_noise is "false" -->
             <param name="qsyy" value="0.0081"/>  <!-- only used when use_process_noise is "false" -->
             <param name="qsvxx" value="0.0064"/> <!-- only used when use_process_noise is "false" -->
