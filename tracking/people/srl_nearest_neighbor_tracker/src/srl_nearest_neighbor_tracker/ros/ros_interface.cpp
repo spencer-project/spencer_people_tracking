@@ -151,8 +151,9 @@ void ROSInterface::publishTracks(ros::Time currentRosTime, const Tracks& tracks)
 
         trackedPerson.track_id = track->id;
         trackedPerson.age = ros::Duration(currentRosTime.toSec() - track->createdAt);        
-        trackedPerson.is_occluded = !track->observation;
-        if(!trackedPerson.is_occluded) trackedPerson.detection_id = track->observation->id;
+        trackedPerson.is_occluded = false; // not using a physical occlusion model for the moment
+        trackedPerson.is_matched = (bool) track->observation;
+        if(trackedPerson.is_matched) trackedPerson.detection_id = track->observation->id;
         m_geometryUtils.meanAndCovarianceToPoseAndTwist(track->state->x(), track->state->C(), trackedPerson.pose, trackedPerson.twist); // state estimate (update)
 
         // Heuristic sanity check for tracked person poses (if anything in the tracker goes wrong)
