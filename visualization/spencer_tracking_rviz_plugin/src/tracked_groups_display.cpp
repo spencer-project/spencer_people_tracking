@@ -26,12 +26,12 @@ void TrackedGroupsDisplay::onInitialize()
 
     m_render_intragroup_connections_property = new rviz::BoolProperty( "Connect group members", true, "Connect all members of a group by lines", this, SLOT(stylesChanged()));
     m_render_ids_property = new rviz::BoolProperty( "Render group IDs", true, "Render group IDs as text", this, SLOT(stylesChanged()));
-    m_render_history_property = new rviz::BoolProperty( "Render history", true, "Render group affiliation history", this, SLOT(stylesChanged()));
+    m_render_history_property = new rviz::BoolProperty( "Render history", false, "Render group affiliation history", this, SLOT(stylesChanged()));
     
     m_single_person_groups_in_constant_color_property  = new rviz::BoolProperty( "Single-person groups in constant color", true, "Render single-person groups in constant color", this, SLOT(stylesChanged()));
     m_hide_ids_of_single_person_groups_property = new rviz::BoolProperty( "Hide IDs of single-person groups", false, "Hide IDs of single-person groups", m_render_ids_property, SLOT(stylesChanged()), this);
 
-    m_history_length_property = new rviz::IntProperty( "Global history size", 10000, "Global number of group affiliation history entries to display.", this, SLOT(stylesChanged()));
+    m_history_length_property = new rviz::IntProperty( "Global history size", 1000, "Global number of group affiliation history entries to display.", this, SLOT(stylesChanged()));
     m_history_length_property->setMin( 1 );
     m_history_length_property->setMax( 10000000 );
 
