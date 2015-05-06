@@ -242,7 +242,7 @@ void callback(const ImageConstPtr &depth,  const ImageConstPtr &color,const Grou
 
         const double LARGE_VARIANCE = 999999999;
         detected_person.pose.covariance[0*6 + 0] = pose_variance;
-        detected_person.pose.covariance[1*6 + 1] = LARGE_VARIANCE; // up axis (since this is in sensor frame!)
+        detected_person.pose.covariance[1*6 + 1] = pose_variance; // up axis (since this is in sensor frame!)
         detected_person.pose.covariance[2*6 + 2] = pose_variance;
         detected_person.pose.covariance[3*6 + 3] = LARGE_VARIANCE;
         detected_person.pose.covariance[4*6 + 4] = LARGE_VARIANCE;
@@ -329,8 +329,8 @@ int main(int argc, char **argv)
     private_node_handle_.param("camera_namespace", cam_ns, string("/camera"));
     private_node_handle_.param("ground_plane", topic_gp, string("/ground_plane"));
 
-    string topic_depth_image = cam_ns + "/depth/image";
-    string topic_color_image = cam_ns + "/rgb/image_color";
+    string topic_depth_image = cam_ns + "/depth/image_rect";
+    string topic_color_image = cam_ns + "/rgb/image_raw";
     string topic_camera_info = cam_ns + "/rgb/camera_info";
 
     // New parameters for SPENCER

@@ -15,9 +15,6 @@
         </include>
     </group>
 
-    <!-- OpenNi2 uses slightly different topic names than OpenNi1, so remap the topic that our system expects -->
-    <remap from="/spencer/sensors/rgbd_front_top/rgb/image_color" to="/spencer/sensors/rgbd_front_top/rgb/image_rect_color"/>
-
     <!-- Set ground plane distance -->
     <rosparam param="/spencer/perception_internal/people_detection/ground_plane/distance" subst_value="true">$(arg height_above_ground)</rosparam>
 
