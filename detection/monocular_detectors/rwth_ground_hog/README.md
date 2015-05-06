@@ -23,3 +23,10 @@ rosrun rwth_ground_hog groundHOG [_parameter_name:=value]
 roslaunch:
 * Using only the RGB image: `roslaunch rwth_ground_hog ground_hog.launch [parameter_name:=value]`
 * Using ground plane to enhance detection `roslaunch rwth_ground_hog ground_hog_with_GP.launch [parameter_name:=value]`
+
+
+### Credits
+
+Original author: Patrick Sudowe, Computer Vision Group, RWTH Aachen  
+ROS integration: Christian Dondrup (@cdondrup), LCAS, University of Lincoln  
+SPENCER integration: Stefan Breuers, Computer Vision Group, RWTH Aachen  

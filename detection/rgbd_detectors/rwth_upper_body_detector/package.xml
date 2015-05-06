@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
 <package>
   <name>rwth_upper_body_detector</name>
-  <version>0.0.0</version>
+  <version>0.9.0</version>
   <description>The upper_body_detector package</description>
+  
+  <!-- SPENCER integration: -->
+  <maintainer email="breuers@vision.rwth-aachen.dek">Stefan Breuers</maintainer>
 
-  <maintainer email="cdondrup@lincoln.ac.uk">Christian Dondrup</maintainer>
-
-  <license>TODO</license>
+  <license>BSD</license>
 
   <url type="website">http://www.vision.rwth-aachen.de/</url>
 
+  <!-- ROS wrapper and original implementation: -->
   <author email="cdondrup@lincoln.ac.uk">Christian Dondrup</author>
   <author email="mitzel@umic.rwth-aachen.de">Dennis Mitzel</author>
   
