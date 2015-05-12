@@ -17,52 +17,13 @@
 
     <!-- People tracker -->
     <group ns="/spencer/perception_internal/people_tracking">
-        <!-- NNT -->
-        <node name="srl_nearest_neighbor_tracker" pkg="srl_nearest_neighbor_tracker" type="nnt_node" output="screen">
-            <!-- Secondary low-confidence detections that can be matched against a track, but not initiate a new one -->
-            <param name="additional_low_confidence_detections" value="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated" if="$(arg laser_low_confidence_detections)"/>
-            <param name="additional_low_confidence_detections" value="" unless="$(arg laser_low_confidence_detections)"/>
+        
+        <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch">
+            <arg name="tracker_queue_size" value="$(arg tracker_queue_size)"/>
+        </include>
 
-            <!-- For synchronization with additional low confidence observations (if topic is set above) -->
-            <param name="synchronizer_queue_size" value="35"/>
-            <param name="synchronizer_age_penalty" value="10000"/>
-
-            <!-- Publisher and subscriber queue (only used for subscriber if not synchronizing with additional low-confidence observations) -->
-            <param name="queue_size" value="$(arg tracker_queue_size)"/>
-
-            <!-- Kalman filter parameters -->
-            <param name="cosxx" value="0.7"/> <!-- initial x positional variance (=squared stddev) -->
-            <param name="cosyy" value="0.7"/>
-            <param name="cosvxx" value="2.0"/> <!-- initial assumed variance in x velocity -->
-            <param name="cosvyy" value="2.0"/>
-            
-            <!-- Kalman filter noise -->
-            <param name="use_process_noise" value="true"/>
-            <param name="process_noise_level" value="0.1"/>  <!-- increase noise level for better reaction to sudden maneuvers (and less precise matching...) -->
-            <param name="qsxx" value="0.0081"/>  <!-- only used when use_process_noise is "false" -->
-            <param name="qsyy" value="0.0081"/>  <!-- only used when use_process_noise is "false" -->
-            <param name="qsvxx" value="0.0064"/> <!-- only used when use_process_noise is "false" -->
-            <param name="qsvyy" value="0.0064"/> <!-- only used when use_process_noise is "false" -->
-            
-            <!-- Gating -->
-            <param name="max_gating_distance" value="1.0"/>
-            
-            <!-- Occlusion handling -->
-            <param name="max_occlusions_before_deletion" value="20"/>
-            <param name="max_occlusions_before_deletion_of_mature_track" value="50"/>
-            <param name="track_is_mature_after_total_num_matches" value="100"/>
-
-            <!-- History of track states for duplicate elimination and debugging -->
-            <param name="state_history_length" value="30"/>
-            
-            <!-- Duplicate track elimination -->
-            <param name="duplicate_track_num_history_entries_to_compare" value="5"/>
-            <param name="duplicate_track_num_history_entries_must_match" value="3"/>
-            <param name="duplicate_track_max_dist" value="0.15"/>
-
-            <!-- Track initiation -->
-            <param name="use_initiation_logic" value="true"/>
-        </node>
+        <rosparam param="srl_nearest_neighbor_tracker/additional_low_confidence_detections" if="$(arg laser_low_confidence_detections)">/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated</rosparam>
+        <rosparam param="srl_nearest_neighbor_tracker/additional_low_confidence_detections" unless="$(arg laser_low_confidence_detections)"></rosparam>
     </group>
 
     <!-- Filter tracks that are output by people tracker (e.g. visually confirmed tracks, moving tracks etc. on separate topics) -->

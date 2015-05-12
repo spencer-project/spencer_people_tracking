@@ -1,35 +1,16 @@
+/* Created on: Jun 02, 2014. Author: Fabian Girrbach */
 #ifndef _LOGIC_INITIATOR_H
 #define _LOGIC_INITIATOR_H
 
 #include <srl_nearest_neighbor_tracker/base/tracker.h>
 #include <srl_nearest_neighbor_tracker/ekf.h>
+#include <srl_nearest_neighbor_tracker/data/initiator_candidate.h>
 
 
 #define SYSTEMATIC_SCAN_ERROR 0.07
 
 namespace srl_nnt {
 
-struct InitiatorCandidate{
-
-    // vector of observations assigned to the candidate
-    Observations observations;
-
-    double meanAngle;
-
-    // current state of kalman filter
-    KalmanFilterState::Ptr state;
-
-    // extrapolation is stored as observation
-    Observation::Ptr extrapolation;
-
-    // Missed observations
-    unsigned int missedObs;
-
-    typedef boost::shared_ptr<InitiatorCandidate> Ptr;
-    typedef boost::shared_ptr<const InitiatorCandidate> ConstPtr;
-};
-
-typedef std::vector< InitiatorCandidate::Ptr > InitiatorCandidates;
 
 enum {
     MAHALANOBIS,
@@ -41,8 +22,9 @@ class LogicInitiator
 {
 public:
     /// Constructor.
-    LogicInitiator(const double velMin, const double velMax, const unsigned int numberScans);
+    LogicInitiator();
     InitiatorCandidates processObservations(const Observations observations);
+
 
 
 private:
@@ -72,15 +54,13 @@ private:
 
 
     const int m_distMethod;
-    const bool m_useKalman;
     const bool m_incrementalCheck;
-    const int m_maxMissedObs;
+    const unsigned int m_maxMissedObs;
     const double m_velocityVariance;
 
 
     InitiatorCandidates m_candidates;
     EKF m_kalmanFilter;
-
 };
 
 

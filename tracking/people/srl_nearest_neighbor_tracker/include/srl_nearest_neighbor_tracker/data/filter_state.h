@@ -1,3 +1,4 @@
+/* Created on: Jan 03, 2015. Author: Timm Linder */
 #ifndef _FILTER_STATE_H
 #define _FILTER_STATE_H
 

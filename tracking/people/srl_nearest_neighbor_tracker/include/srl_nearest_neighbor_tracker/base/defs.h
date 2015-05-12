@@ -1,11 +1,14 @@
+/* Created on: May 07, 2014. Author: Timm Linder, Fabian Girrbach */
+
 /// This file contains common definitions.
 #ifndef _DEFS_H
 #define _DEFS_H
 
+#define OBS_DIM 2           /// our observations consist only of x, y coordinates
+#define STATE_DIM 5         /// we are tracking x, y coordinates and vx, vy velocity
+#define ROS_COV_DIM 6       /// ROS pose covariances always have 6 dimensions (xyz + xyz fixed-axis rotation)
+#define N_MODELS 3        	/// Number of models used for IMM filter
 
-#define OBS_DIM 2            /// our observations consist only of x, y coordinates
-#define STATE_DIM 4          /// we are tracking x, y coordinates and vx, vy velocity
-#define ROS_COV_DIM 6        /// ROS pose covariances always have 6 dimensions (xyz + xyz fixed-axis rotation)
 
 #include <Eigen/Core>
 
@@ -20,6 +23,15 @@ namespace srl_nnt {
     typedef Eigen::Matrix<double, STATE_DIM, OBS_DIM> StateObsMatrix;   /// matrix of dimension STATE_DIM x OBS_DIM
 
     typedef Eigen::Matrix<double, STATE_DIM - OBS_DIM, 1> VelocityVector; /// velocity vector at the end of a state vector
+
+    typedef Eigen::Matrix<double, N_MODELS, N_MODELS> IMMMatrix;    /// square matrix of dimension STATE_DIM x STATE_DIM
+    typedef Eigen::Matrix<double, N_MODELS, 1> IMMVector;    /// square matrix of dimension STATE_DIM x STATE_DIM
+
+    const unsigned int STATE_X_IDX = 0;
+    const unsigned int STATE_Y_IDX = 1;
+    const unsigned int STATE_VX_IDX = 2;
+    const unsigned int STATE_VY_IDX = 3;
+    const unsigned int STATE_OMEGA_IDX = 4;
 
 
     /// Inverse of the chi2-cdf at 0.95 with dofs given by the array index. 
@@ -66,8 +78,6 @@ namespace srl_nnt {
         27.8563             // 6
     };
 }
-
-
 
 
 #endif // _DEFS_H

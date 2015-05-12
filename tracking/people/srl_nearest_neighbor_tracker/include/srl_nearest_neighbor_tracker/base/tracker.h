@@ -1,3 +1,4 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _TRACKER_H
 #define _TRACKER_H
 

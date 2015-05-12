@@ -1,3 +1,4 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _STL_HELPERS_H
 #define _STL_HELPERS_H
 

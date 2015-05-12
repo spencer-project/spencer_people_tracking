@@ -1,3 +1,4 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _NEAREST_NEIGHBOR_TRACKER_H
 #define _NEAREST_NEIGHBOR_TRACKER_H
 
@@ -5,6 +6,9 @@
 #include <srl_nearest_neighbor_tracker/base/tracker.h>
 #include <srl_nearest_neighbor_tracker/ekf.h>
 #include <srl_nearest_neighbor_tracker/logic_initiator.h>
+#include <srl_nearest_neighbor_tracker/imm_filter.h>
+#include <srl_nearest_neighbor_tracker/occlusion_handling/occlusion_manager.h>
+
 
 
 namespace srl_nnt {
@@ -15,7 +19,7 @@ class NearestNeighborTracker : public Tracker
 {
 public:
     /// Constructor.
-    NearestNeighborTracker();
+    NearestNeighborTracker(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodehandle);
 
     /// Process a single tracking time-step using the new set of observations. Returns the currently tracked targets.
     /// The additional low-confidence observations, if any, can be used to match so-far unmatched tracks, but not for the initialization of new tracks.
@@ -57,11 +61,17 @@ private:
     void endCycle();
 
 
+    /// Node handles
+    ros::NodeHandle m_nodeHandle, m_privateNodeHandle;
+
+    /// FrameID where tracker operates
+    string m_frameID;
+
     /// The tracks that are currently being maintained/tracked.
     Tracks m_tracks;
 
     /// The extended Kalman filter used for track prediction and update
-    EKF m_kalmanFilter;
+    Filter::Ptr m_filter;
 
     /// Global track ID counter
     track_id m_trackIdCounter;
@@ -74,6 +84,9 @@ private:
      
     /// The track initialization logic.
     LogicInitiator m_initiator;
+
+    // Occlusion handling and track deletion logic.
+    OcclusionManager::Ptr m_occlusionManager;
 };
 
 

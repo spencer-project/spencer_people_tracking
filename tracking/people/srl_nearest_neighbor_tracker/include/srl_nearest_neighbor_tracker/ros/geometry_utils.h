@@ -1,3 +1,4 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _GEOMETRY_UTILS_H
 #define _GEOMETRY_UTILS_H
 

@@ -1,6 +1,6 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _ROSINTERFACE_H
 #define _ROSINTERFACE_H
-
 
 #include <ros/ros.h>
 #include <tf/tf.h>

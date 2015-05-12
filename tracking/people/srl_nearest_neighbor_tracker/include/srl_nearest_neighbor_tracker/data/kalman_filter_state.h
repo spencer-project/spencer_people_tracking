@@ -1,3 +1,4 @@
+/* Created on: Jan 03, 2015. Author: Timm Linder */
 #ifndef _KALMAN_FILTER_STATE_H
 #define _KALMAN_FILTER_STATE_H
 
@@ -9,21 +10,25 @@ namespace srl_nnt
 // Forward declarations (for friend declarations)
 class EKF;
 class LogicInitiator;
+class IMMFilter;
+class IMMState;
+
 
 /// State and covariances of a Kalman filter.
 class KalmanFilterState : public FilterState
 {
-private:
-    /// Mean (x) of the track state. E.g. x = {x-position, y-position, vx, vy, ax, ay}. 
+protected:
+    /// Mean (x) of the track state. E.g. x = {x-position, y-position, vx, vy, ax, ay}.
     StateVector m_x;
 
-    /// Covariance matrix (C) of the track state. 
+    /// Covariance matrix (C) of the track state.
     StateMatrix m_C;
+private:
 
-    /// Mean (xp) of the predicted track state. 
+    /// Mean (xp) of the predicted track state.
     StateVector m_xp;
 
-    /// Covariance (Cp) of the predicted track state. 
+    /// Covariance (Cp) of the predicted track state.
     StateMatrix m_Cp;
 
 public:
@@ -47,6 +52,8 @@ public:
     // Grant write access to certain classes
     friend class EKF;
     friend class LogicInitiator;
+    friend class IMMFilter;
+    friend class IMMState;
 };
 
 

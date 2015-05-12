@@ -1,3 +1,4 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _PARAMS_H
 #define _PARAMS_H
 
@@ -22,6 +23,16 @@ public:
             value = defaultValue;
         }
 
+        return value;
+    }
+
+    /// Set value of the parameter with the specified name and default value, if no value has been configured.
+    template<typename T> static T set(const std::string& parameterName, const T& value)
+    {
+        assert(s_instance);
+
+        // Just a loose wrapper around the ROS parameter server API, uses local caching to avoid delays by having to contact the ROS master
+        s_instance->m_privateNodeHandle.setParam(parameterName, value);
         return value;
     }
 

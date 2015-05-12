@@ -1,3 +1,4 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #ifndef _PAIRING_H
 #define _PAIRING_H
 
@@ -13,33 +14,33 @@
 namespace srl_nnt
 {
 
- /// A pairing is an assignment of a Track and an Observation.
+/// A pairing is an assignment of a Track and an Observation.
 struct Pairing
 {
-	/// The track of this pairing
-	Track::Ptr track;
+    /// The track of this pairing
+    Track::Ptr track;
 
-	/// The observation of this pairing
-	Observation::Ptr observation;
+    /// The observation of this pairing
+    Observation::Ptr observation;
 
-	/// Flag indicating if pairing has a singular innovation covariance matrix
-	bool singular;
+    /// Flag indicating if pairing has a singular innovation covariance matrix
+    bool singular;
 
-	/// Flag indicating if pairing is validated. The Kalman filter of a track is only updated with validated pairings
-	bool validated;
+    /// Flag indicating if pairing is validated. The Kalman filter of a track is only updated with validated pairings
+    bool validated;
 
-	/// Mahalanobis distance of a pairing
-	double d;
+    /// Mahalanobis distance of a pairing
+    double d;
 
-  	/// Innovation v (nu) of a pairing
-  	ObsVector v;
+    /// Innovation v (nu) of a pairing
+    ObsVector v;
 
-	/// Innovation covariance matrix S, inversed
-  	ObsMatrix Sinv;
+    /// Innovation covariance matrix S, inversed
+    ObsMatrix Sinv;
 
-  	/// Typedefs for easier readability
-	typedef boost::shared_ptr<Pairing> Ptr;
-	typedef boost::shared_ptr<const Pairing> ConstPtr;
+    /// Typedefs for easier readability
+    typedef boost::shared_ptr<Pairing> Ptr;
+    typedef boost::shared_ptr<const Pairing> ConstPtr;
 };
 
 
