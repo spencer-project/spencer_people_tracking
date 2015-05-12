@@ -1,11 +1,15 @@
+#### 2D Laser segment feature library
+
 This package contains laser features (e.g. linearity, circularity, spline-fitting error, ...) for segmented laser range data.
 The code in this package does not have many dependencies, and can thus be included in any C++ ROS application.
 
-Dependencies: Eigen3
+##### Dependencies
 
-Usage example
-=============
+- Eigen3
 
+##### Usage example
+
+```c++
 #include <srl_laser_features/features/feature_registry.h>
 #include <srl_laser_features/segment.h>
 using namespace srl_laser_features;
@@ -32,3 +36,4 @@ for(Features::const_iterator it = features.begin(); it != features.end(); ++it) 
 
     // Now do something with result. Dimensionality of result is equal to feature->getNDimensions()
 }
+```
