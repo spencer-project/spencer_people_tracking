@@ -1,3 +1,5 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
+
 #include <srl_nearest_neighbor_tracker/ros/params.h>
 
 namespace srl_nnt {

@@ -1,3 +1,5 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
+
 #include <srl_nearest_neighbor_tracker/ros/geometry_utils.h>
 #include <srl_nearest_neighbor_tracker/ros/params.h>
 
@@ -49,7 +51,7 @@ void GeometryUtils::meanAndCovarianceToPoseAndTwist(const StateVector& x, const 
     const double AVERAGE_ROTATION_VARIANCE = pow(10.0 / 180 * M_PI, 2); // FIXME: determine from vx, vy?
     const double INFINITE_VARIANCE = 9999999; // should not really use infinity here because then the covariance matrix cannot be rotated (singularities!)
 
-    assert(x.size() % 2 == 0);
+    //assert(x.size() % 2 == 0);
     const int numAxes = x.size() / 2; // either 2 or 3
     const double vx = x(numAxes+0), vy = x(numAxes+1);
 

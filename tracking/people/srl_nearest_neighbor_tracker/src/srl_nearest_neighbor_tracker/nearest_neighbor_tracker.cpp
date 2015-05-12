@@ -1,8 +1,10 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
 #include <srl_nearest_neighbor_tracker/nearest_neighbor_tracker.h>
 #include <srl_nearest_neighbor_tracker/base/defs.h>
 #include <srl_nearest_neighbor_tracker/base/stl_helpers.h>
 #include <srl_nearest_neighbor_tracker/ros/params.h>
 #include <srl_nearest_neighbor_tracker/logic_initiator.h>
+#include <srl_nearest_neighbor_tracker/occlusion_handling/basic_occlusion_manager.h>
 
 #include <ros/ros.h>
 #include <Eigen/LU>
@@ -13,9 +15,28 @@
 
 namespace srl_nnt {
 
-NearestNeighborTracker::NearestNeighborTracker()
-    : m_cycleCounter(0), m_cycleTime(0.0), m_deltaTime(0), m_trackIdCounter(0), m_initiator(0.2 , 2.0, 6)
+NearestNeighborTracker::NearestNeighborTracker(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodehandle)
+: m_nodeHandle(nodeHandle),
+  m_privateNodeHandle(privateNodehandle),
+  m_cycleCounter(0),
+  m_cycleTime(0.0),
+  m_deltaTime(0),
+  m_trackIdCounter(0),
+  m_initiator()
 {
+    m_frameID = Params::get<string>("world_frame", "odom");
+
+    if (Params::get<bool>("use_imm", false)){
+        ROS_INFO_STREAM("Using IMM filter for NNT");
+        m_filter.reset(new IMMFilter(m_nodeHandle, m_privateNodeHandle));
+    }
+    else {
+        ROS_INFO_STREAM("Using Extended Kalman filter for NNT");
+        m_filter.reset(new EKF);
+    }
+
+    m_occlusionManager.reset(new BasicOcclusionManager);
+    m_occlusionManager->initializeOcclusionManager(m_nodeHandle, m_privateNodeHandle);
 }
 
 
@@ -24,6 +45,8 @@ const Tracks& NearestNeighborTracker::processCycle(double currentTime, const Obs
     beginCycle(currentTime);
 
     predictTrackStates();
+
+    m_occlusionManager->manageOcclusionsBeforeDataAssociation(m_tracks, ros::Time(currentTime), m_frameID);
 
     predictMeasurements();
 
@@ -60,7 +83,7 @@ const Tracks& NearestNeighborTracker::processCycle(double currentTime, const Obs
         // (less than a person radius).
         initNewTracksFromObservations(newObservations);
     }
-    
+
     deleteObsoleteTracks();
 
     deleteDuplicateTracks();
@@ -81,16 +104,17 @@ void NearestNeighborTracker::beginCycle(double currentTime)
         m_cycleTime = 0.0; m_cycleCounter = 0; m_trackIdCounter = 0;
         m_tracks.clear();
     }
-
-    m_deltaTime = currentTime - m_cycleTime; 
+    m_deltaTime = currentTime - m_cycleTime;
     m_cycleTime = currentTime;
 
-    ROS_INFO("Beginning tracking cycle no. %lu. Time since last cycle: %.3f sec", m_cycleCounter, m_deltaTime);
+    ROS_DEBUG("Beginning tracking cycle no. %lu. Time since last cycle: %.3f sec", m_cycleCounter, m_deltaTime);
 }
 
 
 void NearestNeighborTracker::endCycle()
 {
+    m_filter->visualizeFilterProperties(ros::Time().fromSec(m_cycleTime),m_frameID, m_tracks);
+
     // Increase cycle counter
     m_cycleCounter++;
 
@@ -102,16 +126,11 @@ void NearestNeighborTracker::predictTrackStates()
 {
     ROS_DEBUG("Predicting track states");
 
-    // Set a constant velocity transition model for the Kalman filter
-    StateMatrix A = StateMatrix::Identity();
-    A(0, 2) = m_deltaTime;
-    A(1, 3) = m_deltaTime;
-    m_kalmanFilter.setTransitionMatrix(A);
-
     foreach(Track::Ptr track, m_tracks) {
         if(track->trackStatus != Track::DELETED) {
-            track->stateHistory.push_back(track->state->deepCopy()); // copy current state into history for later debugging & duplicate track elimination
-            m_kalmanFilter.predictTrackState(track->state, m_deltaTime);
+            m_filter->setTransitionMatrix(track->state->x(), m_deltaTime);
+            track->stateHistory.push_back(track->state->deepCopy()); // copy current state into history for later Debugging & duplicate track elimination
+            m_filter->predictTrackState(track->state, m_deltaTime);
         }
     }
 }
@@ -120,7 +139,7 @@ void NearestNeighborTracker::predictTrackStates()
 void NearestNeighborTracker::predictMeasurements()
 {
     ROS_DEBUG("Predicting measurements");
-    
+
     // For the moment, our "track-to-measurement model" is very simple: Just copy x and y position, and forget about the vx, vy (measurements don't have velocities)
     ObsStateMatrix fixed_H = ObsStateMatrix::Zero();
     fixed_H(0,0) = 1.0;
@@ -143,7 +162,7 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
     foreach(Observation::Ptr observation, newObservations) {
         observation->matched = false;
     }
-    
+
     Pairings compatiblePairings;
 
 
@@ -151,7 +170,7 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
     // Step 1: go through all possible associations and store compatible ones
     //
 
-    const double MATRIX_LN_EPS = -1e8; 
+    const double MATRIX_LN_EPS = -1e8;
     const double MAX_GATING_DISTANCE = Params::get<double>("max_gating_distance", 1.0);
 
     typedef multimap<track_id, Pairing::Ptr> TrackSpecificPairings;
@@ -160,7 +179,7 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
     foreach(Track::Ptr track, tracks)
     {
         foreach(Observation::Ptr observation, newObservations)
-        {
+                                                                                                        {
             // Create a new pairing
             Pairing::Ptr pairing( new Pairing );
 
@@ -170,7 +189,7 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
 
             // Calculate innovation v and inverse of innovation covariance S
             pairing->v = observation->z - track->state->zp();
-            
+
             ObsMatrix S = track->state->H() * track->state->Cp() * track->state->H().transpose() + observation->R;
             Eigen::FullPivLU<ObsMatrix> lu(S);
             double ln_det_S = log(lu.determinant());
@@ -186,17 +205,17 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
                 pairing->d = numeric_limits<double>::quiet_NaN();
                 pairing->singular = true;
 
-                ROS_WARN_STREAM("Singular pairing encountered!\nTrack " << track->id << " measurement prediction:\n" << track->state->zp() << "\nTrack covariance prediction:\n" << track->state->Cp() 
-                                 << "\nObservation " << observation->id << " mean:\n" << observation->z << "\nObservation covariance:\n" << observation->R );
+                ROS_WARN_STREAM("Singular pairing encountered!\nTrack " << track->id << " measurement prediction:\n" << track->state->zp() << "\nTrack covariance prediction:\n" << track->state->Cp()
+                        << "\nObservation " << observation->id << " mean:\n" << observation->z << "\nObservation covariance:\n" << observation->R );
             }
-            
+
             // Perform gating
             if(!pairing->singular && pairing->d < CHI2INV_99[OBS_DIM] && pairing->v.norm() < MAX_GATING_DISTANCE) {
                 // Store in list of compatible pairings
                 compatiblePairings.push_back(pairing);
                 trackSpecificPairings.insert( make_pair(track->id, pairing) );
             }
-        }
+                                                                                                        }
     }
 
     ROS_DEBUG("%zu compatible pairings have been found for %zu existing tracks and %zu new observations!", compatiblePairings.size(), tracks.size(), newObservations.size() );
@@ -219,7 +238,7 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
             Pairing::Ptr pairing = it->second;
 
             // Check if the observation hasn't been matched with a different track already, and if the Mahalanobis distance
-            // is better than what we have seen so far. 
+            // is better than what we have seen so far.
             if(!pairing->observation->matched && pairing->d < best_d) {
                 best_d = pairing->d;
                 bestPairing = pairing;
@@ -236,11 +255,16 @@ Pairings NearestNeighborTracker::performDataAssociation(Tracks& tracks, const Ob
             track->numberOfTotalMatches++;
             track->numberOfConsecutiveOcclusions = 0;
         }
-        else {
+        else if (track->trackStatus == Track::OCCLUDED){
             // Track is occluded
             track->observation.reset();
             track->trackStatus = Track::OCCLUDED;
             track->numberOfConsecutiveOcclusions++;
+        }
+        else{
+            // Track is missed
+            track->observation.reset();
+            track->trackStatus = Track::MISSED;
         }
     }
 
@@ -256,14 +280,15 @@ void NearestNeighborTracker::updateKalmanFilter(const Pairings& pairings)
         // Only update tracks in validated pairings
         if(pairing->validated) {
             assert(pairing->track->observation);
-            m_kalmanFilter.updateMatchedTrack(pairing->track->state, pairing);
+            m_filter->updateMatchedTrack(pairing->track->state, pairing);
         }
     }
+    ROS_DEBUG("Updating occluded tracks");
 
     foreach(Track::Ptr track, m_tracks) {
         // Update occluded tracks
         if(!track->observation) {
-            m_kalmanFilter.updateOccludedTrack(track->state);
+            m_filter->updateOccludedTrack(track->state);
         }
     }
 }
@@ -281,7 +306,7 @@ void NearestNeighborTracker::initNewTracksFromObservations(const Observations& n
             // that has recently been matched
             bool closebyExistingTrack = false;
             foreach(Track::Ptr track, m_tracks) {
-            if(track->numberOfConsecutiveOcclusions < 5) {
+                if(track->numberOfConsecutiveOcclusions < 5) {
                     ObsVector diff = track->state->x().head(2) - observation->z;
                     if(diff.norm() < 0.25) {
                         closebyExistingTrack = true;
@@ -292,21 +317,21 @@ void NearestNeighborTracker::initNewTracksFromObservations(const Observations& n
             if(closebyExistingTrack) continue;
 
             Track::Ptr newTrack( new Track );
-            
+
             newTrack->id = m_trackIdCounter++;
             newTrack->trackStatus = Track::NEW;
             newTrack->observation = observation;
             newTrack->createdAt = m_cycleTime;
-            newTrack->numberOfTotalMatches = newTrack->numberOfConsecutiveOcclusions = 0;
+            newTrack->numberOfTotalMatches = newTrack->numberOfConsecutiveOcclusions = newTrack->model_idx = 0;
 
-            newTrack->state = m_kalmanFilter.initializeTrackState(observation);
-            newTrack->stateHistory.set_capacity(Params::get<int>("state_history_length", 30)); // for debugging & elimination of duplicate tracks
+            newTrack->state = m_filter->initializeTrackState(observation);
+            newTrack->stateHistory.set_capacity(Params::get<int>("state_history_length", 30)); // for DEBUGging & elimination of duplicate tracks
 
-            newTracks.push_back(newTrack);            
+            newTracks.push_back(newTrack);
         }
     }
 
-    if(!newTracks.empty()) ROS_INFO("%zu new track(s) have been initialized!", newTracks.size());
+    if(!newTracks.empty()) ROS_DEBUG("%zu new track(s) have been initialized!", newTracks.size());
     appendTo(m_tracks, newTracks);
 }
 
@@ -317,7 +342,7 @@ void NearestNeighborTracker::initNewTracksFromCandidates(const InitiatorCandidat
 
     Tracks newTracks;
     foreach(InitiatorCandidate::Ptr candidate, candidates)
-      {
+    {
         Observations observations = candidate->observations;
         Track::Ptr newTrack( new Track );
 
@@ -327,13 +352,13 @@ void NearestNeighborTracker::initNewTracksFromCandidates(const InitiatorCandidat
         newTrack->createdAt = m_cycleTime;
         newTrack->numberOfTotalMatches = newTrack->numberOfConsecutiveOcclusions = 0;
 
-        newTrack->state = candidate->state;
-        newTrack->stateHistory.set_capacity(Params::get<int>("state_history_length", 30)); // for debugging & elimination of duplicate tracks
+        newTrack->state = m_filter->initializeTrackStateFromLogicInitiator(candidate);
+        newTrack->stateHistory.set_capacity(Params::get<int>("state_history_length", 30)); // for DEBUGging & elimination of duplicate tracks
 
         newTracks.push_back(newTrack);
-      }
+    }
 
-    if(!newTracks.empty()) ROS_INFO("%zu new track(s) have been initialized!", newTracks.size());
+    if(!newTracks.empty()) ROS_DEBUG("%zu new track(s) have been initialized!", newTracks.size());
     appendTo(m_tracks, newTracks);
 }
 
@@ -358,7 +383,7 @@ void NearestNeighborTracker::deleteDuplicateTracks()
             for(size_t historyIndex = 0; historyIndex < requiredStateHistoryLength; historyIndex++) {
                 FilterState::Ptr s1 = m_tracks[t1]->stateHistory[ m_tracks[t1]->stateHistory.size() - historyIndex - 1]; // get n-latest element
                 FilterState::Ptr s2 = m_tracks[t2]->stateHistory[ m_tracks[t2]->stateHistory.size() - historyIndex - 1];
-                
+
                 ObsVector diff = s1->x().head(2) - s2->x().head(2);
                 if(diff.norm() < MAX_DISTANCE) numMatches++;
             }
@@ -371,7 +396,7 @@ void NearestNeighborTracker::deleteDuplicateTracks()
                 else {
                     tracksToDelete.push_back(m_tracks[t2]);
                 }
-            }            
+            }
         }
     }
 
@@ -382,7 +407,7 @@ void NearestNeighborTracker::deleteDuplicateTracks()
         Tracks::iterator trackToDelete = std::find(m_tracks.begin(), m_tracks.end(), tracksToDelete.back());
         if(trackToDelete != m_tracks.end()) {
             // Delete track
-            ROS_INFO_STREAM("Deleting duplicate track " << (*trackToDelete)->id);
+            ROS_DEBUG_STREAM("Deleting duplicate track " << (*trackToDelete)->id);
             m_tracks.erase(trackToDelete);
         }
 
@@ -394,36 +419,7 @@ void NearestNeighborTracker::deleteDuplicateTracks()
 
 void NearestNeighborTracker::deleteObsoleteTracks()
 {
-    ROS_DEBUG("Deleting obsolete tracks");
-    
-    const int MAX_OCCLUSIONS_BEFORE_DELETION = Params::get<int>("max_occlusions_before_deletion", 20);
-    const int MAX_OCCLUSIONS_BEFORE_DELETION_OF_MATURE_TRACK = Params::get<int>("max_occlusions_before_deletion_of_mature_track", 120);
-    const int TRACK_IS_MATURE_AFTER_TOTAL_NUM_MATCHES = Params::get<int>("track_is_mature_after_total_num_matches", 100);
-
-    size_t numDeletedTracks = 0;
-    bool foundTrackToDelete;
-    
-    do {
-        foundTrackToDelete = false;
-        for(Tracks::iterator trackIt = m_tracks.begin(); trackIt != m_tracks.end(); ++trackIt) {
-            Track::Ptr track = *trackIt;
-            
-            // Check if the track is considered as "mature", i.e. it has been there for a long time already.
-            const bool trackIsMature = track->numberOfTotalMatches >= TRACK_IS_MATURE_AFTER_TOTAL_NUM_MATCHES;
-
-            // Check if the track hasn't been seen for too long.
-            const int occlusionFrameLimit = trackIsMature ? MAX_OCCLUSIONS_BEFORE_DELETION_OF_MATURE_TRACK : MAX_OCCLUSIONS_BEFORE_DELETION;
-            if(track->numberOfConsecutiveOcclusions > occlusionFrameLimit) {
-                m_tracks.erase(trackIt);
-                foundTrackToDelete = true;
-                numDeletedTracks++;
-                break; // need to exit for loop because iterator has become invalid
-            }
-        }
-    }
-    while(foundTrackToDelete);
-
-    if(numDeletedTracks) ROS_INFO("%zu track(s) have been deleted!", numDeletedTracks);
+    m_occlusionManager->deleteOccludedTracks(m_tracks, ros::Time(m_cycleTime));
 }
 
 

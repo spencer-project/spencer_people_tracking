@@ -1,3 +1,5 @@
+/* Created on: Jun 23, 2014. Author: Fabian Girrbach */
+
 #include <ros/ros.h>
 #include <spencer_tracking_msgs/DetectedPersons.h>
 #include <spencer_tracking_msgs/TrackedPersons.h>
@@ -7,14 +9,10 @@
 #include <message_filters/sync_policies/approximate_time.h>
 
 
-
 #include <fstream>
 #include <iostream>
 #include <csignal>
-/*--------------------------------------------------------------------
- * main()
- * Main function to set up ROS node.
- *------------------------------------------------------------------*/
+
 std::ofstream file_gt_persons, file_gt_tracks, file_persons, file_tracks, file_compare_tracks, file_compare_detections;
 
 void callback_gt_persons(const spencer_tracking_msgs::DetectedPersonsConstPtr &msg){

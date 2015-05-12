@@ -23,6 +23,8 @@ set(TRACKER_SOURCES
     ${SOURCE_DIR}/ekf.cpp
     ${SOURCE_DIR}/nearest_neighbor_tracker.cpp
     ${SOURCE_DIR}/logic_initiator.cpp
+    ${SOURCE_DIR}/imm_filter.cpp
+    ${SOURCE_DIR}/occlusion_handling/basic_occlusion_manager.cpp
 )
 
 

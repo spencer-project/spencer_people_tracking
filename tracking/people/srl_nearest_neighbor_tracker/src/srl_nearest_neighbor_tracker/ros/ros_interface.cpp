@@ -1,3 +1,5 @@
+/* Created on: May 07, 2014. Author: Timm Linder */
+
 #include <srl_nearest_neighbor_tracker/ros/ros_interface.h>
 #include <srl_nearest_neighbor_tracker/base/defs.h>
 #include <srl_nearest_neighbor_tracker/base/stl_helpers.h>
@@ -150,10 +152,24 @@ void ROSInterface::publishTracks(ros::Time currentRosTime, const Tracks& tracks)
         spencer_tracking_msgs::TrackedPerson trackedPerson;    
 
         trackedPerson.track_id = track->id;
-        trackedPerson.age = ros::Duration(currentRosTime.toSec() - track->createdAt);        
-        trackedPerson.is_occluded = false; // not using a physical occlusion model for the moment
-        trackedPerson.is_matched = (bool) track->observation;
-        if(trackedPerson.is_matched) trackedPerson.detection_id = track->observation->id;
+        trackedPerson.age = ros::Duration(currentRosTime.toSec() - track->createdAt);
+               
+        switch(track->trackStatus){
+        case Track::MATCHED:
+        case Track::NEW:
+            trackedPerson.is_matched = true;
+            trackedPerson.is_occluded = false;
+            trackedPerson.detection_id = track->observation->id;
+            break;
+        case Track::MISSED:
+            trackedPerson.is_matched = false;
+            trackedPerson.is_occluded = false;
+            break;
+        case Track::OCCLUDED:
+            trackedPerson.is_matched = false;
+            trackedPerson.is_occluded = true;
+        }
+
         m_geometryUtils.meanAndCovarianceToPoseAndTwist(track->state->x(), track->state->C(), trackedPerson.pose, trackedPerson.twist); // state estimate (update)
 
         // Heuristic sanity check for tracked person poses (if anything in the tracker goes wrong)

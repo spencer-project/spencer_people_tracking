@@ -1,3 +1,4 @@
+/* Created on: Jun 02, 2014. Author: Fabian Girrbach */
 #include <srl_nearest_neighbor_tracker/nearest_neighbor_tracker.h>
 #include <srl_nearest_neighbor_tracker/base/defs.h>
 #include <srl_nearest_neighbor_tracker/base/stl_helpers.h>
@@ -15,23 +16,21 @@
 namespace srl_nnt{
 
 
-LogicInitiator::LogicInitiator(const double velMin, const double velMax, const unsigned int numberScans)
-    : m_velMax(velMax),
-      m_velMin(velMin),
-      m_numberScans(numberScans),
+LogicInitiator::LogicInitiator()
+    : m_velMax(Params::get<double>("logic_initiator_max_velocity", 2.0)),
+      m_velMin(Params::get<double>("logic_initiator_min_velocity", 0.2)),
+      m_numberScans(Params::get<int>("logic_initiator_number_scans_before_acceptance",6)),
+      m_maxMissedObs(Params::get<int>("logic_initiator_max_number_consecutive_missed_observations",3)),
+      m_incrementalCheck(Params::get<bool>("logic_initiator_use_incremental_checking",true)),
       m_distMethod(EUCLIDEAN),
       m_maxMahaDistance(0.020100),
       m_maxAngleVariance(angles::from_degrees(30.0)),
-      m_useKalman(false),
-      m_incrementalCheck(true),
-      m_maxMissedObs(3),
       m_velocityVariance(0.1)
 {
-    if(m_distMethod == EUCLIDEAN && m_useKalman == true)
-    {
-        ROS_ERROR("Kalman Filter can only be used in combination with Mahalanobis Distance.");
-        exit(EXIT_FAILURE);
-    }
+    ROS_INFO_STREAM("LogicInitiator set to the following configuration: \nMinimal velocity of tracks "
+            << m_velMin << "m/s\nMaximal velocity of tracks " << m_velMax
+            << "m/s\nNumber of scans "<< m_numberScans << "\nAllowed missed observations "
+            <<  m_maxMissedObs << "\nIncremental checking "<< m_incrementalCheck );
 
 }
 
@@ -174,7 +173,7 @@ InitiatorCandidates LogicInitiator::processObservations(const Observations obser
     }
     m_candidates = acceptedCandidates;
 
-    ROS_INFO_STREAM("Number of accepted initation candidates " << acceptedCandidates.size() << std::endl);
+    ROS_DEBUG_STREAM("Number of accepted initiation candidates " << acceptedCandidates.size() << std::endl);
     return newTracks;
 }
 
@@ -575,7 +574,7 @@ void LogicInitiator::predictKalman(KalmanFilterState::Ptr state, double deltatim
     StateMatrix A = StateMatrix::Identity();
     A(0, 2) = deltatime;
     A(1, 3) = deltatime;
-    m_kalmanFilter.setTransitionMatrix(A);
+    m_kalmanFilter.setTransitionMatrix(state->x(), deltatime);
     m_kalmanFilter.predictTrackState(state, deltatime);
     ROS_DEBUG_STREAM("Predicted state kalman x:" << state->m_xp(0) << " ; y" << state->m_xp(1) << "\nDelta t: " << deltatime);
 }
