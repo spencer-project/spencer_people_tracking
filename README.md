@@ -38,6 +38,9 @@ We have integrated the following person detection modules:
 - A monocular-vision full-body HOG detector ([groundHOG](/detection/monocular_detectors/rwth_ground_hog)) [2], which based upon a given ground plane estimate determines the image corridor in which pedestrians can be expected. This detector is GPU-accelerated using CUDA. The contained [cudaHOG](/detection/monocular_detectors/3rd_party) library requires manual compilation and a recent CUDA SDK as well as an nVidia graphics card.
 - An [RGB-D detector](/detection/rgbd_detectors/pcl_people_detector) from the [PCL library](http://pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php), which extracts candidate ROIs on a groundplane and then applies a linear HOG classifier [4]
 
+External detectors which output a `geometry_msgs/PoseArray` can easily be integrated using the scripts in [this package](/detection/spencer_pose_array_conversion). Examples of such detectors include:
+- The [laser-based leg detector](https://github.com/wg-perception/people/tree/indigo-devel/leg_detector) from wg-perception
+
 ##### Multi-modal detection and fusion
 
 For detection-to-detection fusion, we have implemented a series of nodelets which can be used to flexibly compose a fusion pipeline by means of roslaunch XML files. Details can be found in the [spencer_detected_person_association](/detection/spencer_detected_person_association) package. The following figure shows an example configuration which was used during experiments in SPENCER:
