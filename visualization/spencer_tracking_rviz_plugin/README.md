@@ -56,5 +56,5 @@ the second topic being the tracked persons topic.
 
 ##### Credits
 
-Author: ©2013-2015 Timm Linder, Social Robotics Laboratory, Albert-Ludwigs-University Freiburg, Germany
+Author: ©2013-2015 Timm Linder, Social Robotics Laboratory, Albert-Ludwigs-University Freiburg, Germany  
 E-mail: linder(-at-)cs.uni-freiburg.de
