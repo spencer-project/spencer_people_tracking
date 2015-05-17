@@ -4,7 +4,20 @@
 ![Tracked persons projected into the front RGB-D camera](/../screenshots/screenshots/full-system-3-front-cam-edited.png?raw=true "Tracked persons projected into the front RGB-D camera")
 
 
-*More code, documentation and videos will be added shortly.*
+*This is an ongoing research project. More code, documentation and videos are continuously being added.*
+
+#### Features at a glance
+
+- **Multi-modal detection:** Multiple detectors for RGB-D and 2D laser integrated into a common framework.
+- **People tracking:** Efficient tracker based upon nearest-neighbor data association.
+- **Social relations:** Estimate social / spatial relations between people via coherent motion indicators.
+- **Group tracking:** Detection and tracking of entire groups of people based upon their social relations.
+- **Robustness:** Various extensions such as IMM, track initiation logic and high-recall detector input make the people tracker work relatively robustly even in very dynamic environments.
+- **Real-time:** Runs at 20-30 Hz on gaming laptops, tracker itself requires only ~10% of single CPU core.
+- **Extensible and reusable:** Well-structured ROS message types and clearly defined interfaces make it easy to integrate custom detection and tracking components.
+- **Powerful visualization:** A series of reusable RViz plugins that can be configured via mouse click, plus scripts for generating animated (2D) SVG files.
+- **Evaluation tools:** Metrics (CLEAR-MOT, OSPA) for evaluation of tracking performance.
+- **ROS integration:** All components are fully integrated with ROS and written in C++ or Python. No Matlab required.
 
 #### Motivation
 
