@@ -120,7 +120,7 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 #### Installation
 
-The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo.
+The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
 
 ##### Required dependencies
 
@@ -135,6 +135,7 @@ We recommend installation of ROS and the required depencencies of our components
 
     sudo apt-get install ros-indigo-desktop-full
     sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-indigo-openni-launch ros-indigo-openni2-launch ros-indigo-cmake-modules ros-indigo-eigen-conversions
+    
 ##### Building our ROS packages
 
 As we currently do not yet provide any pre-built Debian packages, we suggest to [create a new catkin workspace](http://wiki.ros.org/catkin/workspaces) for our framework, and then clone the content of this repository into the `src` folder of this new workspace. Then, build the workspace using the normal methods (catkin_make / catkin build).
@@ -143,6 +144,53 @@ As we currently do not yet provide any pre-built Debian packages, we suggest to 
 
 The cudaHOG library used by the groundHOG detector requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
 
+#### Quick start tutorial
+
+The following three tutorials help you to easily get started using our framework.
+
+##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
+
+This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live or Kinect v1 sensor horizontally on a flat surface, and connect it to your computer. Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
+
+    roslaunch spencer_people_tracking_launch tracking_single_rgbd_sensor.launch height_above_ground:=1.6
+    
+This will do the following:
+- Start the OpenNi2 drivers and publish RGB-D point clouds in the `/spencer/sensors/rgbd_front_top/` camera namespace
+- Run an upper-body RGB-D and groundHOG RGB detector, assuming a horizontal ground plane at 1.6 meters below the sensor. Other heights may work as well, but the detector has been trained at approximately this height.
+- Run a simple detection-to-detection fusion pipeline
+- Run the `srl_nearest_neighbor_tracker`, which will subscribe to `/spencer/perception/detected_persons` and publish tracks at `/spencer/perception/tracked_persons`
+- Run RViz with a predefined configuration, which shows the point cloud, detected and tracked persons (using our custom RViz plugins)
+
+If this doesn't work, first check if the point cloud is displayed properly in RViz. If not, there is probably a problem with your RGB-D sensor (USB or OpenNi 2 issues).
+
+##### Tutorial 2: Tracking with front and rear laser + RGB-D sensors
+
+To try out a sensor configuration similar to the SPENCER robot platform, run:
+
+    roslaunch spencer_people_tracking_launch tracking_on_robot.launch
+    
+This assumes the RGB-D sensors mounted horizontally at about 1.6m above ground, and sensor data to be published on the following topics:
+
+    /spencer/sensors/laser_front/echo0  [sensor_msgs/LaserScan]
+    /spencer/sensors/laser_rear/echo0   [sensor_msgs/LaserScan]
+    /spencer/sensors/rgbd_front_top/{rgb/image_raw,depth/image_rect}  [sensor_msgs/Image]
+    /spencer/sensors/rgbd_front_top/{rgb/camera_info} [sensor_msgs/CameraInfo]
+    /spencer/sensors/rgbd_rear_top/{rgb/image_raw,depth/image_rect}   [sensor_msgs/Image]
+    /spencer/sensors/rgbd_rear_top/{rgb/camera_info}  [sensor_msgs/CameraInfo]
+
+The launch file starts a pipeline similar to that from tutorial 1 (above), but includes a second set of RGB-D detectors for the rear sensor, as well as person detectors for the two 2D laser scanners. Sensor drivers which publish the RGB-D and laser data listed above are _not_ started automatically by this launch file. Also, you manually have to start Rviz.
+
+###### Using a subset of these sensors
+
+Note that the fusion pipeline reconfigures automatically if only a subset of the person detectors is running. If e.g. you don't have a rear RGB-D sensor, just comment out the line which includes `rear_rgbd_detectors.launch` in `tracking_on_robot.launch`.
+
+##### Tutorial 3: Fully customized sensor configuration
+
+1. Start your own launch files for starting person detectors, or use a combination of the launch files we provide in [`spencer_people_tracking_launch/launch/detectors`](/launch/spencer_people_tracking_launch/launch/detectors). You may have to remap input and output topics as needed.
+2. Create a copy of [`detection_to_detection_fusion_pipeline.launch`](/detection/spencer_detected_person_association/launch/detection_to_detection_fusion_pipeline.launch) and its children, such as [`fuse_lasers_and_rgbd.launch`](detection/spencer_detected_person_association/launch/fuse_lasers_and_rgbd.launch), in [`spencer_detected_person_association`](/detection/spencer_detected_person_association). Based upon the provided example, create your own pipeline that step-by-step fuses detections from different detectors. For more information, see the corresponding package.
+3. Create a copy of the `people_tracking.launch` file in `spencer_people_tracking_launch`. Adjust it to refer to your own fusion launch file created in step 2.
+3. Start your copy of `people_tracking.launch`.
+4. If needed, start group tracking via `roslaunch spencer_people_tracking_launch group_tracking.launch`.
 
 #### Credits, license & how to cite
 
