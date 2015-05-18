@@ -135,6 +135,8 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
 
+*NOTE: The entire framework has only been tested on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). This will be fixed at a later point in time. See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
+
 ##### Required dependencies
 
 We recommend installation of ROS and the required depencencies of our components via:
