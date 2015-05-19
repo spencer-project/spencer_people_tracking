@@ -52,7 +52,7 @@ We have integrated the following person detection modules:
 - An [RGB-D detector](/detection/rgbd_detectors/pcl_people_detector) from the [PCL library](http://pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php), which extracts candidate ROIs on a groundplane and then applies a linear HOG classifier [4]
 
 Further external detectors which output `geometry_msgs/PoseArray` or `people_msgs/PositionMeasurementArray` messages can easily be integrated into our framework using the scripts from [this package](/detection/spencer_detected_person_conversion). Examples of such detectors include:
-- The [laser-based leg detector](https://github.com/wg-perception/people/tree/indigo-devel/leg_detector) from wg-perception
+- The [laser-based leg detector](https://github.com/wg-perception/people/tree/indigo-devel/leg_detector) from wg-perception, which might work better than our own laser detector if the sensor is located very close to the ground. See our [wrapper package](/detection/laser_detectors/spencer_leg_detector_wrapper/) and [`leg_detectors.launch`](/launch/spencer_people_tracking_launch/launch/detectors/leg_detectors.launch) (replaces `laser_detectors.launch`).
 
 ##### Multi-modal detection and fusion
 
