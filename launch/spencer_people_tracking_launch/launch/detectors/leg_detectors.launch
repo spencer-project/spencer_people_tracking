@@ -1,0 +1,37 @@
+<!-- Alternatively launch file that launches two instances of the laser-based leg detector from wg-perception (needs to be installed separately) -->
+<launch>
+    <arg name="front" default="true"/>  <!-- front detector enabled? -->
+    <arg name="rear" default="true"/>   <!-- rear detector enabled? -->
+    
+    <arg name="config_file" default="spencer2.yaml"/>
+
+    <arg name="detection_id_increment" default="20"/>
+    <arg name="detection_id_offset_front" default="1"/>
+    <arg name="detection_id_offset_rear" default="2"/>
+
+    <!-- With default prefix, topic and node names will be similar to those from laser_detectors.launch. Override this if you want to run both at the same time! -->
+    <arg name="node_prefix" default="laser"/>
+
+    <group ns="/spencer/perception_internal/people_detection">
+        <!-- Front -->
+        <include file="$(find spencer_leg_detector_wrapper)/launch/leg_detector.launch" if="$(arg front)">
+            <arg name="scan" value="/spencer/sensors/laser_front/echo0"/>
+            <arg name="node_prefix" value="$(arg node_prefix)_front"/>
+            <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/$(arg node_prefix)_front"/>
+            <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
+            <arg name="detection_id_offset" value="$(arg detection_id_offset_front)"/>
+            <arg name="config_file" value="$(arg config_file)"/>
+        </include>
+
+        <!-- Rear -->
+        <include file="$(find spencer_leg_detector_wrapper)/launch/leg_detector.launch" if="$(arg rear)">
+            <arg name="scan" value="/spencer/sensors/laser_rear/echo0"/>
+            <arg name="node_prefix" value="$(arg node_prefix)_rear"/>
+            <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/$(arg node_prefix)_rear"/>
+            <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
+            <arg name="detection_id_offset" value="$(arg detection_id_offset_rear)"/>
+            <arg name="config_file" value="$(arg config_file)"/>
+        </include> 
+    </group>
+
+</launch>
