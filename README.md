@@ -46,13 +46,13 @@ We highly encourage reuse of these messages to benefit from our rich infrastruct
 ##### People detection
 
 We have integrated the following person detection modules:
-- A reimplementation of a boosted [2D laser segment classifier](/detection/laser_detectors/srl_laser_detectors), based upon the method by Arras et al. [3]
-- An [RGB-D upper-body detector](/detection/rgbd_detectors/rwth_upper_body_detector) described more closely in [2], which slides a normalized depth template over ROIs in the depth image
-- A monocular-vision full-body HOG detector ([groundHOG](/detection/monocular_detectors/rwth_ground_hog)) [2], which based upon a given ground plane estimate determines the image corridor in which pedestrians can be expected. This detector is GPU-accelerated using CUDA. The contained [cudaHOG](/detection/monocular_detectors/3rd_party) library requires manual compilation and a recent CUDA SDK as well as an nVidia graphics card.
-- An [RGB-D detector](/detection/rgbd_detectors/pcl_people_detector) from the [PCL library](http://pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php), which extracts candidate ROIs on a groundplane and then applies a linear HOG classifier [4]
+- A reimplementation of a **[boosted 2D laser segment classifier](/detection/laser_detectors/srl_laser_detectors)**, based upon the method by Arras et al. [3]
+- An **[RGB-D upper-body detector](/detection/rgbd_detectors/rwth_upper_body_detector)** described more closely in [2], which slides a normalized depth template over ROIs in the depth image
+- A monocular-vision **full-body HOG detector ([groundHOG](/detection/monocular_detectors/rwth_ground_hog))** [2], which based upon a given ground plane estimate determines the image corridor in which pedestrians can be expected. This detector is GPU-accelerated using CUDA. The contained [cudaHOG](/detection/monocular_detectors/3rd_party) library requires manual compilation and a recent CUDA SDK as well as an nVidia graphics card.
+- An **[RGB-D detector](/detection/rgbd_detectors/pcl_people_detector) from the [PCL library](http://pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php)**, which extracts candidate ROIs on a groundplane and then applies a linear HOG classifier [4]
 
 Further external detectors which output `geometry_msgs/PoseArray` or `people_msgs/PositionMeasurementArray` messages can easily be integrated into our framework using the scripts from [this package](/detection/spencer_detected_person_conversion). Examples of such detectors include:
-- The [laser-based leg detector](https://github.com/wg-perception/people/tree/indigo-devel/leg_detector) from wg-perception, which might work better than our own laser detector if the sensor is located very close to the ground. See our [wrapper package](/detection/laser_detectors/spencer_leg_detector_wrapper/) and [`leg_detectors.launch`](/launch/spencer_people_tracking_launch/launch/detectors/leg_detectors.launch) (replaces `laser_detectors.launch`).
+- The **[laser-based leg detector](https://github.com/wg-perception/people/tree/indigo-devel/leg_detector)** from wg-perception, which might work better than our own laser detector if the sensor is located very close to the ground. See our [wrapper package](/detection/laser_detectors/spencer_leg_detector_wrapper/) and [`leg_detectors.launch`](/launch/spencer_people_tracking_launch/launch/detectors/leg_detectors.launch) (replaces `laser_detectors.launch`).
 
 ##### Multi-modal detection and fusion
 
