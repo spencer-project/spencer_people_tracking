@@ -1,0 +1,13 @@
+fixed_frame:            odom
+connection_threshold:   0.165
+min_points_per_group:   15
+leg_reliability_limit:  0.22
+no_observation_timeout: 0.05
+max_second_leg_age:     0.0
+max_track_jump:         0.5
+max_meas_jump:          0.5
+leg_pair_separation:    0.98
+kalman_p:               4.0
+kalman_q:               0.002
+kalman_r:               10.0
+kalman_on:              1

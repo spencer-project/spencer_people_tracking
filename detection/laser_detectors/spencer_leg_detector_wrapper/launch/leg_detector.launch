@@ -1,0 +1,31 @@
+<!-- Launches the leg detector from wg-perception (needs to be installed separately) -->
+<launch>
+    <arg name="scan" default="scan"/>                           <!-- laser scan input topic -->
+    <arg name="detected_persons" default="detected_persons"/>   <!-- output topic -->
+    <arg name="node_prefix" default="leg_detector"/>            <!-- prefix for node names -->
+
+    <arg name="config_file" default="spencer2.yaml"/>
+ 
+    <arg name="detection_id_offset" default="0"/>
+    <arg name="detection_id_increment" default="1"/>
+    <arg name="cov_scale" default="0.01"/>
+
+
+    <group ns="$(arg node_prefix)">
+        <node name="detector" pkg="leg_detector" type="leg_detector" args="scan:=$(arg scan) $(find leg_detector)/config/trained_leg_detector.yaml" output="screen">
+            <!-- Load detector config -->
+            <rosparam command="load" file="$(find spencer_leg_detector_wrapper)/configs/$(arg config_file)"/>
+        </node>
+
+        <node name="converter" pkg="spencer_detected_person_conversion" type="position_measurement_array_to_detected_persons.py" output="screen">
+            <param name="detection_id_offset" value="$(arg detection_id_offset)"/>
+            <param name="detection_id_increment" value="$(arg detection_id_increment)"/>
+            <param name="use_object_id" value="false"/>
+            <param name="cov_scale" value="$(arg cov_scale)"/>
+
+            <remap from="/position_measurements" to="leg_tracker_measurements"/>
+            <remap from="/spencer/perception/detected_persons" to="$(arg detected_persons)"/>
+        </node>
+    </group>
+        
+</launch>
