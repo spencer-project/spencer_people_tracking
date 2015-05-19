@@ -1,4 +1,4 @@
-<!-- Alternatively launch file that launches two instances of the laser-based leg detector from wg-perception (needs to be installed separately) -->
+<!-- Alternative launch file that launches two instances of the laser-based leg detector from wg-perception (needs to be installed separately) -->
 <launch>
     <arg name="front" default="true"/>  <!-- front detector enabled? -->
     <arg name="rear" default="true"/>   <!-- rear detector enabled? -->
