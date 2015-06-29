@@ -8,7 +8,7 @@
     <group ns="/spencer/perception_internal/people_detection">
 
         <!-- RWTH fixed groundplane -->
-        <include file="$(find rwth_ground_plane)/launch/ground_plane_really_fixed.launch" if="$(arg publish_gp)">
+        <include file="$(find rwth_ground_plane)/launch/ground_plane_fixed.launch" if="$(arg publish_gp)">
             <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane"/>
             <arg name="rate" value="30.0"/> <!-- limits how fast upper-body and HOG detector can run -->     
         </include>
