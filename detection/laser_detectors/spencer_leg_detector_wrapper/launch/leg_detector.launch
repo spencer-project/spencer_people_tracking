@@ -23,6 +23,9 @@
             <param name="use_object_id" value="false"/>
             <param name="cov_scale" value="$(arg cov_scale)"/>
 
+            <!-- FIXME: I believe the target topic should be people_tracker_measurements (=fused), otherwise we get one
+                 detection per single leg, leading to duplicate person tracks. Couldn't test this on SPENCER data, as our
+                 sensor is mounted too high to discriminate between two legs of a person. -->
             <remap from="/position_measurements" to="leg_tracker_measurements"/>
             <remap from="/spencer/perception/detected_persons" to="$(arg detected_persons)"/>
         </node>
