@@ -165,7 +165,7 @@ The following three tutorials help you to easily get started using our framework
 
 ##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
 
-This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live or Kinect v1 sensor horizontally on a flat surface, and connect it to your computer. Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
+This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live or Kinect v1 sensor horizontally on a flat surface, and connect it to your computer (or play the example bagfile linked in a section further below). Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
 
     roslaunch spencer_people_tracking_launch tracking_single_rgbd_sensor.launch height_above_ground:=1.6
     
@@ -206,6 +206,12 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 3. Create a copy of the `people_tracking.launch` file in `spencer_people_tracking_launch`. Adjust it to refer to your own fusion launch file created in step 2.
 3. Start your copy of `people_tracking.launch`.
 4. If needed, start group tracking via `roslaunch spencer_people_tracking_launch group_tracking.launch`.
+
+#### Example dataset (bagfile)
+
+A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework will be linked here shortly.
+
+In case you just want to test one of the detectors, we will also provide a launch file that remaps the bagfile topics to the ones expected by the detector launch files (e.g. `laser` instead of `/spencer/sensors/laser_front/echo0`). 
 
 #### Credits, license & how to cite
 
