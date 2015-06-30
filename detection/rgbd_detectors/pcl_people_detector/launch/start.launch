@@ -1,0 +1,31 @@
+<launch>
+    <arg name="input_topic" default="/camera/depth_registered/points"/>
+    <arg name="camera_info_topic" default="/camera/rgb/camera_info"/>
+
+    <arg name="ground_coeffs" default="0 0 1 1.6"/> <!-- n_x n_y n_z d. TODO: Verify that normal is correctly oriented. -->
+    <arg name="min_person_height" default="1.2"/>
+    <arg name="max_person_height" default="2.0"/>
+
+    <arg name="base_link_frame" default="base_link"/>
+    <arg name="detection_frame" default="pcl_people_detector_frame"/>  <!-- Virtual frame that is published by the detector. Change only if running multiple instances. -->
+    
+    <arg name="detection_id_offset" default="0"/>
+    <arg name="detection_id_increment" default="1"/>
+    <arg name="node_name" default="pcl_people_detector"/>
+
+    <node name="$(arg node_name)" type="detect_people" pkg="pcl_people_detector" output="screen">
+        <param name="input_topic" value="$(arg input_topic)"/>
+        <param name="camera_info_topic" value="$(arg camera_info_topic)"/>
+        
+        <param name="ground_coeffs" value="$(arg ground_coeffs)"/>
+        <param name="min_person_height" value="$(arg min_person_height)"/>
+        <param name="max_person_height" value="$(arg max_person_height)"/>
+        
+        <param name="base_link_frame" value="$(arg base_link_frame)"/>
+        <param name="detection_frame" value="$(arg detection_frame)"/>
+        
+        <param name="detection_id_offset" value="$(arg detection_id_offset)"/>
+        <param name="detection_id_increment" value="$(arg detection_id_increment)"/>
+    </node>
+
+</launch>
