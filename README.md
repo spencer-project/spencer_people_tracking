@@ -225,7 +225,15 @@ Credits of the different ROS packages go to the particular authors listed in the
 This work has been supported by the EC under contract number FP7-ICT-600877 (SPENCER).
 If you use the software contained in this repository for your research, please cite the following publication:
 
-> TBD
+> Taking a Closer Look at People Tracking in Challenging Environments Using a Novel Multi-Modal Evaluation Framework    
+> Linder, T. and Breuers, S. (equal contribution), Leibe, B., Arras, K.O.    
+> IEEE International Conference on Robotics and Automation (ICRA) 2016    
+
+also optionally:
+
+> People Detection, Tracking and Visualization using ROS on a Mobile Service Robot    
+> Linder, T. and Arras, K.O.    
+> Robot Operating System (ROS): The Complete Reference. Springer Studies in Systems, Decision and Control, 2016, to appear    
 
 Most of the software in this repository is released under a BSD (2-clause) license. For details, however, please check the individual ROS packages.
 
