@@ -233,7 +233,7 @@ also optionally:
 
 > People Detection, Tracking and Visualization using ROS on a Mobile Service Robot    
 > Linder, T. and Arras, K.O.    
-> Robot Operating System (ROS): The Complete Reference. Springer Studies in Systems, Decision and Control, 2016, to appear    
+> Robot Operating System (ROS): The Complete Reference (Vol. 1). Springer Studies in Systems, Decision and Control, 2016
 
 Most of the software in this repository is released under a BSD (2-clause) license. For details, however, please check the individual ROS packages.
 
