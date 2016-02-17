@@ -225,8 +225,8 @@ Credits of the different ROS packages go to the particular authors listed in the
 This work has been supported by the EC under contract number FP7-ICT-600877 (SPENCER).
 If you use the software contained in this repository for your research, please cite the following publication:
 
-> Taking a Closer Look at People Tracking in Challenging Environments Using a Novel Multi-Modal Evaluation Framework    
-> Linder, T. and Breuers, S. (equal contribution), Leibe, B., Arras, K.O.    
+> On Multi-Modal People Tracking from Mobile Platforms in Very Crowded and Dynamic Environments    
+> Linder, T., Breuers, S., Leibe, B., Arras, K.O.    
 > IEEE International Conference on Robotics and Automation (ICRA) 2016    
 
 also optionally:
