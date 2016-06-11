@@ -1,0 +1,4 @@
+uint64[]      detection_ids       # IDs of detected persons
+---
+bool[]        was_found           # False if no associated track could be found (e.g. because the detection was false alarm). Has same length as detection_ids.
+uint64[]      track_ids           # ID of the associated tracks. Undefined if 'was_found' is false. Has same length as detection_ids.

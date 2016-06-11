@@ -5,14 +5,15 @@ find_package(catkin REQUIRED COMPONENTS rospy roscpp message_filters spencer_tra
 
 
 FIND_PACKAGE(Eigen REQUIRED)
+include_directories(${Eigen_INCLUDE_DIRS})
 
-#add_service_files(
-#  FILES
-#  LookupTrackId.srv
-#  LookupTrackIds.srv
-#)
+add_service_files(
+  FILES
+  LookupTrackId.srv
+  LookupTrackIds.srv
+)
 
-#catkin_python_setup()
+catkin_python_setup()
 
 generate_messages(
    DEPENDENCIES
@@ -23,7 +24,6 @@ catkin_package(
   CATKIN_DEPENDS roscpp message_filters spencer_tracking_msgs std_msgs nodelet eigen_conversions tf_conversions
 )
 
-include_directories(${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 set(SOURCE_DIR src/spencer_detected_person_association)
 

@@ -1,0 +1,4 @@
+uint64      detection_id        # ID of a detected person
+---
+bool        was_found           # False if no associated track could be found (e.g. because the detection was false alarm).
+uint64      track_id            # ID of the associated track. Undefined if 'was_found' is false.
