@@ -48,6 +48,8 @@ spencer_diagnostics::MonitoredPublisher pub_detected_persons;
 
 cv::Mat img_depth_;
 cv_bridge::CvImagePtr cv_depth_ptr;	// cv_bridge for depth image
+ImageConstPtr color_image; // we cache the most recent color image for visualization purposes if somebody is listening
+string topic_color_image;
 
 Matrix<double> upper_body_template;
 Detector* detector;
@@ -169,7 +171,11 @@ void ReadUpperBodyTemplate(string template_path)
     }
 }
 
-void callback(const ImageConstPtr &depth,  const ImageConstPtr &color,const GroundPlane::ConstPtr &gp, const CameraInfoConstPtr &info)
+void colorImageCallback(const ImageConstPtr &color) {
+    color_image = color;
+}
+
+void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const CameraInfoConstPtr &info)
 {
     // Check if calculation is necessary
     bool detect = pub_message.getNumSubscribers() > 0 || pub_centres.getNumSubscribers() > 0 || pub_detected_persons.getNumSubscribers() > 0;
@@ -255,21 +261,29 @@ void callback(const ImageConstPtr &depth,  const ImageConstPtr &color,const Grou
     }
 
     // Creating a ros image with the detection results an publishing it
-    if(vis) {
-        ROS_DEBUG("Publishing image");
-        QImage image_rgb(&color->data[0], color->width, color->height, QImage::Format_RGB888); // would opencv be better?
-        render_bbox_2D(detection_msg, image_rgb, 0, 0, 255, 2);
+    if(vis && abs((depth->header.stamp - color_image->header.stamp).toSec()) < 0.2) {  // only if color image is not outdated (not using a synchronizer!)
+        // Check for suppported image format
+        if(color_image->encoding == "rgb8" || color_image->encoding == "bgr8") {
+            ROS_DEBUG("Publishing result image for upper-body detector");
 
-        sensor_msgs::Image sensor_image;
-        sensor_image.header = color->header;
-        sensor_image.height = image_rgb.height();
-        sensor_image.width  = image_rgb.width();
-        sensor_image.step   = color->step;
-        vector<unsigned char> image_bits(image_rgb.bits(), image_rgb.bits()+sensor_image.height*sensor_image.width*3);
-        sensor_image.data = image_bits;
-        sensor_image.encoding = color->encoding;
+            // Make a copy here so that in case `render_bbox_2D` corrupts memory,
+            // we don't corrupt the original buffer in the ROS message and may get better stacktraces.
+            QImage image_rgb = QImage(&color_image->data[0], color_image->width, color_image->height, color_image->step, QImage::Format_RGB888).copy(); // would opencv be better?
+            render_bbox_2D(detection_msg, image_rgb, 0, 0, 255, 2);
+            const uchar *bits = image_rgb.constBits();
 
-        pub_result_image.publish(sensor_image);
+            sensor_msgs::Image sensor_image;
+            sensor_image.header = color_image->header;
+            sensor_image.height = image_rgb.height();
+            sensor_image.width  = image_rgb.width();
+            sensor_image.step   = image_rgb.bytesPerLine();
+            sensor_image.data   = vector<uchar>(bits, bits + image_rgb.byteCount());
+            sensor_image.encoding = color_image->encoding;
+
+            pub_result_image.publish(sensor_image);
+        } else {
+            ROS_WARN("Color image not in RGB8/BGR8 format not supported");
+        }
     }
 
     // Publishing detections
@@ -281,23 +295,26 @@ void callback(const ImageConstPtr &depth,  const ImageConstPtr &color,const Grou
 // Connection callback that unsubscribes from the tracker if no one is subscribed.
 void connectCallback(message_filters::Subscriber<CameraInfo> &sub_cam,
                      message_filters::Subscriber<GroundPlane> &sub_gp,
-                     image_transport::SubscriberFilter &sub_col,
+                     boost::shared_ptr<image_transport::Subscriber> &sub_col,
                      image_transport::SubscriberFilter &sub_dep,
                      image_transport::ImageTransport &it) {
     if(!pub_message.getNumSubscribers() && !pub_result_image.getNumSubscribers() && !pub_centres.getNumSubscribers() && !pub_detected_persons.getNumSubscribers()) {
         ROS_DEBUG("Upper Body Detector: No subscribers. Unsubscribing.");
         sub_cam.unsubscribe();
         sub_gp.unsubscribe();
-        sub_col.unsubscribe();
+        sub_col->shutdown();
         sub_dep.unsubscribe();
     } else {
         ROS_DEBUG("Upper Body Detector: New subscribers. Subscribing.");
         sub_cam.subscribe();
         sub_gp.subscribe();
-        sub_col.subscribe(it,sub_col.getTopic().c_str(),1);
         sub_dep.subscribe(it,sub_dep.getTopic().c_str(),1);
     }
-}
+
+    if(pub_result_image.getNumSubscribers()) {
+        sub_col = boost::make_shared<image_transport::Subscriber>( it.subscribe(topic_color_image, 1, &colorImageCallback) );
+    }
+}  
 
 int main(int argc, char **argv)
 {
@@ -329,9 +346,9 @@ int main(int argc, char **argv)
     private_node_handle_.param("camera_namespace", cam_ns, string("/camera"));
     private_node_handle_.param("ground_plane", topic_gp, string("/ground_plane"));
 
+    topic_color_image = cam_ns + "/rgb/image_raw";
     string topic_depth_image = cam_ns + "/depth/image_rect";
-    string topic_color_image = cam_ns + "/rgb/image_raw";
-    string topic_camera_info = cam_ns + "/rgb/camera_info";
+    string topic_camera_info = cam_ns + "/depth/camera_info";
 
     // New parameters for SPENCER
     private_node_handle_.param("detection_id_increment", detection_id_increment, 1);
@@ -363,10 +380,11 @@ int main(int argc, char **argv)
     // Create a subscriber.
     // Set queue size to 1 because generating a queue here will only pile up images and delay the output by the amount of queued images
     image_transport::SubscriberFilter subscriber_depth;
+    // The color image is not synchronized for performance reasons since it is only needed when somebody is listening to the visualization image topic.
+    // Otherwise, we avoid deserialization -- which can already take 10-20% CPU -- by unsubscribing.
+    boost::shared_ptr<image_transport::Subscriber> subscriber_color;
     subscriber_depth.subscribe(it, topic_depth_image.c_str(),1); subscriber_depth.unsubscribe();
     message_filters::Subscriber<CameraInfo> subscriber_camera_info(n, topic_camera_info.c_str(), 1); subscriber_camera_info.unsubscribe();
-    image_transport::SubscriberFilter subscriber_color;
-    subscriber_color.subscribe(it, topic_color_image.c_str(), 1); subscriber_color.unsubscribe();
     message_filters::Subscriber<GroundPlane> subscriber_gp(n, topic_gp.c_str(), 1); subscriber_gp.unsubscribe();
 
     ros::SubscriberStatusCallback con_cb = boost::bind(&connectCallback,
@@ -383,7 +401,7 @@ int main(int argc, char **argv)
                                                                      boost::ref(it));
 
     //The real queue size for synchronisation is set here.
-    sync_policies::ApproximateTime<Image, Image, GroundPlane, CameraInfo> MySyncPolicy(queue_size);
+    sync_policies::ApproximateTime<Image, GroundPlane, CameraInfo> MySyncPolicy(queue_size);
     MySyncPolicy.setAgePenalty(1000); //set high age penalty to publish older data faster even if it might not be correctly synchronized.
 
     // Initialise detector
@@ -392,14 +410,13 @@ int main(int argc, char **argv)
     detector = new Detector();
 
     // Create synchronization policy. Here: async because time stamps will never match exactly
-    const sync_policies::ApproximateTime<Image, Image, GroundPlane, CameraInfo> MyConstSyncPolicy = MySyncPolicy;
-    Synchronizer< sync_policies::ApproximateTime<Image, Image, GroundPlane, CameraInfo> > sync(MyConstSyncPolicy,
-                                                                                               subscriber_depth,
-                                                                                               subscriber_color,
-                                                                                               subscriber_gp,
-                                                                                               subscriber_camera_info);
+    const sync_policies::ApproximateTime<Image, GroundPlane, CameraInfo> MyConstSyncPolicy = MySyncPolicy;
+    Synchronizer< sync_policies::ApproximateTime<Image, GroundPlane, CameraInfo> > sync(MyConstSyncPolicy,
+                                                                                       subscriber_depth,
+                                                                                       subscriber_gp,
+                                                                                       subscriber_camera_info);
     // Register one callback for all topics
-    sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
+    sync.registerCallback(boost::bind(&callback, _1, _2, _3));
 
 
     // Create publisher
