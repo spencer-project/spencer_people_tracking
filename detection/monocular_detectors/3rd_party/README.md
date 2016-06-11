@@ -45,4 +45,7 @@ As mentioned the cmake file will take care of almost everything. Just follow the
 Now perform installation as described above. If there is an error like "missing reference to __cudaInitModule", make sure CUDA SDK version is correct and remove the "build" folder, re-create it & run cmake again! It seems the nvcc compiler is run only once, and if you initially have got a wrong CUDA version, the libcudaHOG.so file is never re-built if you do not first delete the "build" folder!
 
 ## IMPORTANT!
-If there is an error "undefined reference to 'QString::fromAscii_helper" while running "make", edit "build/libcudaHOG/src/libcudaHOG/cudaHOG.pro" and remove the lines with the "cudaHOGDetect" and "cudaHOGDump" subdirs!
+If there is an error "undefined reference to 'QString::fromAscii_helper" or linker error "missing libboost_program_options-mt" while running "make", edit "build/libcudaHOG/src/libcudaHOG/cudaHOG.pro" and remove the lines with the "cudaHOGDetect" and "cudaHOGDump" subdirs!
+
+In case of CUDA Error 999 when launching sample applications from the CUDA SDK, this might be a permissions problem! Try if the samples work when run via sudo. In that case, a dirty workaround is to call one of the applications (e.g. deviceQueryDrv) once in an /etc/init/ script at login-session-start.
+

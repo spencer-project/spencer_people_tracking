@@ -6,7 +6,8 @@
 
   <maintainer email="cdondrup@lincoln.ac.uk">Christian Dondrup</maintainer>
 
-  <license>TODO</license>
+  <!-- Must be GPLv3-licensed, because source code dependency cudaHOG is also under GPL -->
+  <license>GPLv3</license>
 
   <url type="website">http://www.vision.rwth-aachen.de/</url>
 
