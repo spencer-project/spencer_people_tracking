@@ -1,3 +1,35 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  Copyright (c) 2006-2012, Matthias Luber, Luciano Spinello and Kai O. Arras, Social Robotics Laboratory and
+*    Oscar Martinez, Autonomous Intelligent Systems, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <srl_laser_features/features/feature06.h>
 
 #include <Eigen/LU>
@@ -19,7 +51,7 @@ void Feature06::evaluate(const Segment& segment, Eigen::VectorXd& result) const
 
 	const size_t numPoints = segment.points.size();
 	if (numPoints > 2) {
-		
+
 		double px[numPoints];
 		double py[numPoints];
 
@@ -105,12 +137,12 @@ int Feature06::fitCircle(int n, double *x_vec, double *y_vec, double& xc, double
 				yc = X(1, 0);
 				r = sqrt(-X(2, 0) + xc * xc + yc * yc);
 				return 1;
-			} 
+			}
 			else {
 				// Points badly conditioned (n > 3)
 				return -3;
 			}
-		} 
+		}
 		else {
 			// try QR
 			Eigen::FullPivHouseholderQR<Eigen::MatrixXd> QR(A);
@@ -122,7 +154,7 @@ int Feature06::fitCircle(int n, double *x_vec, double *y_vec, double& xc, double
 			r = sqrt(-X(2, 0) + xc * xc + yc * yc);
 			return 1;
 		}
-	} 
+	}
 	else if (n == 3) {
 		double a, b, c, d, e, f, g;
 
@@ -139,12 +171,12 @@ int Feature06::fitCircle(int n, double *x_vec, double *y_vec, double& xc, double
 			yc = (a * f - c * e) / g;
 			r = sqrt((x_vec[0] - xc) * (x_vec[0] - xc) + (y_vec[0] - yc) * (y_vec[0] - yc));
 			return 2;
-		} 
+		}
 		else {
 			// Points badly conditioned (n == 3)
 			return -2;
 		}
-	} 
+	}
 	else {
 		// Too few points
 		xc = 0.0;

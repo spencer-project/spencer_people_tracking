@@ -1,5 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# Software License Agreement (BSD License)
+#
+#  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import rospy, numpy, message_filters, math, copy, tf, collections, sys
 from srl_laser_segmentation.msg import LaserscanSegmentation
 from spencer_tracking_msgs.msg import TrackedPersons, TrackedPerson, DetectedPersons, DetectedPerson
@@ -7,7 +36,7 @@ from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Quaternion
 
 
-""" 
+"""
 Outputs spencer_tracking_msgs/TrackedPersons and spencer_tracking_msgs/DetectedPersons based upon a
 srl_laser_segmentation/LaserscanSegmentation message and a sensor_msgs/Laserscan. This assumes that the segmentation
 labels correspond to (groundtruth) person track IDs which are consistent over time. Does not work with arbitrary segmentation
@@ -20,7 +49,7 @@ class SegmentationToTrackConverter(object):
 
         trackedPersonsTopic = rospy.resolve_name("tracked_persons")
         detectedPersonsTopic = rospy.resolve_name("detected_persons")
-        
+
         self.trackedPersonsPublisher = rospy.Publisher(trackedPersonsTopic, TrackedPersons, queue_size=100000)
         self.detectedPersonsPublisher = rospy.Publisher(detectedPersonsTopic, DetectedPersons, queue_size=100000)
 
@@ -53,7 +82,7 @@ class SegmentationToTrackConverter(object):
         for pointIndex in xrange(0, pointCount):
             cartesianCoordinates.append( self.calculateCartesianCoordinates(laserscan, pointIndex) )
 
-        # For each labelled segment, create and append one TrackedPerson and DetectedPerson message       
+        # For each labelled segment, create and append one TrackedPerson and DetectedPerson message
         trackedPersons = TrackedPersons(header=laserscanSegmentation.header)
         detectedPersons = DetectedPersons(header=laserscanSegmentation.header)
         for segment in laserscanSegmentation.segments:
@@ -84,7 +113,7 @@ class SegmentationToTrackConverter(object):
                     dt += abs((previousStamp - historyStamp).to_sec())
                     previousCentroid = historyCentroid
                     previousStamp = historyStamp
-            
+
                 velocity = accumulatedVelocity / dt
 
             centroidHistory.append( (currentStamp, centroid) )
@@ -112,7 +141,7 @@ class SegmentationToTrackConverter(object):
                 yaw = math.atan2(velocity[1], velocity[0])
                 quaternion = tf.transformations.quaternion_from_euler(0, 0, yaw)
                 trackedPerson.pose.pose.orientation = Quaternion(x=quaternion[0], y=quaternion[1], z=quaternion[2], w=quaternion[3])
-            
+
             trackedPerson.pose.covariance[2 * 6 + 2] = trackedPerson.pose.covariance[3 * 6 + 3] = trackedPerson.pose.covariance[4 * 6 + 4] = LARGE_VARIANCE  # z pos, roll, pitch
 
             # Set velocity
@@ -138,7 +167,7 @@ class SegmentationToTrackConverter(object):
 
             detectedPersons.detections.append(detectedPerson)
             self._detectionIdCounter += 1
-        
+
         # Publish tracked persons
         self.trackedPersonsPublisher.publish(trackedPersons)
         self.detectedPersonsPublisher.publish(detectedPersons)

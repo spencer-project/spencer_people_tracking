@@ -1,7 +1,33 @@
-/*! \file EfficientAHC.h
- \brief Header file of the EfficientAHC class.
- \author Matthias Luber, Social Robotics Laboratory, Albert-Ludwigs-University of Freiburg, Germany
- */
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2006-2012, Matthias Luber, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef SRL_LASER_SEGMENTATION_EFFICIENT_AHC_H_
 #define SRL_LASER_SEGMENTATION_EFFICIENT_AHC_H_
 
@@ -41,25 +67,25 @@ public:
 	 * @param distance Distance between these nodes. */
 	DendroNode(DendroNode* left, DendroNode* right, double distance);
 
-	/// Get the left child node. 
+	/// Get the left child node.
 	inline DendroNode* getLeft() const
 	{
 		return m_left;
 	}
 
-	/// Get the right child node. 
+	/// Get the right child node.
 	inline DendroNode* getRight() const
 	{
 		return m_right;
 	}
 
-	/// Get the distance between the merged nodes. 
+	/// Get the distance between the merged nodes.
 	inline double getDistance() const
 	{
 		return m_distance;
 	}
 
-	/// Get the vector of data point indices in this node. 
+	/// Get the vector of data point indices in this node.
 	inline const std::vector<unsigned int>& getPoints() const
 	{
 		return m_points;
@@ -67,16 +93,16 @@ public:
 
 
 protected:
-	/// Left child node in the dendrogram. 
+	/// Left child node in the dendrogram.
 	DendroNode* m_left;
 
-	/// Right child node in the dendrogram. 
+	/// Right child node in the dendrogram.
 	DendroNode* m_right;
 
-	/// Distance between the left and the right node. 
+	/// Distance between the left and the right node.
 	double m_distance;
 
-	/// Vector of indices of the data points in this node. 
+	/// Vector of indices of the data points in this node.
 	std::vector<unsigned int> m_points;
 
 };
@@ -94,10 +120,10 @@ const std::string LinkageString[] = { "SINGLE", "AVERAGE_CPU", "AVERAGE_MEM", "C
 class EfficientAHC
 {
 public:
-	/// Convert double to int values. 
+	/// Convert double to int values.
 	static const int DOUBLE_TO_INT_MULTIPLIER;
 
-	/// Linkage type. 
+	/// Linkage type.
 	enum Linkage
 	{
 		SINGLE, /* */
@@ -106,19 +132,19 @@ public:
 		COMPLETE
 	};
 
-	/// Constructor. 
+	/// Constructor.
 	EfficientAHC(Linkage linkge, double threshold);
 
-	/// Destructor. 
+	/// Destructor.
 	virtual ~EfficientAHC();
 
-	/// Set clustering threshold. 
+	/// Set clustering threshold.
 	inline void setThreshold(double threshold)
 	{
 		m_threshold = threshold;
 	}
 
-	/// Get clustering threshold. 
+	/// Get clustering threshold.
 	inline const double getThreshold() const
 	{
 		return m_threshold;
@@ -140,31 +166,31 @@ protected:
 	 */
 	struct Cost
 	{
-		/// Constructor. 
+		/// Constructor.
 		Cost() :
 			m_node(NULL), m_data(NULL)
 		{
 		}
 
-		/// Distance between element in row and column. 
+		/// Distance between element in row and column.
 		double m_distance;
 
-		/// Index of the assigned column. 
+		/// Index of the assigned column.
 		unsigned int m_index;
 
-		/// Fib heap node. 
+		/// Fib heap node.
 		fibheap_el* m_node;
 
-		/// Additional data. 
+		/// Additional data.
 		void* m_data;
 
-		/// Operator. 
+		/// Operator.
 		void operator=(int value)
 		{
 			m_index = value;
 		}
 
-		/// Operator. 
+		/// Operator.
 		void operator=(double value)
 		{
 			m_distance = value;
@@ -176,16 +202,16 @@ protected:
 	 */
 	struct DataAverageCPU
 	{
-		/// Sum of the elements in the cluster of the assigned row. 
+		/// Sum of the elements in the cluster of the assigned row.
 		Eigen::VectorXd m_rowSum;
 
-		/// Number of data points in the cluster of the assigned row. 
+		/// Number of data points in the cluster of the assigned row.
 		unsigned int m_rowSize;
 
-		/// Sum of the elements in the cluster of the assigned column. 
+		/// Sum of the elements in the cluster of the assigned column.
 		Eigen::VectorXd m_colSum;
 
-		/// Number of data points in the cluster of the assigned column. 
+		/// Number of data points in the cluster of the assigned column.
 		unsigned int m_colSize;
 	};
 
@@ -194,10 +220,10 @@ protected:
 	 */
 	struct DataAverageMEM
 	{
-		/// Indices of the elements in the cluster of the assigned row. 
+		/// Indices of the elements in the cluster of the assigned row.
 		std::vector<unsigned int> m_rowIndices;
 
-		/// Indices of the elements in the cluster of the assigned column. 
+		/// Indices of the elements in the cluster of the assigned column.
 		std::vector<unsigned int> m_colIndices;
 	};
 
@@ -205,97 +231,97 @@ protected:
 	 * @param size Number of data points to segment. */
 	bool resize(unsigned int size);
 
-	/// Free current allocated memory. 
+	/// Free current allocated memory.
 	bool freeMem();
 
-	/// Get the minimal distance between the clusters represented by left and right. 
+	/// Get the minimal distance between the clusters represented by left and right.
 	double getMinDistance(DendroNode* left, DendroNode* right, const std::vector<Point2D>& points) const;
 
-	/// Build up the dendrogram up to the EffAHC_CLUSTER_DISTANCE threshold. 
+	/// Build up the dendrogram up to the EffAHC_CLUSTER_DISTANCE threshold.
 	void buildDendrogram(const Eigen::MatrixXd& data);
 
-	/// Linkage type. 
+	/// Linkage type.
 	Linkage m_linkage;
 
-	/// Clustering Threshold. 
+	/// Clustering Threshold.
 	double m_threshold;
 
-	/// Number of allocated data structures. 
+	/// Number of allocated data structures.
 	unsigned int m_allocatedN;
 
-	/// Number of data points. 
+	/// Number of data points.
 	unsigned int N;
 
-	/// Cost matrix. 
+	/// Cost matrix.
 	Cost** CC;
 
-	/// Flag, the entries in the cost matrix require an additional data object. 
+	/// Flag, the entries in the cost matrix require an additional data object.
 	bool m_dataObjectRequired;
 
-	/// Indicators for fused rows and cols. 
+	/// Indicators for fused rows and cols.
 	bool* I;
 
-	/// Priority queues with sorted similarities in decreasing order. 
+	/// Priority queues with sorted similarities in decreasing order.
 	fibheap** P;
 
-	/// Root nodes of the Dendrogram. 
+	/// Root nodes of the Dendrogram.
 	DendroNode** m_rootNodes;
 
-	/// Vector of all instantiated DendroNodes. 
+	/// Vector of all instantiated DendroNodes.
 	std::vector<DendroNode*> m_dendroNodes;
 
-	/// Function type: create a data object. 
+	/// Function type: create a data object.
 	typedef void(*createFunction)(void*& object);
 
-	/// Creates data object used for speed optimized average linkage. 
+	/// Creates data object used for speed optimized average linkage.
 	static void createAverageCPU(void*& object);
 
-	/// Creates data object used for memory optimized average linkage. 
+	/// Creates data object used for memory optimized average linkage.
 	static void createAverageMEM(void*& object);
 
-	/// Function type: initializes a data object. 
+	/// Function type: initializes a data object.
 	typedef void(*initFunction)(const Eigen::MatrixXd& data, unsigned int row, unsigned int col, void*& object);
 
-	/// Initialize data object used for speed optimized average linkage. 
+	/// Initialize data object used for speed optimized average linkage.
 	static void initAverageCPU(const Eigen::MatrixXd& data, unsigned int row, unsigned int col, void*& object);
 
-	/// Initialize data object used for memory optimized average linkage. 
+	/// Initialize data object used for memory optimized average linkage.
 	static void initAverageMEM(const Eigen::MatrixXd& data, unsigned int row, unsigned int col, void*& object);
 
-	/// Function type: delete a data object. 
+	/// Function type: delete a data object.
 	typedef void(*deleteFunction)(void* object);
 
-	/// Delete data object used for speed optimized average linkage. 
+	/// Delete data object used for speed optimized average linkage.
 	static void deleteAverageCPU(void* object);
 
-	/// Delete data object used for memory optimized average linkage. 
+	/// Delete data object used for memory optimized average linkage.
 	static void deleteAverageMEM(void* object);
 
-	/// Function type: update distances. 
+	/// Function type: update distances.
 	typedef void(*updateFunction)(const Eigen::MatrixXd& data, const Cost&, const Cost&, Cost&, Cost&);
 
-	/// Update single linkage. 
+	/// Update single linkage.
 	static void updateSingle(const Eigen::MatrixXd& data, const Cost& row_k1_in, const Cost& row_k2_in, Cost& row_k1_out, Cost& k1_row_out);
 
-	/// Update average linkage. 
+	/// Update average linkage.
 	static void updateAverageCPU(const Eigen::MatrixXd& data, const Cost& row_k1_in, const Cost& row_k2_in, Cost& row_k1_out, Cost& k1_row_out);
 
-	/// Update average linkage. 
+	/// Update average linkage.
 	static void updateAverageMEM(const Eigen::MatrixXd& data, const Cost& row_k1_in, const Cost& row_k2_in, Cost& row_k1_out, Cost& k1_row_out);
 
-	/// Update complete linkage. 
+	/// Update complete linkage.
 	static void updateComplete(const Eigen::MatrixXd& data, const Cost& row_k1_in, const Cost& row_k2_in, Cost& row_k1_out, Cost& k1_row_out);
 
-	/// Function pointer to create data function. 
+	/// Function pointer to create data function.
 	createFunction m_createFunction;
 
-	/// Function pointer to initialize data function. 
+	/// Function pointer to initialize data function.
 	initFunction m_initFunction;
 
-	/// Function pointer to delete data function. 
+	/// Function pointer to delete data function.
 	deleteFunction m_deleteFunction;
 
-	/// Function pointer to update function. 
+	/// Function pointer to update function.
 	updateFunction m_updateFunction;
 };
 

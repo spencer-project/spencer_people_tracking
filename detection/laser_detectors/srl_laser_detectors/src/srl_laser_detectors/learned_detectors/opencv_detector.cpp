@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <srl_laser_detectors/learned_detectors/opencv_detector.h>
 #include <srl_laser_features/features/feature_registry.h>
 
@@ -40,8 +70,8 @@ void OpenCvDetector::train(const Segments& segments, const Labels& labels)
     dumpFeatureMatrix(featureMatrix, labels);
 
     // Implemented by the derived class.
-    trainOnFeatures(featureMatrix, labelVector);   
-} 
+    trainOnFeatures(featureMatrix, labelVector);
+}
 
 
 void OpenCvDetector::dumpFeatureMatrix(const cv::Mat& featureMatrix, const Labels& labels)
@@ -88,7 +118,7 @@ cv::Mat OpenCvDetector::maskSamplesWithNonfiniteValues(const cv::Mat& featureMat
 
 
 bool OpenCvDetector::loadModel(const std::string& filename)
-{  
+{
     std::string theFilename = filename;
 
     if(theFilename.empty()) m_privateNodeHandle.getParam("model", theFilename);
@@ -157,20 +187,20 @@ cv::Mat OpenCvDetector::calculateFeatureMatrix(const Segments& segments)
         const Segment& segment = segments[i];
         std::map<FeatureDimension, float> featureValueLookup; // one entry per dimension per feature
 
-        for(size_t j = 0; j < m_features.size(); j++) { 
+        for(size_t j = 0; j < m_features.size(); j++) {
             Feature::Ptr feature = m_features[j];
             Eigen::VectorXd values;
             feature->evaluate(segment, values);
 
             // Each feature can have multiple dimensions, store these in a map so we can look up
             // the requested dimensions in the next step
-            for(size_t dim = 0; dim < feature->getNDimensions(); dim++) { 
+            for(size_t dim = 0; dim < feature->getNDimensions(); dim++) {
                 featureValueLookup[ feature->getDescription(dim) ] = values(dim);
             }
         }
 
         // Look up the requested dimensions
-        for(size_t k = 0; k < m_featureDimensions.size(); k++) { 
+        for(size_t k = 0; k < m_featureDimensions.size(); k++) {
             const FeatureDimension& featureDescription = m_featureDimensions[k];
             featureMatrix.at<float>(i, k) = featureValueLookup[featureDescription];
         }

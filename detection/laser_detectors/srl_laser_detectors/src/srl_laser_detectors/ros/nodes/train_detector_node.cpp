@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <srl_laser_detectors/detector_factory.h>
 #include <srl_laser_detectors/ros/ros_interface.h>
 #include <srl_laser_detectors/learned_detector.h>
@@ -25,7 +55,7 @@ bool stopListening = false;
 ros::WallTime lastTrainingDataReceivedAt;
 boost::shared_ptr<ros::Publisher> segmentCloudPublisher;
 
-/// CTRL+C handler    
+/// CTRL+C handler
 void sigintHandler(int sgn __attribute__ ((unused)))
 {
     stopListening = true;
@@ -111,7 +141,7 @@ void newTrainingDataReceived(const sensor_msgs::LaserScan::ConstPtr& laserscan, 
                 label = FOREGROUND;
                 numForegroundSegments++;
             }
-        } 
+        }
         else {
             label = AMBIGUOUS;
             numAmbiguousSegments++;
@@ -147,7 +177,7 @@ void newTrainingDataReceived(const sensor_msgs::LaserScan::ConstPtr& laserscan, 
     static size_t lastInfoShownInCycle = 0;
     static size_t currentCycle = 0;
     if(currentCycle++ > lastInfoShownInCycle + 10) {
-        cout << "\rReceived so far (after " << currentCycle << " cycles): " << numForegroundSegments << " foreground segments, " 
+        cout << "\rReceived so far (after " << currentCycle << " cycles): " << numForegroundSegments << " foreground segments, "
              << numBackgroundSegments << " background segments, " << numAmbiguousSegments << " ambiguous/unclear segments. ";
 
         if(numAmbiguousSegments / (numForegroundSegments + numBackgroundSegments + numAmbiguousSegments) > 0.3) cout << "Check if laserscan is under-segmented, or adjust thresholds!";
@@ -195,7 +225,7 @@ int main(int argc, char **argv)
     signal(SIGINT, sigintHandler);
 
     // Look up detector type
-    DetectorFactory::init();  
+    DetectorFactory::init();
     DetectorType type; privateHandle.param<string>("type", type, "");
     boost::shared_ptr<Detector> detector = DetectorFactory::createDetector(type, nodeHandle, privateHandle);
 
@@ -208,10 +238,10 @@ int main(int argc, char **argv)
 
     // Create publisher for visualization
     segmentCloudPublisher.reset( new ros::Publisher(nodeHandle.advertise<sensor_msgs::PointCloud2>("/train_fg_bg_segments", 10)) );
-    
+
     // Create ROS subscribers to receive training and test data
     size_t queue_size = 100000; // allow very long queue in order not to miss any samples (memory-intense!)
-    
+
     // Initialize subscribers
     message_filters::Subscriber<sensor_msgs::LaserScan> laserscanSubscriber(nodeHandle, "laser", queue_size);
     message_filters::Subscriber<srl_laser_segmentation::LaserscanSegmentation> segmentationSubscriber(nodeHandle, "laser_segmentation", queue_size);
@@ -252,7 +282,7 @@ int main(int argc, char **argv)
 
     vector<size_t> randomIndices; randomIndices.resize(trainingAndTestSegments.size());
     for(size_t i = 0; i < trainingAndTestSegments.size(); i++) randomIndices[i] = i;
-    
+
     bool shuffleDataBeforeTrainTestSplit;
     privateHandle.param<bool>("shuffle_data_before_train_test_split", shuffleDataBeforeTrainTestSplit, true);
     if(shuffleDataBeforeTrainTestSplit) {
@@ -287,7 +317,7 @@ int main(int argc, char **argv)
 
     ROS_INFO("Training set contains %zu segments, of which %zu (%.1f percent) are foreground", trainingSegments.size(), numForegroundTraining, 100.0f * numForegroundTraining / trainingSegments.size() );
     ROS_INFO("Test set contains %zu segments, of which %zu (%.1f percent) are foreground", testSegments.size(), numForegroundTest, 100.0f * numForegroundTest / testSegments.size() );
-    ros::spinOnce();    
+    ros::spinOnce();
 
     //
     // Train detector
@@ -309,7 +339,7 @@ int main(int argc, char **argv)
         ROS_INFO_STREAM("Learned model has been saved to " << modelFilename.str());
     }
 
-    ros::spinOnce();    
+    ros::spinOnce();
 
 
     //
@@ -354,5 +384,5 @@ int main(int argc, char **argv)
     ofstream resultsFile(resultsFilename.str().c_str());
     resultsFile << results.str();
 
-    ros::spinOnce();    
+    ros::spinOnce();
 }
