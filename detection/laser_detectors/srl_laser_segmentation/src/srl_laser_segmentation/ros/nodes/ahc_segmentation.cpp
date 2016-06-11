@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     srl_laser_segmentation::ROSInterface rosInterface(nodeHandle, privateHandle);
 
     // Read parameters
-    double distanceThreshold; privateHandle.param<double>("distance_threshold", distanceThreshold, 0.4); // in meters
+    double distanceThreshold; privateHandle.param<double>("distance_threshold", distanceThreshold, 0.2); // in meters
 
     std::string linkageName; privateHandle.param<std::string>("linkage", linkageName, "single");
 

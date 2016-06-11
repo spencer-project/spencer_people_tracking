@@ -26,19 +26,23 @@ void ROSInterface::connect(Detector* detector, const string& laserTopic, const s
     }
     m_detector = detector;
 
-    size_t queue_size = 35;
+    int queue_size = 1;
 
     // Get parameters
     int detectionIdOffset;
     m_privateNodeHandle.param<int>("detection_id_increment", m_detectionIdIncrement, 1);
     m_privateNodeHandle.param<int>("detection_id_offset", detectionIdOffset, 0);
+    m_privateNodeHandle.param<int>("subscriber_queue_size", queue_size, 1);
     m_lastDetectionId = detectionIdOffset;    
-    
+
+    int synchronizer_queue_size = queue_size;
+    m_privateNodeHandle.param<int>("synchronizer_queue_size", synchronizer_queue_size, 5);
+
     // Subscribers
     m_laserscanSubscriber.reset( new message_filters::Subscriber<sensor_msgs::LaserScan>(m_nodeHandle, laserTopic, queue_size) );
     m_segmentationSubscriber.reset (new message_filters::Subscriber<srl_laser_segmentation::LaserscanSegmentation>(m_nodeHandle, segmentationTopic, queue_size) );
 
-    m_inputSynchronizer.reset( new Synchronizer(SyncPolicy(queue_size), *m_laserscanSubscriber, *m_segmentationSubscriber) );
+    m_inputSynchronizer.reset( new Synchronizer(SyncPolicy(synchronizer_queue_size), *m_laserscanSubscriber, *m_segmentationSubscriber) );
     m_inputSynchronizer->registerCallback(&ROSInterface::newLaserscanAndSegmentationAvailable, this);
 
     // Publisher
@@ -89,7 +93,7 @@ void ROSInterface::newLaserscanAndSegmentationAvailable(const sensor_msgs::Laser
         m_lastDetectionId += m_detectionIdIncrement;
         detectedPerson.detection_id = m_lastDetectionId;
         detectedPerson.modality = spencer_tracking_msgs::DetectedPerson::MODALITY_GENERIC_LASER_2D;
-
+        
         detectedPerson.confidence = resultingConfidences[i];
 
         detectedPerson.pose.pose.position.x = useMedianForPose ? segment.median(0) : segment.mean(0);

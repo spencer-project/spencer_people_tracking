@@ -1,10 +1,10 @@
-#include <srl_laser_segmentation/jump_distance.h>
+#include <srl_laser_segmentation/extended_jump_distance.h>
 #include <srl_laser_segmentation/ros/ros_interface.h>
 
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "jump_distance_segmentation");
+    ros::init(argc, argv, "extended_jump_distance_segmentation");
     ros::NodeHandle nodeHandle("");
     ros::NodeHandle privateHandle("~");
 
@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     double jumpDistance; privateHandle.param<double>("distance_threshold", jumpDistance, 0.2); // in meters
     
     // Initialize segmentation algorithm and connect to the ROS interface
-    srl_laser_segmentation::JumpDistanceSegmentation segmentation(jumpDistance);    
+    srl_laser_segmentation::ExtendedJumpDistanceSegmentation segmentation(jumpDistance);    
 
     // Subscribe to laser scans and publish segmentations
     rosInterface.connect(&segmentation);

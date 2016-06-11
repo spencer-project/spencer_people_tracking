@@ -15,7 +15,8 @@ typedef Eigen::Vector2d Point2D;
 /// Class label for training or testing a detector.
 enum Label {
     BACKGROUND,
-    FOREGROUND
+    FOREGROUND,
+    AMBIGUOUS
 };
 
 /// Detection statistics of a detector (for testing / cross-validation)

@@ -1,0 +1,72 @@
+<launch>
+    <!-- Training options -->
+    <arg name="type" default="random_forest"/>
+    <arg name="shuffle_data_before_train_test_split" default="true"/>
+    <arg name="test_set_ratio" default="0.35"/>
+    <arg name="timeout" default="5.0"/>
+    <arg name="output_folder" default="$(find srl_laser_detectors)/models"/>
+    <arg name="filename_prefix" default="learned_model_"/>
+
+    <!-- Detector type-specific options -->
+    <arg name="adaboost_weak_count" default="250"/>
+
+    <!-- Segmentation -->
+    <arg name="segmentation" default="true"/>  <!-- set to false if segmentation is provided externally -->
+    <arg name="segmentation_type" default="extended_jump_distance_segmentation"/>
+    <arg name="distance_threshold" default="0.2"/>
+    
+    <arg name="min_avg_distance_from_sensor" default="0"/>
+    <arg name="max_avg_distance_from_sensor" default="13"/>
+    <arg name="min_points_per_segment" default="5"/>
+    <arg name="max_points_per_segment" default="350"/>
+    <arg name="min_segment_width" default="0.0"/>
+
+
+    <!-- Optional command-line arguments
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_aspekt1.lab"/> 
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_mainstation1_cut.lab"/> -->
+    <arg name="filename" default="/home/linder/Datasets/kindercar_oct2013/rathausgasse.log"/>
+    <arg name="playback_end" default=""/>
+    <arg name="rate" default="5.0"/>
+    <arg name="timing_mode" default="0"/>
+    
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <group>
+        <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+            <arg name="visualization" value="false"/>
+            <arg name="filename" value="$(arg filename)"/>
+            <arg name="clock_rate" value="$(arg rate)"/>
+            <arg name="timing_mode" value="$(arg timing_mode)"/>
+            <arg name="publish_tracks_directly" value="true"/>
+            <arg name="end" value="$(arg playback_end)"/>
+        </include>
+
+        <node name="laser_segmentation" type="$(arg segmentation_type)" pkg="srl_laser_segmentation">
+            <param name="min_avg_distance_from_sensor" value="$(arg min_avg_distance_from_sensor)"/>
+            <param name="max_avg_distance_from_sensor" value="$(arg max_avg_distance_from_sensor)"/>
+            <param name="min_points_per_segment" value="$(arg min_points_per_segment)"/>
+            <param name="max_points_per_segment" value="$(arg max_points_per_segment)"/>
+            <param name="min_segment_width" value="$(arg min_segment_width)"/>
+            <param name="distance_threshold" value="$(arg distance_threshold)"/>
+            <param name="queue_size" value="100000"/>
+        </node>
+
+        <node name="train_laser_detector" type="train_detector" pkg="srl_laser_detectors" output="screen" required="true">
+            <param name="type" value="$(arg type)"/>
+            <param name="shuffle_data_before_train_test_split" value="$(arg shuffle_data_before_train_test_split)"/>
+            <param name="test_set_ratio" value="$(arg test_set_ratio)"/>
+            <param name="timeout" value="$(arg timeout)"/>
+            <param name="output_folder" value="$(arg output_folder)"/>
+            <param name="filename_prefix" value="$(arg filename_prefix)"/>
+
+            <param name="rf_num_trees" value="15"/>
+            <param name="rf_max_depth" value="10"/>
+
+            <param name="adaboost_weak_count" value="$(arg adaboost_weak_count)"/>
+        </node>
+
+    </group>   
+
+
+</launch>

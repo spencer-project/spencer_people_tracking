@@ -19,7 +19,7 @@ void SegmentUtils::extractSegments(const sensor_msgs::LaserScan::ConstPtr& laser
     vector<Point2D> pointsInCartesianCoords; pointsInCartesianCoords.reserve(numPoints);
     vector<bool> isPointValid; isPointValid.reserve(numPoints);
 
-    for(size_t pointIndex = 0; pointIndex < laserscan->ranges.size(); pointIndex++) {
+    for(size_t pointIndex = 0; pointIndex < numPoints; pointIndex++) {
         double phi = laserscan->angle_min + laserscan->angle_increment * pointIndex + M_PI_2;
         double rho = laserscan->ranges[pointIndex];
 

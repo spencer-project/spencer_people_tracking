@@ -2,6 +2,7 @@
 #include <srl_laser_detectors/naive_detectors/blob_detector.h>
 #include <srl_laser_detectors/learned_detectors/svm_detector.h>
 #include <srl_laser_detectors/learned_detectors/adaboost_detector.h>
+#include <srl_laser_detectors/learned_detectors/random_forest_detector.h>
 
 
 namespace srl_laser_detectors {
@@ -18,11 +19,16 @@ Detector* createAdaboostDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle& p
     return new AdaboostDetector(nodeHandle, privateNodeHandle);
 }
 
+Detector* createRandomForestDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle) {
+    return new RandomForestDetector(nodeHandle, privateNodeHandle);
+}
+
 void DetectorFactory::init()
 {
     factoryMethods["blob"] = &createBlobDetector;
     factoryMethods["svm"]  = &createSVMDetector;
     factoryMethods["adaboost"]  = &createAdaboostDetector;
+    factoryMethods["random_forest"] = &createRandomForestDetector;
 }
 
 

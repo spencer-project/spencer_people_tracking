@@ -12,13 +12,18 @@
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
+#include <sensor_msgs/PointCloud2.h>  // for visualization
+
 using namespace srl_laser_detectors;
 using namespace std;
 
 Segments trainingAndTestSegments;
 Labels trainingAndTestLabels;
+int maxCycleLimit;
 size_t numForegroundSegments = 0, numBackgroundSegments = 0, numAmbiguousSegments = 0;
 bool stopListening = false;
+ros::WallTime lastTrainingDataReceivedAt;
+boost::shared_ptr<ros::Publisher> segmentCloudPublisher;
 
 /// CTRL+C handler    
 void sigintHandler(int sgn __attribute__ ((unused)))
@@ -27,9 +32,29 @@ void sigintHandler(int sgn __attribute__ ((unused)))
 }
 
 
+/// Helper function for visualization
+sensor_msgs::PointField createPointField(const std::string& name, size_t offset, uint8_t datatype) {
+    sensor_msgs::PointField field;
+    field.name = name;
+    field.offset = offset;
+    field.datatype = datatype;
+    field.count = 1;
+    return field;
+}
+
+float randomFloat(float minValue, float maxValue)
+{
+    float r = (float)rand() / RAND_MAX;
+    return minValue + r * (maxValue - minValue);
+}
+
+
 /// Callback that is invoked everytime new training data (synchronized laserscan, segmentation and annotations) is received via ROS
 void newTrainingDataReceived(const sensor_msgs::LaserScan::ConstPtr& laserscan, const srl_laser_segmentation::LaserscanSegmentation::ConstPtr& segmentation, const srl_laser_segmentation::LaserscanSegmentation::ConstPtr& annotations)
 {
+    lastTrainingDataReceivedAt = ros::WallTime::now();
+    if(stopListening) return;
+
     // Get groundtruth foreground / background segmentation; the assumption is that annotated segments contain only foreground.
     vector<Label> groundtruth(laserscan->ranges.size(), BACKGROUND);
     foreach(srl_laser_segmentation::LaserscanSegment annotation, annotations->segments) {
@@ -47,6 +72,9 @@ void newTrainingDataReceived(const sensor_msgs::LaserScan::ConstPtr& laserscan, 
     double foregroundThreshold = 0.8; // FIXME: parameter
     double backgroundThreshold = 0.8; // FIXME: parameter
 
+    // For later visualization
+    vector<float> cloudData;
+
     // Compare each segment to the groundtruth annotations
     foreach(Segment& segment, segments) {
         // Count overlap in foreground / background points
@@ -56,22 +84,62 @@ void newTrainingDataReceived(const sensor_msgs::LaserScan::ConstPtr& laserscan, 
             else numBackgroundPoints++;
         }
 
+        // Decide if this is a foreground, background or ambiguous segment
         const size_t numTotalPoints = numForegroundPoints + numBackgroundPoints;
         const double foregroundRatio = numForegroundPoints / (double)numTotalPoints;
         const double backgroundRatio = numBackgroundPoints / (double)numTotalPoints;
 
+        Label label;
+
+        double segmentWidth = hypot(segment.points.front()(0) - segment.points.back()(0), segment.points.front()(1) - segment.points.back()(1));
+
+        int minPointsForForegroundSegment = 10;
+        double maxSegmentWidth = 0.7;
+
         if(backgroundRatio >= backgroundThreshold) {
             trainingAndTestSegments.push_back(segment);
-            trainingAndTestLabels.push_back(BACKGROUND);
+            label = BACKGROUND;
             numBackgroundSegments++;
         }
         else if(foregroundRatio >= foregroundThreshold) {
-            trainingAndTestSegments.push_back(segment);
-            trainingAndTestLabels.push_back(FOREGROUND);
-            numForegroundSegments++;
+            if(numTotalPoints < minPointsForForegroundSegment || segmentWidth > maxSegmentWidth) {
+                label = AMBIGUOUS;
+                numAmbiguousSegments++;
+            }
+            else {
+                trainingAndTestSegments.push_back(segment);
+                label = FOREGROUND;
+                numForegroundSegments++;
+            }
         } 
         else {
+            label = AMBIGUOUS;
             numAmbiguousSegments++;
+        }
+
+        if(label != AMBIGUOUS) trainingAndTestLabels.push_back(label);
+
+        // Visualization as point cloud (to be viewed in RViz), color visualizes label
+        if(segmentCloudPublisher->getNumSubscribers()) {
+            float r = 0, g = 0, b = 0;
+            if(label == BACKGROUND || label == AMBIGUOUS) r = 255.0f;
+            if(label == FOREGROUND || label == AMBIGUOUS) g = 255.0f;
+
+            double intensity = randomFloat(0.2, 1.0f);
+            r *= intensity;
+            g *= intensity;
+
+            for(size_t pointIndex = 0; pointIndex < segment.points.size(); pointIndex++) {
+                typedef union { uint32_t i; float f; } ColorValue;
+                ColorValue colorValue;
+                colorValue.i = uint32_t(b) + (uint32_t(g) << 8) + (uint32_t(r) << 16);
+
+                cloudData.push_back(segment.points[pointIndex](0)); // x
+                cloudData.push_back(segment.points[pointIndex](1)); // y
+                cloudData.push_back(0.0); // z
+                cloudData.push_back(numeric_limits<float>::quiet_NaN()); // padding
+                cloudData.push_back(colorValue.f); // color
+            }
         }
     }
 
@@ -86,6 +154,35 @@ void newTrainingDataReceived(const sensor_msgs::LaserScan::ConstPtr& laserscan, 
 
         cout << flush;
         lastInfoShownInCycle = currentCycle;
+    }
+
+
+    // Limit max. frame count
+    if(currentCycle > maxCycleLimit) {
+        stopListening = true;
+        ROS_INFO("Reached cycle limit, stopping to listen!");
+    }
+
+    // Publish visualization
+    if(segmentCloudPublisher->getNumSubscribers()) {
+        sensor_msgs::PointCloud2 visualizationCloud;
+
+        visualizationCloud.header = segmentation->header;
+        visualizationCloud.is_bigendian = false;
+        visualizationCloud.is_dense = false;
+        visualizationCloud.fields.push_back(createPointField("x", 0, sensor_msgs::PointField::FLOAT32));
+        visualizationCloud.fields.push_back(createPointField("y", 1 * sizeof(float), sensor_msgs::PointField::FLOAT32));
+        visualizationCloud.fields.push_back(createPointField("z", 2 * sizeof(float), sensor_msgs::PointField::FLOAT32));
+        visualizationCloud.fields.push_back(createPointField("rgb", 4 * sizeof(float), sensor_msgs::PointField::FLOAT32));
+
+        visualizationCloud.point_step = sizeof(float) * 5;
+        uint8_t* castedPointArray = reinterpret_cast<uint8_t*>(&cloudData[0]);
+        visualizationCloud.width = cloudData.size() / 5;
+        visualizationCloud.data = std::vector<uint8_t>(castedPointArray, castedPointArray + visualizationCloud.point_step * visualizationCloud.width);
+        visualizationCloud.height = 1;
+        visualizationCloud.row_step = visualizationCloud.width * visualizationCloud.point_step;
+
+        segmentCloudPublisher->publish(visualizationCloud);
     }
 }
 
@@ -107,6 +204,10 @@ int main(int argc, char **argv)
         ROS_WARN("Specified detector type (%s) cannot be trained. Training stage will be skipped.", type.c_str());
     }
 
+    privateHandle.param<int>("cycle_limit", maxCycleLimit, numeric_limits<int>::max());
+
+    // Create publisher for visualization
+    segmentCloudPublisher.reset( new ros::Publisher(nodeHandle.advertise<sensor_msgs::PointCloud2>("/train_fg_bg_segments", 10)) );
     
     // Create ROS subscribers to receive training and test data
     size_t queue_size = 100000; // allow very long queue in order not to miss any samples (memory-intense!)
@@ -127,9 +228,18 @@ int main(int argc, char **argv)
     //
     // Collect training / test data
     //
+    double timeout;
+    privateHandle.param<double>("timeout", timeout, 10.0);
     ROS_INFO("Listening for training / test data (laserscans, segmentation, groundtruth segment annotations)... these need to have exactly matching timestamps!");
-    ROS_INFO("Press CTRL+C to stop listening and proceed with the next phase.");
-    while(!stopListening) ros::spinOnce();
+    ROS_INFO("Will stop listening if not receiving training data for more than %.1f sec!", timeout);
+    if(maxCycleLimit != numeric_limits<int>::max()) ROS_INFO("Will also stop listening after %d cycles.", maxCycleLimit);
+
+    while(!stopListening) {
+        ros::spinOnce();
+        if(lastTrainingDataReceivedAt.toSec() > 0.0) {
+            if(ros::WallTime::now() > lastTrainingDataReceivedAt + ros::WallDuration(timeout)) stopListening = true;
+        }
+    }
 
     ROS_INFO("Starting training phase!");
     ros::spinOnce();
@@ -142,9 +252,15 @@ int main(int argc, char **argv)
 
     vector<size_t> randomIndices; randomIndices.resize(trainingAndTestSegments.size());
     for(size_t i = 0; i < trainingAndTestSegments.size(); i++) randomIndices[i] = i;
-    random_shuffle(randomIndices.begin(), randomIndices.end());
     
-    double testSetRatio = 0.1; // FIXME: parameter
+    bool shuffleDataBeforeTrainTestSplit;
+    privateHandle.param<bool>("shuffle_data_before_train_test_split", shuffleDataBeforeTrainTestSplit, true);
+    if(shuffleDataBeforeTrainTestSplit) {
+        random_shuffle(randomIndices.begin(), randomIndices.end());
+    }
+
+    double testSetRatio;
+    privateHandle.param<double>("test_set_ratio", testSetRatio, 0.1);
     const size_t lastTestElement = randomIndices.size() * testSetRatio;
 
     Segments trainingSegments, testSegments;
@@ -176,8 +292,13 @@ int main(int argc, char **argv)
     //
     // Train detector
     //
+    string outputFolder, filenamePrefix;
+    privateHandle.param<string>("output_folder", outputFolder, "");
+    privateHandle.param<string>("filename_prefix", filenamePrefix, "learned_model_");
+    if(!outputFolder.empty() && outputFolder[outputFolder.size()-1] != '/') outputFolder += "/";
+
     stringstream modelFilename;
-    modelFilename << "learned_model_" << (long) ros::Time::now().toSec() << "." << type;
+    modelFilename << outputFolder << filenamePrefix << (long) ros::Time::now().toSec() << "." << type;
 
     if(NULL != learnedDetector) {
         ROS_INFO("Starting training phase... this may take a while, please be patient!");
@@ -211,7 +332,7 @@ int main(int argc, char **argv)
             << " Precision=" << detectionMetrics.precision
             << " Recall=" << detectionMetrics.recall
             << " F1-Measure=" << detectionMetrics.f1measure
-            << " FP-Rate=" << float(detectionMetrics.fp) / (detectionMetrics.fp + detectionMetrics.tp + detectionMetrics.fn + detectionMetrics.tn)
+            << " FP-Rate=" << float(detectionMetrics.fp) / (detectionMetrics.fp + detectionMetrics.tn)
             << endl;
 
     results << " TP=" << detectionMetrics.tp

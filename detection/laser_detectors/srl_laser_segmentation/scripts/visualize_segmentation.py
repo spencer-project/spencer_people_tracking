@@ -5,6 +5,7 @@ from srl_laser_segmentation.msg import LaserscanSegmentation
 from visualization_msgs.msg import MarkerArray, Marker
 from sensor_msgs.msg import PointCloud2, PointField, LaserScan
 from std_msgs.msg import ColorRGBA
+from geometry_msgs.msg import Point
 
 """ 
 Visualizes a srl_laser_segmentation/LaserscanSegmentation message and a sensor_msgs/Laserscan as a
@@ -26,11 +27,11 @@ class LaserscanSegmentationVisualizer(object):
 
         self._lastMarkerCount = 0
 
-        self.cloudPublisher = rospy.Publisher(cloudTopic, PointCloud2)
-        self.markerArrayPublisher = rospy.Publisher(markersTopic, MarkerArray)
+        self.cloudPublisher = rospy.Publisher(cloudTopic, PointCloud2, queue_size=3)
+        self.markerArrayPublisher = rospy.Publisher(markersTopic, MarkerArray, queue_size=3)
 
-        laserSubscriber = message_filters.Subscriber(laserscanTopic, LaserScan)
-        segmentationSubscriber = message_filters.Subscriber(segmentationTopic, LaserscanSegmentation)
+        laserSubscriber = message_filters.Subscriber(laserscanTopic, LaserScan, queue_size=3)
+        segmentationSubscriber = message_filters.Subscriber(segmentationTopic, LaserscanSegmentation, queue_size=3)
 
         self.timeSynchronizer = message_filters.TimeSynchronizer([laserSubscriber, segmentationSubscriber], 20)
         self.timeSynchronizer.registerCallback(self.newSegmentationReceived)
@@ -97,7 +98,7 @@ class LaserscanSegmentationVisualizer(object):
             cloud.data += chr(int(resultingColor[0] * 255))  # b
             cloud.data += chr(0) # a
 
-        # Add text markers to marker array
+        # Add text markers and line strip markers to marker array
         for segment in laserscanSegmentation.segments:
             centroid = centroidsOfLabel[segment.label]
             color = self.lookupColorForLabel(segment.label)
@@ -117,6 +118,18 @@ class LaserscanSegmentationVisualizer(object):
             textMarker.pose.position.z = centroid[2]
 
             markerArray.markers.append(textMarker)
+
+            if len(segment.measurement_indices) > 1:
+                lineStripMarker = Marker(header=header)
+                lineStripMarker.type = Marker.LINE_STRIP
+                lineStripMarker.id = len(markerArray.markers)
+                lineStripMarker.color = ColorRGBA(r=color[0], g=color[1], b=color[2], a=0.7)
+                lineStripMarker.scale.x = 0.02
+
+                for pointIndex in segment.measurement_indices:
+                    lineStripMarker.points.append( Point(x=cartesianCoordinates[pointIndex][0], y=cartesianCoordinates[pointIndex][1], z=0 ) )
+
+                markerArray.markers.append(lineStripMarker)
 
         # Delete old markers which are not needed any more
         currentMarkerCount = len(markerArray.markers)  # must be before creating delete markers

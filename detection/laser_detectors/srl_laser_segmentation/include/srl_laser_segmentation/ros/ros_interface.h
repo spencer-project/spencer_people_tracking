@@ -29,6 +29,7 @@ private:
     
     ros::NodeHandle m_nodeHandle, m_privateNodeHandle;
     ros::Publisher m_laserscanSegmentationPublisher;
+    ros::Publisher m_laserscanSegmentationUnfilteredPublisher;
     ros::Subscriber m_laserscanSubscriber;
 };
 

@@ -21,8 +21,8 @@ class SegmentationToTrackConverter(object):
         trackedPersonsTopic = rospy.resolve_name("tracked_persons")
         detectedPersonsTopic = rospy.resolve_name("detected_persons")
         
-        self.trackedPersonsPublisher = rospy.Publisher(trackedPersonsTopic, TrackedPersons)
-        self.detectedPersonsPublisher = rospy.Publisher(detectedPersonsTopic, DetectedPersons)
+        self.trackedPersonsPublisher = rospy.Publisher(trackedPersonsTopic, TrackedPersons, queue_size=100000)
+        self.detectedPersonsPublisher = rospy.Publisher(detectedPersonsTopic, DetectedPersons, queue_size=100000)
 
         self._detectionIdCounter = 0
         self._lastDataStamp = None

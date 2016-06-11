@@ -18,7 +18,7 @@ public:
     virtual ~AgglomerativeHierarchicalClustering();
 
     /// Segment the given list of points. Consecutive points are assumed to be adjacent, i.e. the ordering of points is relevant.
-    virtual void performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment>& resultingSegments);
+    virtual void performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment::Ptr>& resultingSegments);
 };
 
 } // end of namespace srl_laser_segmentation

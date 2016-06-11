@@ -43,6 +43,15 @@ add_dependencies(jump_distance_segmentation ${catkin_EXPORTED_TARGETS} ${PROJECT
 target_link_libraries(jump_distance_segmentation ${catkin_LIBRARIES})
 
 
+add_executable(extended_jump_distance_segmentation 
+  ${SOURCE_DIR}/ros/ros_interface.cpp
+  ${SOURCE_DIR}/ros/nodes/extended_jump_distance_segmentation.cpp
+  ${SOURCE_DIR}/extended_jump_distance.cpp
+)
+add_dependencies(extended_jump_distance_segmentation ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(extended_jump_distance_segmentation ${catkin_LIBRARIES})
+
+
 add_executable(ahc_segmentation
   ${SOURCE_DIR}/ros/ros_interface.cpp
   ${SOURCE_DIR}/ros/nodes/ahc_segmentation.cpp

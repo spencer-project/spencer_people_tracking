@@ -13,8 +13,8 @@ void Feature08::evaluate(const Segment& segment, Eigen::VectorXd& result) const
 	if (numPoints > 2) {
 		// the points are in Cartesian coordinates but ordered by their polar angle
 		std::vector<double> d(3);
-		double dx0, dx1, dx2;
-		double dy0, dy1, dy2;
+		double dx0, dx1;
+		double dy0, dy1;
 		double area;
 		double denom;
 		double div;
@@ -22,7 +22,12 @@ void Feature08::evaluate(const Segment& segment, Eigen::VectorXd& result) const
 		for (size_t pIndex = 1; pIndex < numPoints - 1; ++pIndex) {
 			d[0] = (segment.points[pIndex-1] - segment.points[pIndex  ]).norm();
 			d[1] = (segment.points[pIndex  ] - segment.points[pIndex+1]).norm();
-			d[2] = (segment.points[pIndex-1] - segment.points[pIndex+1]).norm();	
+			d[2] = (segment.points[pIndex-1] - segment.points[pIndex+1]).norm();
+		
+			dx0 = segment.points[pIndex-1][0] - segment.points[pIndex][0];
+			dy0 = segment.points[pIndex-1][1] - segment.points[pIndex][1];
+			dx1 = segment.points[pIndex][0] - segment.points[pIndex+1][0];
+			dy1 = segment.points[pIndex][1] - segment.points[pIndex+1][1];
 
 			// mean angular difference
 			div = d[0] * d[1];

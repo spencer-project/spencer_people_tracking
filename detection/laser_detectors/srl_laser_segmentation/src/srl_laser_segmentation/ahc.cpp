@@ -15,7 +15,7 @@ AgglomerativeHierarchicalClustering::~AgglomerativeHierarchicalClustering()
 }
 
 
-void AgglomerativeHierarchicalClustering::performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment>& resultingSegments)
+void AgglomerativeHierarchicalClustering::performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment::Ptr>& resultingSegments)
 {
     ROS_DEBUG_NAMED("AgglomerativeHierarchicalClustering", "AgglomerativeHierarchicalClustering::%s", __func__);
 
@@ -74,12 +74,12 @@ void AgglomerativeHierarchicalClustering::performSegmentation(const std::vector<
         }
         else {
             // Got a new segment
-            srl_laser_segmentation::LaserscanSegment segment;
-            segment.label = segmentCounter++;
+            srl_laser_segmentation::LaserscanSegment::Ptr segment(new srl_laser_segmentation::LaserscanSegment);
+            segment->label = segmentCounter++;
             for(size_t i = 0; i < node->getPoints().size(); i++) {
                 point_index filteredPointIndex = node->getPoints()[i];
                 point_index originalPointIndex = pointMapping[ filteredPointIndex ];
-                segment.measurement_indices.push_back( originalPointIndex );
+                segment->measurement_indices.push_back( originalPointIndex );
             }
             resultingSegments.push_back(segment);
         }

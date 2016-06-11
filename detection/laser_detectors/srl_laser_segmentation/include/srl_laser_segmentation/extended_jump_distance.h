@@ -1,17 +1,17 @@
-#ifndef _SRL_LASER_SEGMENTATION_JUMP_DISTANCE_H
-#define _SRL_LASER_SEGMENTATION_JUMP_DISTANCE_H
+#ifndef _SRL_LASER_SEGMENTATION_EXTENDED_JUMP_DISTANCE_H
+#define _SRL_LASER_SEGMENTATION_EXTENDED_JUMP_DISTANCE_H
 
 #include <srl_laser_segmentation/segmentation_algorithm.h>
 
 
 namespace srl_laser_segmentation {
 
-/// A segmentation algorithm.
-class JumpDistanceSegmentation: public SegmentationAlgorithm {
+/// Extended version of standard jump distance clustering which may merge a cluster with its pre-predecessor if Euclidean distance is below jump distance.
+class ExtendedJumpDistanceSegmentation: public SegmentationAlgorithm {
 public:
     /// Constructor.
     /// @param jumpDistance The jump distance above which a new segment is created.
-    JumpDistanceSegmentation(double jumpDistance);
+    ExtendedJumpDistanceSegmentation(double jumpDistance);
 
     /// Segment the given list of points. Consecutive points are assumed to be adjacent, i.e. the ordering of points is relevant.
     virtual void performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment::Ptr>& resultingSegments);
@@ -28,4 +28,4 @@ private:
 
 } // end of namespace srl_laser_segmentation
 
-#endif // _SRL_LASER_SEGMENTATION_JUMP_DISTANCE_H
+#endif // _SRL_LASER_SEGMENTATION_EXTENDED_JUMP_DISTANCE_H

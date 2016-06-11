@@ -1,8 +1,23 @@
 Test results (detection metrics): 
- Accuracy=0.943 Precision=0.891 Recall=0.757 F1-Measure=0.819 FP-Rate=0.016
- TP=1499 TN=9489 FP=183 FN=480
+ Accuracy=0.947 Precision=0.942 Recall=0.914 F1-Measure=0.928 FP-Rate=0.021
+ TP=7645 TN=13739 FP=468 FN=722
+Testing took 1093 ms
 
-Testing took 462 ms (11651 test segments)
-NOTE: This is about 5x faster than Adaboost at 0.25 deg angular resolution!
+Trained on fr_mainstation1_cut.lab dataset (first 160.0 seconds)
+Using these settings:
 
-Trained on fr_mainstation1_cut.lab dataset (first 20.000 positive class samples)
+    <arg name="type" default="adaboost"/>
+    <arg name="shuffle_data_before_train_test_split" default="true"/>
+    <arg name="test_set_ratio" default="0.1"/>
+    
+    <arg name="adaboost_weak_count" default="500"/>
+
+    <arg name="segmentation" default="true"/>  <!-- set to false if segmentation is provided externally -->
+    <arg name="segmentation_type" default="extended_jump_distance_segmentation"/>
+    <arg name="distance_threshold" default="0.4"/>
+    
+    <arg name="min_avg_distance_from_sensor" default="0"/>
+    <arg name="max_avg_distance_from_sensor" default="20"/>
+    <arg name="min_points_per_segment" default="3"/>
+    <arg name="max_points_per_segment" default="50"/>
+    <arg name="min_segment_width" default="0.0"/>

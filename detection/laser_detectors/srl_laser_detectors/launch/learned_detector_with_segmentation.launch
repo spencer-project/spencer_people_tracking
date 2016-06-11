@@ -1,28 +1,33 @@
-<!-- Use this launch file for SICK LMS200-style sensors with 0.5 deg angular resolution -->
+<!-- Generic Adaboost detector launch file with segmentation -->
 <launch>
     <arg name="suffix" default=""/> <!-- must be set if running multiple instances -->
-    
+
+    <!-- Subscriber parameters -->
     <arg name="laser" default="laser"/> <!-- laser topic -->
     <arg name="subscriber_queue_size" default="1"/>
     <arg name="synchronizer_queue_size" default="5"/>
 
+    <!-- Detection -->
+    <arg name="model" default="$(find srl_laser_detectors)/models/lms200_0.50deg_height70cm_ahc.adaboost"/>  <!-- full path to learned classifier model -->
+    <arg name="type" default="adaboost"/>  <!-- must be equal to file extension -->
+
     <arg name="detected_persons" default="detected_persons"/> <!-- output detected persons topic -->
     <arg name="detection_id_increment" default="1"/>
     <arg name="detection_id_offset" default="0"/>
-    
+
+    <arg name="pose_variance" default="0.1"/> <!-- diagonal element of output R matrix (position uncertainty) -->
+    <arg name="adaboost_threshold" default="0.0"/> <!-- decision threshold for the signum function -->
+
+    <!-- Segmentation -->
     <arg name="segmentation" default="true"/>  <!-- set to false if segmentation is provided externally -->
     <arg name="segmentation_type" default="extended_jump_distance_segmentation"/>
-    <arg name="distance_threshold" default="0.1"/>
-
-    <arg name="min_avg_distance_from_sensor"/>
-    <arg name="max_avg_distance_from_sensor"/>
-    <arg name="min_points_per_segment"/>
-    <arg name="max_points_per_segment"/>
-
-    <arg name="min_width" default="0.05"/>
-    <arg name="max_width" default="0.5"/>
-
-    <arg name="pose_variance" default="0.01"/>
+    <arg name="distance_threshold" default="0.2"/>
+    
+    <arg name="min_avg_distance_from_sensor" default="0"/>
+    <arg name="max_avg_distance_from_sensor" default="20"/>
+    <arg name="min_points_per_segment" default="3"/>
+    <arg name="max_points_per_segment" default="200"/>
+    <arg name="min_segment_width" default="0.2"/>
 
     <remap from="laser" to="$(arg laser)"/>
     <remap from="detected_persons" to="$(arg detected_persons)"/>
@@ -32,19 +37,18 @@
         <param name="max_avg_distance_from_sensor" value="$(arg max_avg_distance_from_sensor)"/>
         <param name="min_points_per_segment" value="$(arg min_points_per_segment)"/>
         <param name="max_points_per_segment" value="$(arg max_points_per_segment)"/>
+        <param name="min_segment_width" value="$(arg min_segment_width)"/>
         <param name="distance_threshold" value="$(arg distance_threshold)"/>
         <param name="queue_size" value="$(arg subscriber_queue_size)"/>
     </node>
 
-    <node name="laser_detector$(arg suffix)" type="blob_detector" pkg="srl_laser_detectors" args="" output="screen">
+    <node name="laser_detector$(arg suffix)" type="detector" pkg="srl_laser_detectors" output="screen">
+        <param name="type" value="$(arg type)"/>
+        <param name="model" value="$(arg model)"/>
         <param name="detection_id_increment" value="$(arg detection_id_increment)"/>
         <param name="detection_id_offset" value="$(arg detection_id_offset)"/>
-        <param name="min_width" value="$(arg min_width)"/>
-        <param name="max_width" value="$(arg max_width)"/>
-        <param name="min_points" value="$(arg min_points_per_segment)"/> <!-- deprecated -->
-        <param name="max_points" value="$(arg max_points_per_segment)"/> <!-- deprecated -->
-        <param name="max_range" value="$(arg max_avg_distance_from_sensor)"/> <!-- deprecated -->
         <param name="pose_variance" value="$(arg pose_variance)"/>
+        <param name="adaboost_threshold" value="$(arg adaboost_threshold)"/>
         <param name="subscriber_queue_size" value="$(arg subscriber_queue_size)"/>
         <param name="synchronizer_queue_size" value="$(arg synchronizer_queue_size)"/>
     </node>

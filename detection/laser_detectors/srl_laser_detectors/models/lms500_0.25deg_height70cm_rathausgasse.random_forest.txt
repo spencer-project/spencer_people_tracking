@@ -1,0 +1,6 @@
+Test results (detection metrics): 
+ Accuracy=0.962 Precision=0.906 Recall=0.766 F1-Measure=0.830 FP-Rate=0.011
+ TP=5057 TN=46934 FP=524 FN=1545
+Testing took 12592 ms
+
+Trained on Rathausgasse with Extended Jump Distance Segmentation, distance 0.2m

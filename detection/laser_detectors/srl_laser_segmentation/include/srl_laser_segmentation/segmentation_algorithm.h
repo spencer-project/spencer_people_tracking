@@ -19,7 +19,7 @@ public:
     virtual ~SegmentationAlgorithm() {};
 
     /// Segment the given list of points. Consecutive points are assumed to be adjacent, i.e. the ordering of points is relevant.
-    virtual void performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment>& resultingSegments) = 0;
+    virtual void performSegmentation(const std::vector<Point2D>& points, std::vector<srl_laser_segmentation::LaserscanSegment::Ptr>& resultingSegments) = 0;
 
 protected:
     /// Check if the given measurement is valid (i.e. not out-of-range)

@@ -47,6 +47,7 @@ if(OpenCV_FOUND)
     ${SOURCE_DIR}/learned_detectors/opencv_detector.cpp
     ${SOURCE_DIR}/learned_detectors/svm_detector.cpp
     ${SOURCE_DIR}/learned_detectors/adaboost_detector.cpp
+    ${SOURCE_DIR}/learned_detectors/random_forest_detector.cpp
     ${SOURCE_DIR}/naive_detectors/blob_detector.cpp
 
     ${SOURCE_DIR}/ros/ros_interface.cpp

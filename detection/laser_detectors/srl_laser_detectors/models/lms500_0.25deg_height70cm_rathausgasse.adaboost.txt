@@ -1,0 +1,4 @@
+Test results (detection metrics): 
+ Accuracy=0.969 Precision=0.895 Recall=0.846 F1-Measure=0.870 FP-Rate=0.014
+ TP=5607 TN=46770 FP=661 FN=1022
+Testing took 12634 ms

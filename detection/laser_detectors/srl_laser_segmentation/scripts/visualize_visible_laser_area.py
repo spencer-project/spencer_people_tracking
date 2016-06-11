@@ -22,7 +22,7 @@ class VisibleLaserscanAreaVisualizer(object):
         self.minDistanceToSensor = rospy.get_param("~min_distance_to_sensor", 0.0)  # to filter out wrong echoes close to the sensor
         ### End of configurable parameters ###
 
-        self.markerArrayPublisher = rospy.Publisher(markersTopic, MarkerArray)
+        self.markerArrayPublisher = rospy.Publisher(markersTopic, MarkerArray, queue_size=1)
         laserSubscriber = rospy.Subscriber(laserscanTopic, LaserScan, self.newLaserscanReceived, queue_size=1)
         
         rospy.loginfo("Visualizing visible area of laser scan at %s on topic %s"

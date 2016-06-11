@@ -16,9 +16,13 @@ void ROSInterface::connect(SegmentationAlgorithm* segmentationAlgorithm, const s
     }
     m_segmentationAlgorithm = segmentationAlgorithm;
 
-    size_t queue_size = 5;
+    int queue_size = 5;
+    m_privateNodeHandle.getParam("queue_size", queue_size);
+
     m_laserscanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(laserTopic, queue_size, &ROSInterface::newLaserscanAvailable, this);
     m_laserscanSegmentationPublisher = m_nodeHandle.advertise<srl_laser_segmentation::LaserscanSegmentation>(segmentationTopic, queue_size);
+
+    m_laserscanSegmentationUnfilteredPublisher = m_nodeHandle.advertise<srl_laser_segmentation::LaserscanSegmentation>(segmentationTopic + "_unfiltered", queue_size);
 }
 
 void ROSInterface::newLaserscanAvailable(const sensor_msgs::LaserScan::ConstPtr& laserscan)
@@ -44,14 +48,17 @@ void ROSInterface::newLaserscanAvailable(const sensor_msgs::LaserScan::ConstPtr&
     }    
 
     // Perform segmentation
-    std::vector<srl_laser_segmentation::LaserscanSegment> resultingSegments;
+    std::vector<srl_laser_segmentation::LaserscanSegment::Ptr> resultingSegments;
     m_segmentationAlgorithm->performSegmentation(pointsInCartesianCoords, resultingSegments);
 
     // Read filter parameters
     int minPointsPerSegment = 3, maxPointsPerSegment = 50;
+    double minSegmentWidth = 0.0;
     m_privateNodeHandle.getParamCached("min_points_per_segment", minPointsPerSegment);
     m_privateNodeHandle.getParamCached("max_points_per_segment", maxPointsPerSegment);
-    ROS_INFO_ONCE("Filtering out all resulting segments with less than %d or more than %d points!", minPointsPerSegment, maxPointsPerSegment);
+    m_privateNodeHandle.getParamCached("min_segment_width", minSegmentWidth);
+    double squaredMinSegmentWidth = minSegmentWidth * minSegmentWidth;
+    ROS_INFO_ONCE("Filtering out all resulting segments with less than %d or more than %d points, or less than %.0f cm wide!", minPointsPerSegment, maxPointsPerSegment, minSegmentWidth * 100.0);
 
     double minAvgDistanceFromSensor = 0;
     m_privateNodeHandle.getParamCached("min_avg_distance_from_sensor", minAvgDistanceFromSensor);   
@@ -62,11 +69,12 @@ void ROSInterface::newLaserscanAvailable(const sensor_msgs::LaserScan::ConstPtr&
     ROS_INFO_ONCE("Maximum allowed average segment distance from sensor is %f meters!", maxAvgDistanceFromSensor);
 
     // Filter segments
-    srl_laser_segmentation::LaserscanSegmentation laserscanSegmentation;
+    srl_laser_segmentation::LaserscanSegmentation laserscanSegmentation, laserscanSegmentationUnfiltered;
     laserscanSegmentation.segments.reserve(resultingSegments.size());
+    laserscanSegmentationUnfiltered.segments.reserve(resultingSegments.size());
 
     for(size_t i = 0; i < resultingSegments.size(); i++) {
-        srl_laser_segmentation::LaserscanSegment& currentSegment = resultingSegments[i];
+        srl_laser_segmentation::LaserscanSegment& currentSegment = *resultingSegments[i];
 
         Point2D mean = Point2D::Zero();
         size_t numValidPoints = 0;
@@ -76,6 +84,8 @@ void ROSInterface::newLaserscanAvailable(const sensor_msgs::LaserScan::ConstPtr&
             mean += point;
             numValidPoints++;
         }
+        // Just filter out NaN segments
+        laserscanSegmentationUnfiltered.segments.push_back(currentSegment);
 
         // Filter by point count
         if(numValidPoints < minPointsPerSegment || numValidPoints > maxPointsPerSegment) continue;
@@ -85,12 +95,22 @@ void ROSInterface::newLaserscanAvailable(const sensor_msgs::LaserScan::ConstPtr&
         double sensorDistance = mean.norm();
         if(sensorDistance < minAvgDistanceFromSensor || sensorDistance > maxAvgDistanceFromSensor) continue;
 
+        // Filter by segment width
+        if(squaredMinSegmentWidth > 0) {
+            Point2D& firstPoint = pointsInCartesianCoords[currentSegment.measurement_indices.front()];
+            Point2D& lastPoint = pointsInCartesianCoords[ currentSegment.measurement_indices.back()];
+            double dx = lastPoint(0) - firstPoint(0);
+            double dy = lastPoint(1) - firstPoint(1);
+            if(dx*dx + dy*dy < squaredMinSegmentWidth) continue;
+        }
+
         // Segment looks okay
         laserscanSegmentation.segments.push_back(currentSegment);
     }
 
     // Set message header and publish
-    laserscanSegmentation.header = laserscan->header;
+    laserscanSegmentation.header = laserscanSegmentationUnfiltered.header = laserscan->header;
+    if(m_laserscanSegmentationUnfilteredPublisher.getNumSubscribers() > 0) m_laserscanSegmentationUnfilteredPublisher.publish(laserscanSegmentationUnfiltered);
     m_laserscanSegmentationPublisher.publish(laserscanSegmentation);
 }
 
