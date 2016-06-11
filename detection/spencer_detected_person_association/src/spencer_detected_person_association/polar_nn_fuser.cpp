@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <pluginlib/class_list_macros.h>
 #include "polar_nn_fuser.h"
 
@@ -47,7 +77,7 @@ namespace spencer_detected_person_association
         // Overall distance is weighted sum of the two components (similar to a 'weighted Manhattan distance', where the two components are angular and radial distances)
         double angular_importance = 0.8; getPrivateNodeHandle().getParamCached("angular_importance", angular_importance);
         double radial_importance = 0.2; getPrivateNodeHandle().getParamCached("radial_importance", radial_importance);
-        
+
         const float weightSum = angular_importance + radial_importance;
         angular_importance /= weightSum; radial_importance /= weightSum;
 
@@ -64,21 +94,21 @@ namespace spencer_detected_person_association
         // Obtain and normalize weights for angular component
         double angular_weight1 = 0.5; getPrivateNodeHandle().getParamCached("fused_angular_weight_for_topic1", angular_weight1);
         double angular_weight2 = 0.5; getPrivateNodeHandle().getParamCached("fused_angular_weight_for_topic2", angular_weight2);
-        
+
         const float angularWeightSum = angular_weight1 + angular_weight2;
         angular_weight1 /= angularWeightSum; angular_weight2 /= angularWeightSum;
 
         // Obtain and normalize weights for radial component -- usually one of them should receive a lower weight in practice, when there is high uncertainty in the depth estimates
         double radial_weight1 = 0.5; getPrivateNodeHandle().getParamCached("fused_radial_weight_for_topic1", radial_weight1);
         double radial_weight2 = 0.5; getPrivateNodeHandle().getParamCached("fused_radial_weight_for_topic2", radial_weight2);
-        
+
         const float radialWeightSum = radial_weight1 + radial_weight2;
         radial_weight1 /= radialWeightSum; radial_weight2 /= radialWeightSum;
 
         // Obtain and normalize weights for orientation component (if at all relevant, most detections don't have an orientation...)
         double orientation_weight1 = 0.5; getPrivateNodeHandle().getParamCached("fused_orientation_weight_for_topic1", orientation_weight1);
         double orientation_weight2 = 0.5; getPrivateNodeHandle().getParamCached("fused_orientation_weight_for_topic2", orientation_weight2);
-        
+
         const float orientationWeightSum = orientation_weight1 + orientation_weight2;
         orientation_weight1 /= orientationWeightSum; orientation_weight2 /= orientationWeightSum;
 
@@ -99,7 +129,7 @@ namespace spencer_detected_person_association
         fusedPose.pose.position.y = rho_avg * sin(phi_avg);
 
         fusedPose.pose.position.z = 0.5 * d1.pose.pose.position.z + 0.5 * d2.pose.pose.position.z; // FIXME: Make weights configurable if we ever track in 3D
-           
+
         // Interpolate the orientation using SLERP
         Eigen::Quaterniond q1, q2, qInterpolated;
         tf::quaternionMsgToEigen(d1.pose.pose.orientation, q1);
@@ -118,4 +148,4 @@ namespace spencer_detected_person_association
 }
 
 
-PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, PolarNNFuserNodelet, spencer_detected_person_association::PolarNNFuserNodelet, nodelet::Nodelet) 
+PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, PolarNNFuserNodelet, spencer_detected_person_association::PolarNNFuserNodelet, nodelet::Nodelet)

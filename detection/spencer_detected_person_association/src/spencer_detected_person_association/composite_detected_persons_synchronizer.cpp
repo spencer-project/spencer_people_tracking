@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <pluginlib/class_list_macros.h>
 #include "composite_detected_persons_synchronizer.h"
 
@@ -35,10 +65,10 @@ namespace spencer_detected_person_association
         privateNodeHandle.getParam("synchronizer_age_penalty", m_agePenalty);
 
         m_queueSize = 10; // TODO: Find reasonable default
-        privateNodeHandle.getParam("synchronizer_queue_size", m_queueSize);   
+        privateNodeHandle.getParam("synchronizer_queue_size", m_queueSize);
 
         m_topicMonitorInterval = 3.0; // How often to check for new topics becoming active or topics going inactive, in seconds
-        privateNodeHandle.getParam("topic_monitor_interval", m_topicMonitorInterval);    
+        privateNodeHandle.getParam("topic_monitor_interval", m_topicMonitorInterval);
 
         ROS_INFO_STREAM_NAMED(m_nodeletName, "Synchronizing topics " << ss.str() << "with queue size " << m_queueSize << ", age penalty " << m_agePenalty);
 
@@ -73,7 +103,7 @@ namespace spencer_detected_person_association
                 }
                 ROS_INFO_NAMED(m_nodeletName, "Number of active input topics has changed from %zu to %zu. Re-configuring message filters. Active inputs for output topic '%s' are now: %s",
                     m_previouslyActiveTopics.size(), activeTopics.size(), m_nodeHandle.resolveName("output").c_str(), ss.str().c_str());
-                
+
                 // Assure thread safety
                 boost::mutex::scoped_lock lock(m_monitorMutex);
 
@@ -94,7 +124,7 @@ namespace spencer_detected_person_association
 
             // Sleep for a while
             try { boost::this_thread::sleep(monitorInterval); }
-            catch(boost::thread_interrupted&) { return; } // stop thread 
+            catch(boost::thread_interrupted&) { return; } // stop thread
         }
     }
 
@@ -142,7 +172,7 @@ namespace spencer_detected_person_association
         }
         case 2: {
             SyncPolicyWithTwoInputs syncPolicyWithTwoInputs(m_queueSize);
-            syncPolicyWithTwoInputs.setAgePenalty(m_agePenalty); 
+            syncPolicyWithTwoInputs.setAgePenalty(m_agePenalty);
             const SyncPolicyWithTwoInputs constSyncPolicyWithTwoInputs = syncPolicyWithTwoInputs;
 
             m_synchronizerWithTwoInputs.reset(new SynchronizerWithTwoInputs(constSyncPolicyWithTwoInputs, *activeTopics[0], *activeTopics[1]));
@@ -171,7 +201,7 @@ namespace spencer_detected_person_association
         msgs.push_back(msg);
         handleNewInputMessages(msgs);
     }
-        
+
 
     void CompositeDetectedPersonsSynchronizer::onTwoInputMessagesReceived(spencer_tracking_msgs::CompositeDetectedPersons::ConstPtr msg1, spencer_tracking_msgs::CompositeDetectedPersons::ConstPtr msg2)
     {

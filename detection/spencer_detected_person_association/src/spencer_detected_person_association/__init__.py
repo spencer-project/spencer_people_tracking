@@ -1,3 +1,31 @@
+# Software License Agreement (BSD License)
+#
+#  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 """
 The TrackAssociation class subscribes to /spencer/perception/tracked_persons and provides a lookup from any past detection ID to the associated track ID, if any.
 Note that this module cannot look into the future -- if the person tracker is lagging behind the detections, the detection-to-track lookup will not return anything useful for the latest detections!
@@ -33,7 +61,7 @@ trackAssociation = spencer_detected_person_association.TrackAssociation()
 trackId = trackAssociation.lookupTrackId(someDetectionId)
 """
 class TrackAssociation(object):
-    """ 
+    """
     Constructor, automatically subscribes to /spencer/perception/tracked_persons to
     :param maxDetectionsToRemember: Maximum number of detections to remember.
     """
@@ -116,7 +144,7 @@ class FusedDetectionIdMemory(object):
                 rospy.logwarn("Lookup from original detection IDs to fused detection IDs is empty, make sure %s is being published!" % self.fusedDetectionsTopic)
 
             return self.fusedDetectionLookup.get(originalDetectionId)
-        
+
     """ Internal callback which processes new CompositeDetectedPersons. """
     def newFusedDetectionsAvailable(self, fusedDetections):
         with self.lock:
@@ -154,7 +182,7 @@ class TrackSynchronizer(message_filters.SimpleFilter):
     def __init__(self, inputFilter, queue_size):
         message_filters.SimpleFilter.__init__(self)
         self.trackAssociation = TrackAssociation()
-        self.trackAssociation.trackSubscriber.addCallback(self.newTracksAvailable)        
+        self.trackAssociation.trackSubscriber.addCallback(self.newTracksAvailable)
         self.latestTrackTimestamp = rospy.Time(0);
         self.connectInput(inputFilter)
         self.queue_size = queue_size
@@ -172,7 +200,7 @@ class TrackSynchronizer(message_filters.SimpleFilter):
         with self.lock:
             # Temporarily store the message in the queue
             self.queue.append(msg)
-            
+
             # Invoke callback for all queued messages where track information is already available
             while self.queue and self.queue[0].header.stamp <= self.latestTrackTimestamp:
                 publishMsg = self.queue.popleft()

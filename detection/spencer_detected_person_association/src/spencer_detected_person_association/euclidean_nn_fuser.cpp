@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <pluginlib/class_list_macros.h>
 #include "euclidean_nn_fuser.h"
 
@@ -25,7 +55,7 @@ namespace spencer_detected_person_association
         // Obtain and normalize weights of arithmetic mean
         double weight1 = 0.5; getPrivateNodeHandle().getParamCached("pose_weight_for_topic1", weight1);
         double weight2 = 0.5; getPrivateNodeHandle().getParamCached("pose_weight_for_topic2", weight2);
-        
+
         const float weightSum = weight1 + weight2;
         weight1 /= weightSum; weight2 /= weightSum;
 
@@ -33,7 +63,7 @@ namespace spencer_detected_person_association
         fusedPose.pose.position.x = weight1 * d1.pose.pose.position.x + weight2 * d2.pose.pose.position.x;
         fusedPose.pose.position.y = weight1 * d1.pose.pose.position.y + weight2 * d2.pose.pose.position.y;
         fusedPose.pose.position.z = weight1 * d1.pose.pose.position.z + weight2 * d2.pose.pose.position.z;
-           
+
         // Interpolate the orientation using SLERP
         Eigen::Quaterniond q1, q2, qInterpolated;
         tf::quaternionMsgToEigen(d1.pose.pose.orientation, q1);
@@ -52,4 +82,4 @@ namespace spencer_detected_person_association
 }
 
 
-PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, EuclideanNNFuserNodelet, spencer_detected_person_association::EuclideanNNFuserNodelet, nodelet::Nodelet) 
+PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, EuclideanNNFuserNodelet, spencer_detected_person_association::EuclideanNNFuserNodelet, nodelet::Nodelet)

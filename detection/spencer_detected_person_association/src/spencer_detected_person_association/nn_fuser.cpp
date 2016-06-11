@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "nn_fuser.h"
 
 #include <Eigen/Core>
@@ -9,7 +39,7 @@
 
 namespace spencer_detected_person_association
 {
-    void NearestNeighborFuserNodelet::onInit() 
+    void NearestNeighborFuserNodelet::onInit()
     {
         NODELET_INFO("Initializing NearestNeighborFuserNodelet...");
         initSynchronizer(getName(), getNodeHandle(), getPrivateNodeHandle(), 1, 2); // we require at most two input topics
@@ -18,7 +48,7 @@ namespace spencer_detected_person_association
         int detectionIdOffset;
         getPrivateNodeHandle().param<int>("detection_id_increment", m_detectionIdIncrement, 1);
         getPrivateNodeHandle().param<int>("detection_id_offset", detectionIdOffset, 0);
-        m_lastDetectionId = detectionIdOffset;    
+        m_lastDetectionId = detectionIdOffset;
     }
 
     void NearestNeighborFuserNodelet::onNewInputMessagesReceived(const std::vector<spencer_tracking_msgs::CompositeDetectedPersons::ConstPtr>& inputMsgs)
@@ -27,7 +57,7 @@ namespace spencer_detected_person_association
         outputMsg->header.frame_id = inputMsgs[0]->header.frame_id;
         outputMsg->header.stamp = inputMsgs[0]->header.stamp;
         outputMsg->header.seq = m_seq++;
-        
+
         // Get first set of composite detections to fuse
         const spencer_tracking_msgs::CompositeDetectedPersons::ConstPtr& firstSet = inputMsgs[0];
 
@@ -43,18 +73,18 @@ namespace spencer_detected_person_association
         }
         else {
             // Both sets contain elements, need to fuse the detections: This is where it get's interesting...
-            
+
             // Use timestamp of latest message
             if(inputMsgs[1]->header.stamp > outputMsg->header.stamp) outputMsg->header.stamp = inputMsgs[1]->header.stamp;
- 
+
             // Get second set of composite detections to fuse
             const spencer_tracking_msgs::CompositeDetectedPersons::ConstPtr& secondSet = inputMsgs[1];
             ROS_ASSERT(!firstSet->elements.empty() && !secondSet->elements.empty());
-            
+
             // Ensure each topic uses the same coordinate frame ID
             ROS_ASSERT_MSG(secondSet->header.frame_id == firstSet->header.frame_id, "All input messages must already be in the same coordinate frame! Got %s and %s!",
                 firstSet->header.frame_id.c_str(), secondSet->header.frame_id.c_str());
-            
+
             // Initialize distance matrix with infinite values
             const float INF = std::numeric_limits<float>::infinity();
             Eigen::MatrixXf distanceMatrix = Eigen::MatrixXf::Constant(firstSet->elements.size(), secondSet->elements.size(), INF);
@@ -98,11 +128,11 @@ namespace spencer_detected_person_association
                 spencer_tracking_msgs::CompositeDetectedPerson fusedDetection;
                 fusedDetection.composite_detection_id = m_lastDetectionId;
                 m_lastDetectionId += m_detectionIdIncrement;
-                
+
                 fusedDetection.min_confidence = std::min(d1.min_confidence, d2.min_confidence);
                 fusedDetection.max_confidence = std::max(d2.max_confidence, d2.max_confidence);
                 fusedDetection.mean_confidence = (d1.mean_confidence + d2.mean_confidence) / 2.0;
-                
+
                 fusedDetection.pose = fusedPose;
 
                 fusedDetection.original_detections.insert(fusedDetection.original_detections.end(), d1.original_detections.begin(), d1.original_detections.end()); // d1
