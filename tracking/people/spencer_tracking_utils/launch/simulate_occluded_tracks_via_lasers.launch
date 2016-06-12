@@ -2,35 +2,48 @@
     <arg name="input_tracks" default="groundtruth_tracks"/>
     <arg name="output_tracks" default="tracks_matched_against_both_lasers"/>
 
+    <arg name="match_against_lasers" default="true"/>
+
     <arg name="min_distance" default="0.0"/>
     <arg name="max_distance" default="99999999.9"/>
+    <arg name="sensor_target_frame_for_distance" default="laser_center_link"/>
+
 
     <!-- The nodes in this group form a processing chain, i.e. first node takes initial input, last node produces final output -->
     <group ns="simulate_occluded_tracks_via_lasers">
-        <node name="filter_tracks_by_distance" type="filter_tracks_by_distance" pkg="spencer_tracking_utils">
-            <remap from="input_tracks" to="$(arg input_tracks)"/>
-            <remap from="output_tracks" to="tracks_filtered_by_distance"/>
+
+        <group if="$(arg match_against_lasers)">
+            <node name="mark_all_tracks_as_occluded" type="mark_all_tracks_as_occluded" pkg="spencer_tracking_utils">
+                <remap from="input_tracks" to="$(arg input_tracks)"/>
+                <remap from="output_tracks" to="all_tracks_occluded"/>
+            </node>
+
+            <node name="match_tracks_against_laser_front" type="match_tracks_against_laser" pkg="spencer_tracking_utils">
+                <remap from="laser" to="/spencer/sensors/laser_front/echo0"/>
+                <remap from="input_tracks" to="all_tracks_occluded"/>
+                <remap from="output_tracks" to="tracks_matched_against_laser_front"/>
+            </node>
+
+            <node name="match_tracks_against_laser_rear" type="match_tracks_against_laser" pkg="spencer_tracking_utils">
+                <remap from="laser" to="/spencer/sensors/laser_rear/echo0"/>
+                <remap from="input_tracks" to="tracks_matched_against_laser_front"/>
+                <remap from="output_tracks" to="tracks_matched_against_laser_rear"/>
+            </node>
+        </group>
+
+
+        <node name="filter_tracks_by_distance" type="filter_tracks_by_distance" pkg="spencer_tracking_utils" output="screen">
+            <remap from="input_tracks" to="tracks_matched_against_laser_rear" if="$(arg match_against_lasers)"/>
+            <remap from="input_tracks" to="$(arg input_tracks)" unless="$(arg match_against_lasers)"/>
+            
+            <remap from="output_tracks" to="$(arg output_tracks)"/>
 
             <param name="min_distance" value="$(arg min_distance)"/>
             <param name="max_distance" value="$(arg max_distance)"/>
-            <param name="sensor_target_frame" value="laser_center_link"/>
-        </node>
 
-        <node name="mark_all_tracks_as_occluded" type="mark_all_tracks_as_occluded" pkg="spencer_tracking_utils">
-            <remap from="input_tracks" to="tracks_filtered_by_distance"/>
-            <remap from="output_tracks" to="all_tracks_occluded"/>
-        </node>
+            <param name="set_to_occluded" value="true"/>  <!-- do not filter out tracks, just set to occluded if outside of bounds -->
 
-        <node name="match_tracks_against_laser_front" type="match_tracks_against_laser" pkg="spencer_tracking_utils">
-            <remap from="laser" to="/spencer/sensors/laser_front/echo0"/>
-            <remap from="input_tracks" to="all_tracks_occluded"/>
-            <remap from="output_tracks" to="tracks_matched_against_laser_front"/>
-        </node>
-
-        <node name="match_tracks_against_laser_rear" type="match_tracks_against_laser" pkg="spencer_tracking_utils">
-            <remap from="laser" to="/spencer/sensors/laser_rear/echo0"/>
-            <remap from="input_tracks" to="tracks_matched_against_laser_front"/>
-            <remap from="output_tracks" to="$(arg output_tracks)"/>
+            <param name="sensor_target_frame" value="$(arg sensor_target_frame_for_distance)"/>
         </node>
 
     </group>

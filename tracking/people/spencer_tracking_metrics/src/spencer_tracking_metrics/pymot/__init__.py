@@ -1,3 +1,19 @@
+#
+# PyMot metrics
+#
+# Source: https://github.com/Videmo/pymot
+# License unclear
+#
+# Contributors:
+# Markus Roth (roth@videmo.de)
+# Martin Bäuml (baeuml@kit.edu)
+# Mika Fischer (fischer@videmo.de)
+# Keni Bernardin (bernardin@videmo.de)
+#
+# Extended for use with 2D ground plane coordinates by
+# Fabian Girrbach, Timm Linder, Social Robotics Lab, University of Freiburg
+# 
+
 import sys
 import json
 import argparse
@@ -10,6 +26,8 @@ from importers import MOT_groundtruth_import
 from formatchecker import FormatChecker
 from utilities import write_stderr_red
 import logging
+import time
+import glob, os, re
 LOG = logging.getLogger(__name__)
 
 
@@ -21,7 +39,7 @@ class MOTEvaluation:
         self.matching_threshold_ = matchingThreshold
         """Threshold distance for matching in meters"""
     
-        self.munkres_inf_ = 5.0*(10**17)
+        self.munkres_inf_ = 100000
         """Not quite infinite number for Munkres algorithm"""
     
         self.sync_delta_ = 0.001
@@ -32,6 +50,18 @@ class MOTEvaluation:
         
         self.hypotheses_ = hypotheses
         """Hypotheses. See hypotheses.json for a sample file"""
+
+        self.use_lapjv = rospy.get_param("~use_lapjv", True)
+        """ use LAPJV instead of Munkres? (requires library to be installed from http://www.starklab.org/members/kazmar/software/) """
+        
+        if self.use_lapjv:
+            try:
+                import lapjv
+            except ImportError:
+                rospy.logerr("Setting use_lapjv in PyMot to False because required library could not be found. Install from http://www.starklab.org/members/kazmar/software/!")
+                self.use_lapjv = False
+            else:
+                self.lapjv = lapjv
 
         self.convertIDsToString()
 
@@ -51,6 +81,9 @@ class MOTEvaluation:
         # List of dicts, containing ground truths and hypotheses for visual debugging
         self.visualDebugFrames_ = []
 
+        self.evalMisses = []
+        self.evalFalsePositives = []
+        self.evalMismatches = []
 
     def get_hypotheses_frame(self, timestamp):
         """Get list of hypotheses occuring chronologically close to ground truth timestamp, but at most with time difference self.sync_delta"""
@@ -81,6 +114,25 @@ class MOTEvaluation:
         for frame in frames:
             self.evaluateFrame(frame)
 
+        misses_filename = rospy.get_param("~misses_filename", "misses.txt")
+        falsepositives_filename = rospy.get_param("~falsepositives_filename", "falsepositives.txt")
+        mismatches_filename = rospy.get_param("~mismatches_filename", "mismatches.txt")
+
+        with open(misses_filename, 'w') as file:
+            for item in self.evalMisses:
+                file.write("%s " % str(item[0]) + " " + str(item[1]) + "\n")
+            file.close
+            #print "Wrote misses to "
+
+        with open(falsepositives_filename, 'w') as file:
+            for item in self.evalFalsePositives:
+                file.write("%s " % str(item[0]) + " " + str(item[1]) + " " + str(item[2]) + " " + str(item[3]) + " " + str(item[4]) + " " + str(item[5]) + "\n")
+            file.close
+
+        with open(mismatches_filename, 'w') as file:
+            for item in self.evalMismatches:
+                file.write("%s " % str(item[0]) + " " + str(item[1]) + " " + str(item[2]) + " " + str(item[3]) + " " + str(item[4]) + " " + str(item[5]) + "\n")
+            file.close
 
     def evaluateFrame(self, frame):
         """Update statistics by evaluating a new frame."""
@@ -94,6 +146,18 @@ class MOTEvaluation:
         # Save occuring ground truth ids
         for g in groundtruths:
             self.groundtruth_ids_.add(g["id"])
+            # Added for Mostly Tracked calculation
+            temp_id = g["id"]
+            # If gt already seen increment counter for gt_id
+            if temp_id in self.mostly_tracked_list.keys():            
+                if not g.get("dco",False):
+                    self.mostly_tracked_list[temp_id]["gt_count"] += 1
+            # For new gt track initialize a new dict
+            else :
+                self.mostly_tracked_list[temp_id] = {'gt_count': 1, 'hyp_count': 0}
+                
+                 
+            
 
         # Save occuring hypothesis ids
         for h in hypotheses:
@@ -142,21 +206,29 @@ class MOTEvaluation:
                 continue
             
             hypothesis = filter(lambda h: h["id"] == self.mappings_[gt_id], hypotheses) # Get hypothesis with hypothesis id according to mapping
-            assert len(hypothesis) <= 1
+            assert len(hypothesis) <= 1, "Multiple track hypotheses found with the same ID (#%s) at cycle no. %d! Make sure the tracker is outputting unique track IDs!" % (hypothesis[0]["id"] , int(timestamp))
             if len(hypothesis) != 1:
                 continue
             
             # Hypothesis found for known mapping
             # Check hypothesis for overlap
             distance = numpy.linalg.norm(Rect(groundtruth[0]).asNumpyArray() - Rect(hypothesis[0]).asNumpyArray() )
-            if distance <= self.matching_threshold_:
+            if distance <= self.matching_threshold_ and not groundtruth[0].get("dco",False):
                 rospy.logdebug("Keeping correspondence between %s and %s" % (groundtruth[0]["id"], hypothesis[0]["id"]))
 #                    print "DIFF Keep corr %s %s %.2f" % (groundtruth[0]["id"], hypothesis[0]["id"], Rect(groundtruth[0]).overlap(Rect(hypothesis[0])))
                 #listofprints.append("DIFF Keep corr %s %s %.2f" % (groundtruth[0]["id"], hypothesis[0]["id"], Rect(groundtruth[0]).overlap(Rect(hypothesis[0]))))
                 correspondences[gt_id] = hypothesis[0]["id"]
                 self.total_distance_ += distance
+            elif groundtruth[0].get("dco",False):
+                correspondences[gt_id] = hypothesis[0]["id"]
+            elif hypothesis[0].get("dco",False) and not groundtruth[0].get("dco",False) and distance <= 2*self.matching_threshold_:
+                self.misses_ += 1 
+                correspondences[gt_id] = hypothesis[0]["id"]
+                self.total_distance_ += distance
+                self.evalMisses.append([frame["num"], correspondences[gt_id]])
 
-        
+        munk_hypotheses = filter(lambda h: h['id'] not in correspondences.values(), hypotheses)         
+        munk_gts = filter(lambda g: g['id'] not in correspondences.keys(), groundtruths) 
         for p in sorted(listofprints):
             rospy.logdebug(p)
 
@@ -165,11 +237,13 @@ class MOTEvaluation:
         rospy.logdebug("STEP 2: FIND CORRESPONDENCE")
         
         # Fill hungarian matrix with +inf
-        munkres_matrix = [ [ self.munkres_inf_ for i in range(len(hypotheses)) ] for j in range(len(groundtruths)) ] # TODO make square matrix
+        munkres_matrix = [ [ self.munkres_inf_ for i in range(max(len(munk_hypotheses), len(munk_gts))) ] for j in range(max(len(munk_hypotheses), len(munk_gts))) ] # TODO make square matrix
+        valid_counter = 0
+        
 
         # Find correspondences
-        for i in range(len(groundtruths)):
-            groundtruth = groundtruths[i]
+        for i in range(len(munk_gts)):
+            groundtruth = munk_gts[i]
             
             # Skip groundtruth with correspondence from mapping
             if groundtruth["id"] in correspondences.keys():
@@ -177,8 +251,8 @@ class MOTEvaluation:
                 continue
             
             # Fill hungarian matrix with distance between gts and hypos
-            for j in range(len(hypotheses)):
-                hypothesis = hypotheses[j]
+            for j in range(len(munk_hypotheses)):
+                hypothesis = munk_hypotheses[j]
                 
                 # Skip hypotheses with correspondence from mapping
                 if hypothesis["id"] in correspondences.values():
@@ -192,15 +266,28 @@ class MOTEvaluation:
                 if distance <= self.matching_threshold_:
 #                        print "Fill Hungarian", rect_groundtruth, rect_hypothesis, overlap
                     munkres_matrix[i][j] = distance
+                    valid_counter += 1
                     rospy.logdebug("DIFF candidate %s %s %.2f" % (groundtruth["id"], hypothesis["id"], distance))
         
-        # Do the Munkres
-        #rospy.logdebug(munkres_matrix)
-        
+        # Do the Munkres / LAPJV        
         # Only run munkres on non-empty matrix
-        if len(munkres_matrix) > 0:
-            m = Munkres()
-            indices = m.compute(munkres_matrix)
+        if valid_counter > 1:
+            # t = time.time()   
+            if self.use_lapjv:
+                np_array = numpy.array(munkres_matrix, dtype=numpy.float32 )
+                lap_result = self.lapjv.lap(np_array)
+                indices = zip(range(max(len(munk_hypotheses),len(munk_gts))), lap_result[1])
+#               elapsed = time.time() - t
+#               rospy.loginfo("LAPJV needed {}s".format(elapsed))
+            else:
+                m = Munkres()
+                indices = m.compute(munkres_matrix)
+#               elapsed = time.time() - t
+#               rospy.loginfo("Munkres needed {}s".format(elapsed))                       
+        elif valid_counter == 1:
+            np_array = numpy.array(munkres_matrix, dtype=numpy.float32  )
+            idx = numpy.unravel_index(np_array.argmin(), np_array.shape)
+            indices = [idx]            
         else:
             rospy.logdebug("No need to run Hungarian with %d ground truths and %d hypothesis." % (len(groundtruths), len(hypotheses)))
             indices = []
@@ -213,11 +300,11 @@ class MOTEvaluation:
             
             # Skip invalid self.mappings_
             # Check for max float distance matches (since Hungarian returns complete mapping)
-            if (munkres_matrix[gt_index][hypo_index] == self.munkres_inf_): # NO correspondence <=> overlap >= thresh
+            if (munkres_matrix[gt_index][hypo_index] >= self.munkres_inf_): # NO correspondence <=> overlap >= thresh
                 continue
             
-            gt_id   = groundtruths[gt_index]["id"]
-            hypo_id = hypotheses[hypo_index]["id"]
+            gt_id   = munk_gts[gt_index]["id"]
+            hypo_id = munk_hypotheses[hypo_index]["id"]
             
             # Assert no known mappings have been added to hungarian, since keep correspondence should have considered this case.
             if gt_id in self.mappings_:
@@ -234,7 +321,7 @@ class MOTEvaluation:
 
             # Count "recoverable" and "non-recoverable" mismatches
             # "recoverable" mismatches
-            if gt_id in self.gt_map_ and self.gt_map_[gt_id] != hypo_id and not groundtruths[gt_index].get("dco",False):
+            if gt_id in self.gt_map_ and self.gt_map_[gt_id] != hypo_id and not munk_gts[gt_index].get("dco",False):
                 rospy.logdebug("Look ma! We got a recoverable mismatch over here! (%s-%s) -> (%s-%s)" % (gt_id, self.gt_map_[gt_id], gt_id, hypo_id))
                 self.recoverable_mismatches_ += 1
 
@@ -245,7 +332,7 @@ class MOTEvaluation:
                 old_gt_dco = filter(lambda g: g["id"] == old_gt_id and g.get("dco",False), groundtruths)
 
                 assert len(old_gt_dco) <= 1;
-                if not (groundtruths[gt_index].get("dco",False) and len(old_gt_dco) == 1):
+                if not (munk_gts[gt_index].get("dco",False) and len(old_gt_dco) == 1):
                     rospy.logdebug("Look ma! We got a non-recoverable mismatch over here! (%s-%s) -> (%s-%s)" % (self.hypo_map_[hypo_id], hypo_id, gt_id, hypo_id))
                     self.non_recoverable_mismatches_ += 1
 
@@ -263,7 +350,7 @@ class MOTEvaluation:
                 # CAVE: Other than in perl script:
                 # Do not consider for mismatch, if both old gt and new gt are DCO
                 gt_with_mapping_gt_id_dco = filter(lambda g: g["id"] == mapping_gt_id and g.get("dco",False), groundtruths)
-                if len (gt_with_mapping_gt_id_dco) == 1 and groundtruths[gt_index].get("dco",False):
+                if len (gt_with_mapping_gt_id_dco) == 1 and munk_gts[gt_index].get("dco",False):
                     rospy.logdebug("Ground truths %s and %s are DCO. Not considering for mismatch." % (mapping_gt_id, gt_id))
 #                    print "DIFF DCO %s" % (gt_id), groundtruths[gt_index]
                     
@@ -287,6 +374,8 @@ class MOTEvaluation:
 
                         g = g[0]
                         h = h[0]
+
+                        self.evalMismatches.append([frame["num"], h["id"], h["x"], h["y"], h["w"], h["h"]])
 
                         g["class"] = "mismatch"
                         h["class"] = "mismatch"
@@ -342,6 +431,7 @@ class MOTEvaluation:
                 groundtruth["class"] = "miss"
                 visualDebugAnnotations.append(groundtruth)
                 self.misses_ += 1
+                self.evalMisses.append([frame["num"], groundtruth["id"]])
 
         # Count false positives
         for hypothesis in hypotheses:
@@ -351,10 +441,20 @@ class MOTEvaluation:
                 self.false_positives_ += 1
                 visualDebugAnnotations.append(hypothesis)
                 hypothesis["class"] = "false positive"
+                self.evalFalsePositives.append([frame["num"], hypothesis["id"], hypothesis["x"], hypothesis["y"], hypothesis["w"], hypothesis["h"]])
         
         self.total_correspondences_ += len(correspondences)
+
+        # For counting matches, do not count groundtruths with "don't care"-flag
+        self.total_matches_ += len(correspondences)
+        for groundtruth in groundtruths:
+            if groundtruth.get("dco", False) and groundtruth["id"] in correspondences.keys():
+                self.total_matches_ -= 1
+
         
-        self.total_groundtruths_ += len(groundtruths) # Number of objects (ground truths) in current frame
+        # FIXED: Count only groundtruth objects that don't carry a 'don't care' flag. Otherwise we can get high MOTA scores even if the track recall is 0.0!
+        self.total_groundtruths_ += len( filter(lambda groundtruth: not groundtruth.get("dco", False), groundtruths) )
+        #self.total_groundtruths_ += len(groundtruths) # Number of objects (ground truths) in current frame
 
         visualDebugFrame = {
             "timestamp": timestamp,
@@ -365,39 +465,11 @@ class MOTEvaluation:
             visualDebugFrame["num"] = frame["num"]
 
         self.visualDebugFrames_.append(visualDebugFrame)
-
-    @staticmethod
-    def calcMOTA(abs_stats):
-        num_gt = abs_stats['ground truths']
-        if num_gt == 0:
-            write_stderr_red("Warning", "No ground truth. MOTA calculation not possible")
-            return 0.0
-        return 1.0 - float(abs_stats['misses'] + abs_stats['false positives'] + abs_stats['mismatches']) / num_gt
-
-    @staticmethod
-    def calcMOTP(abs_stats):
-        num_corr = abs_stats['correspondences']
-        if num_corr == 0:
-            write_stderr_red("Warning", "No ground truth. MOTA calculation not possible")
-            return 0.0
-        return float(abs_stats['total distance']) / num_corr
-
-    @staticmethod
-    def calcRelativeStatistics(abs_stats):
-        gt = abs_stats['ground truths']
-        num_gt_tracks = abs_stats['lonely ground truth tracks'] + abs_stats['covered ground truth tracks']
-
-        return {
-            "MOTA":                 MOTEvaluation.calcMOTA(abs_stats),
-            "MOTP":                 MOTEvaluation.calcMOTP(abs_stats),
-            "miss rate":            float(abs_stats['misses']) / gt,
-            "false positive rate":  float(abs_stats['false positives']) / gt,
-            "mismatch rate":        float(abs_stats['mismatches']) / gt,
-            "recoverable mismatch rate":   float(abs_stats['recoverable mismatches']) / gt,
-            "non-recoverable mismatch rate":    float(abs_stats['non-recoverable mismatches']) / gt,
-            "track precision":      float(abs_stats['covering hypothesis tracks']) / abs_stats['hypothesis tracks'] if abs_stats['hypothesis tracks'] != 0 else 0.0,
-            "track recall":         float(abs_stats['covered ground truth tracks'])  / num_gt_tracks if num_gt_tracks != 0 else 0.0,
-        }
+        
+        # Added for Mostly tracked support
+        # Increment hyp count for each found correspondence
+        for gt_id, hyp_id in correspondences.iteritems():
+            self.mostly_tracked_list[gt_id]['hyp_count'] += 1
 
 
     def getMOTA(self):
@@ -433,7 +505,8 @@ class MOTEvaluation:
             "mismatches":      self.mismatches_,
             "recoverable mismatches": self.recoverable_mismatches_,
             "non-recoverable mismatches":  self.non_recoverable_mismatches_,
-            "correspondences": self.total_correspondences_,
+            "correspondences": self.total_correspondences_,  # includes correspondences where GT has don't care-flag!
+            "matches": self.total_matches_,  # this instead ignores GT with DCF
             "total distance":   self.total_distance_,
             "lonely ground truth tracks": len(lonely_ground_truths),
             "covered ground truth tracks": len(covered_ground_truths),
@@ -453,14 +526,39 @@ class MOTEvaluation:
             "MOTA":                 self.getMOTA(),
             "MOTP":                 self.getMOTP(),
             "miss rate":            float(self.misses_) / gt,
-            "false positive rate":  float(self.false_positives_) / gt,
+            "false positive rate":  float(self.false_positives_) / gt,  # FIXME: Better call this FP%, as FPR = FP / (FP + TN) not / GT!
             "mismatch rate":        float(self.mismatches_) / gt,
             "recoverable mismatch rate":   float(self.recoverable_mismatches_) / gt,
             "non-recoverable mismatch rate":    float(self.non_recoverable_mismatches_) / gt,
             "track precision":      float(len(self.hypo_map_.keys())) / len(self.hypothesis_ids_) if len(self.hypothesis_ids_) != 0 else 0.0,
             "track recall":         float(len(self.gt_map_.keys()))  / len(self.groundtruth_ids_) if len(self.groundtruth_ids_) != 0 else 0.0,
+            "relative ID switches": float(self.mismatches_) * gt / self.total_matches_  # relative to recovered track count (i.e. tracker with higher track recall is allowed to have more ID switches), see MOTChallenge 2015
         }
-
+        
+    def calcMostlyTracked(self):
+        mostly_tracked = 0
+        partial_tracked = 0
+        mostly_lost = 0
+        for track in self.mostly_tracked_list.values():
+            percent = float(track['hyp_count'])/float(track['gt_count'])
+            if percent >= 0.8:
+                mostly_tracked += 1
+            elif percent < 0.2:
+                mostly_lost += 1
+            else:
+                partial_tracked +=1
+                
+        rospy.logdebug('Mostly Tracked: {}; Partial Tracked: {}; Mostly Lost: {}'.format(mostly_tracked,partial_tracked,mostly_lost))
+    
+        return {
+                'mostly_tracked': mostly_tracked,
+                'partially_tracked': partial_tracked,
+                'mostly_lost': mostly_lost
+                }
+         
+    def getMostlyStatistics(self):
+        result = self.calcMostlyTracked()
+        return result
 
     def printTrackStatistics(self):
         # Lonely ground truths (no single correspondence)
@@ -532,63 +630,9 @@ class MOTEvaluation:
         self.false_positives_ = 0
         self.total_groundtruths_ = 0
         self.total_distance_ = 0.0
-        self.total_correspondences_ = 0       
+        self.total_correspondences_ = 0
+        self.total_matches_ = 0
 
         self.groundtruth_ids_ = set()
         self.hypothesis_ids_ = set()
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--groundtruth', required=True)
-    parser.add_argument('-b', '--hypothesis', required=True)
-    parser.add_argument('-c', '--check_format', action="store_true", default=True)
-    parser.add_argument('-v', '--visual_debug_file')
-    args = parser.parse_args()
-
-    # Load ground truth according to format
-    # Assume MOT format, if non-json
-    gt = open(args.groundtruth) # gt file
-    if args.groundtruth.endswith(".json"):
-        groundtruth = json.load(gt)[0]
-    else:
-        groundtruth = MOT_groundtruth_import(gt.readlines())
-    gt.close()
-
-    # Load MOT format files
-    hypo = open(args.hypothesis) # hypo file
-    if args.hypothesis.endswith(".json"):
-        hypotheses = json.load(hypo)[0]
-    else:
-        hypotheses = MOT_hypo_import(hypo.readlines())
-    hypo.close()
-
-
-    evaluator = MOTEvaluation(groundtruth, hypotheses)
-
-    if(args.check_format):
-        formatChecker = FormatChecker(groundtruth, hypotheses)
-        success = formatChecker.checkForExistingIDs()
-        success |= formatChecker.checkForAmbiguousIDs()
-        success |= formatChecker.checkForCompleteness()
-
-        if not success:
-            write_stderr_red("Error:", "Stopping. Fix ids first. Evaluating with broken data does not make sense!\n    File: %s" % args.groundtruth)
-            sys.exit()
-
-    evaluator.evaluate()
-    print "Track statistics"
-    evaluator.printTrackStatistics()
-    print 
-    print "Results"
-    evaluator.printResults()
-#    evaluator.printLegacyFormat()
-
-#    print json.dumps(evaluator.getAbsoluteStatistics(), indent=4, sort_keys=True)
-#    print json.dumps(evaluator.getRelativeStatistics(), indent=4, sort_keys=True)
-
-    if(args.visual_debug_file):
-        with open(args.visual_debug_file, 'w') as fp:
-            json.dump(evaluator.getVisualDebug(), fp, indent=4)
-
+        self.mostly_tracked_list = dict()

@@ -1,25 +1,55 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Renders tracks (spencer_tracking_msg/TrackedPersons) and odometry to an SVG file, (C)2014 Timm Linder
-# Parameters:
-#   _odom (bool):       render odometry published at /odom?, default: True
-#   _detections (bool): render detections as rectangles?, default: True
-#   _grid (bool):       render metric grid?, default: True
-#   _style (string):    rendering style for tracks, either "lines" or "points", default: "points"
-#   _colormap (string): colormap to use for tracks, either "rainbow", "srl" or "srlalternative", default: "rainbow"
-#   _occlusions (bool): if true, occlusions will be rendered as circles without fill color (only for style "points"), default: True
-#   _labels (bool):     render track IDs? default: True
-#   _timestamps (bool): render track deletion/creation timestamps? default: True
-#   _velocities (bool): render track and odometry velocities (as < shape), default: True
-#   _start (float):     time index at which to start recording, default: 0
-#   _end (float):       time index at which to stop recording, default: infinity
-#   _prefix (string):   prefix for filename of rendered SVGs, default: "Tracks "
-#   _autoquit (bool):   if true, will quit automatically if no data is received for 10 seconds, default: True
-#   _animate (bool):    add animation, default: False
-#   _speed (float):     animation speed, default: 1.0
-#   _history (bool):    show track history in animation, default: True
-#   _cycles (bool):     show cycle number on track (lots of text elements!), default: False
+# Software License Agreement (BSD License)
+#
+#  Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"""
+Renders tracks (spencer_tracking_msg/TrackedPersons) and odometry to an SVG file, (C)2014 Timm Linder
+Parameters:
+  _odom (bool):       render odometry published at /odom?, default: True
+  _detections (bool): render detections as rectangles?, default: True
+  _grid (bool):       render metric grid?, default: True
+  _style (string):    rendering style for tracks, either "lines" or "points", default: "points"
+  _colormap (string): colormap to use for tracks, either "rainbow", "srl" or "srlalternative", default: "rainbow"
+  _occlusions (bool): if true, occlusions will be rendered as circles without fill color (only for style "points"), default: True
+  _labels (bool):     render track IDs? default: True
+  _timestamps (bool): render track deletion/creation timestamps? default: True
+  _velocities (bool): render track and odometry velocities (as < shape), default: True
+  _start (float):     time index at which to start recording, default: 0
+  _end (float):       time index at which to stop recording, default: infinity
+  _prefix (string):   prefix for filename of rendered SVGs, default: "Tracks "
+  _autoquit (bool):   if true, will quit automatically if no data is received for 10 seconds, default: True
+  _animate (bool):    add animation, default: False
+  _speed (float):     animation speed, default: 1.0
+  _history (bool):    show track history in animation, default: True
+  _cycles (bool):     show cycle number on track (lots of text elements!), default: False
+"""
 
 import os, sys, math, time, socket, xmlrpclib, signal, codecs
 import svgwrite

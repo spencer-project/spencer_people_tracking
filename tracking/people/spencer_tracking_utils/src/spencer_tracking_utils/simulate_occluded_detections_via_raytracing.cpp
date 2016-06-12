@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <ros/ros.h>
 #include <spencer_tracking_msgs/DetectedPersons.h>
 
@@ -80,10 +110,12 @@ void newDetectedPersonsReceived(const DetectedPersons::ConstPtr& detectedPersons
         tf::poseTFToMsg(targetPose, occluder.detectedPerson.pose.pose);   
         occluder.position = Eigen::Vector3d(targetPose.getOrigin().x(), targetPose.getOrigin().y(), 0.0 /* FIXME: Hack! */);
 
+        // FIXME: We need two rays, or rather a polygon per occluder
         occluder.distanceToSensor = occluder.position.norm();
         occluder.ray = Eigen::ParametrizedLine<double, 3>(Eigen::Vector3d::Zero(), occluder.position.normalized());
 
         // If too far away from sensor, discard detection
+        // FIXME: This should be in the loop below, and be about occluded persons not occluders
         if(occluder.distanceToSensor <= g_sensorMaxRange)
         {
             // Assure list of occluders is sorted by ascending distance to the frame origin
@@ -107,6 +139,9 @@ void newDetectedPersonsReceived(const DetectedPersons::ConstPtr& detectedPersons
             if(&potentiallyOccludedPerson == &potentialOccluder) break; 
 
             // Check if our potentially occluded person is closeby the ray of the potentially occluding person
+            // FIXME: This should be in the loop below, and be about occluded persons not occluders
+            // TODO: If at least the mid-point of the potentially occluded person, and one of the end points (normal on center ray * person_radius)
+            // is inside the occlusion polygon, then person is at least 50% occluded
             double distanceToRay = potentialOccluder.ray.distance(potentiallyOccludedPerson.position);
 
             if(distanceToRay <= g_personRadius) {
@@ -117,6 +152,7 @@ void newDetectedPersonsReceived(const DetectedPersons::ConstPtr& detectedPersons
         }    
 
         // Person is not occluded, so push it into the result list!
+        // FIXME: Always push all persons, but set is_occluded flag
         if(!foundOccluder) resultingDetectedPersons->detections.push_back(potentiallyOccludedPerson.detectedPerson);
     }
 

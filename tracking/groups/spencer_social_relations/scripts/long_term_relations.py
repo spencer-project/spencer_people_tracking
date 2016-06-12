@@ -1,11 +1,38 @@
 #!/usr/bin/env python
-# Author: Timm Linder, linder@cs.uni-freiburg.de
+
+# Software License Agreement (BSD License)
 #
-# Subscribes to /spencer/perception/social_relations and /spencer/perception/tracked_persons, and publishes at /spencer/perception/long_term_social_relations
-# which are a smoothed version of the input relations (i.e. relations will decay more slowly, and build up more slowly).
+#  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+#  All rights reserved.
 #
-# Parameters:
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
 #
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"""
+Subscribes to /spencer/perception/social_relations and /spencer/perception/tracked_persons,
+and publishes at /spencer/perception/long_term_social_relations which are a smoothed
+version of the input relations (i.e. relations will decay more slowly, and build up more slowly).
+"""
 
 import os, sys, math, time, copy, numpy
 import roslib, rospy, message_filters
@@ -103,6 +130,11 @@ def main():
     storedRelations = dict()
     lastDataReceivedAt = rospy.Time.now()
  
+    growthAmount    = rospy.get_param("~growth", 0.5 / 3.5)      # growth of relation strength (between 0.0 and 1.0) per second
+    slowDecayAmount = rospy.get_param("~slow_decay", 0.5 / 40.0) # slow decay of relation strength (between 0.0 and 1.0) per second
+    fastDecayAmount = rospy.get_param("~fast_decay", 0.5 / 5.0)  # fast decay, when maximum distance is exceeded
+    maxDistance     = rospy.get_param("~max_distance", 4.0)      # distance above which relation strength will be forced to 0.0
+
     trackedPersonsTopic = rospy.resolve_name("/spencer/perception/tracked_persons")
     inputRelationsTopic = rospy.resolve_name("/spencer/perception/social_relations")
     outputRelationsTopic = rospy.resolve_name("/spencer/perception/long_term_social_relations")
@@ -116,7 +148,7 @@ def main():
     rospy.loginfo("Subscribing to " + inputRelationsTopic + " and " + trackedPersonsTopic)
 
     global pub
-    pub = rospy.Publisher(outputRelationsTopic, SocialRelations)
+    pub = rospy.Publisher(outputRelationsTopic, SocialRelations, queue_size=3)
     rospy.loginfo("Publishing long-term relations on " + outputRelationsTopic)
 
     rospy.spin()

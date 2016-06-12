@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <ros/ros.h>
 #include <spencer_tracking_msgs/TrackedPersons.h>
 
@@ -31,6 +61,7 @@ ros::Publisher g_filteredTracksPublisher;
 int g_numFramesToObserve, g_deleteUnseenTracksAfterNumFrames;
 double g_maxTimespanToObserve;
 double g_minRequiredAvgVelocity;
+bool g_rememberTracksWhichOnceMoved;
 
 
 void newTrackedPersonsReceived(const TrackedPersons::ConstPtr& trackedPersons) {
@@ -74,7 +105,7 @@ void newTrackedPersonsReceived(const TrackedPersons::ConstPtr& trackedPersons) {
 
                 // Track is not yet approved -- filter it out for the moment, and record its positions to see if it moved.
                 // Only do this for non-occluded tracks that are backed by a detection.
-                if(!trackedPerson.is_occluded) {
+                if(!trackedPerson.is_occluded || !g_rememberTracksWhichOnceMoved) {
                     StampedPosition stampedPosition;
                     stampedPosition.stamp = now;
                     stampedPosition.x = trackedPerson.pose.pose.position.x; // assumes x, y are groundplane coordinates (e.g. frame ID is base_footprint, odom, etc.)
@@ -92,8 +123,8 @@ void newTrackedPersonsReceived(const TrackedPersons::ConstPtr& trackedPersons) {
 
                         if(ds / dt >= g_minRequiredAvgVelocity) {
                             // Approve track
-                            existingRecord.approved = true;
-                            existingRecord.positionHistory.clear(); // not needed anymore since it's approved now
+                            existingRecord.approved = g_rememberTracksWhichOnceMoved;
+                            if(existingRecord.approved) existingRecord.positionHistory.clear(); // not needed anymore since it's approved now
                             filteredTracks->tracks.push_back(trackedPerson);
                         }
                     }
@@ -125,11 +156,13 @@ int main(int argc, char **argv)
     g_maxTimespanToObserve = 5.0; // seconds after which to delete old positions from history. Useful if track is seen only once, but then occluded thereafter. Should be larger than g_numFramesToObserve / expectedHz
     g_deleteUnseenTracksAfterNumFrames = 10;
     g_minRequiredAvgVelocity = 0.35;
+    g_rememberTracksWhichOnceMoved = true;
 
     privateHandle.getParam("num_frames_to_observe", g_numFramesToObserve);
     privateHandle.getParam("max_timespan_to_observe", g_maxTimespanToObserve);
     privateHandle.getParam("delete_unseen_tracks_after_num_frames", g_deleteUnseenTracksAfterNumFrames);
     privateHandle.getParam("min_required_avg_velocity", g_minRequiredAvgVelocity);
+    privateHandle.getParam("remember_tracks_which_once_moved", g_rememberTracksWhichOnceMoved);
 
     std::string inputTopic = "input_tracks";
     std::string outputTopic = "output_tracks";

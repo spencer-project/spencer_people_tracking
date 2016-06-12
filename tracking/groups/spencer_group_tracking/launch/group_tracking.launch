@@ -1,0 +1,24 @@
+<launch>
+  <arg name="long_term" default="false"/>
+
+  <group ns="/spencer/perception_internal/group_tracking">
+    <remap from="/spencer/perception/tracked_persons" to="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body_or_moving"/>
+
+    <node name="spatial_relations" type="spatial_relations" pkg="spencer_social_relations">
+      <remap from="/spencer/perception/spatial_relations" to="/spencer/perception/social_relations"/>
+    </node>
+
+    <node name="long_term_social_relations" type="long_term_relations.py" pkg="spencer_social_relations">
+      <param name="growth" value="0.3333"/>
+      <param name="slow_decay" value="0.03333"/>
+      <param name="fast_decay" value="0.16666"/>
+      <param name="max_distance" value="4.0"/>
+    </node>
+
+    <node name="group_tracking" type="tracked_groups.py" pkg="spencer_group_tracking">
+      <param name="publish_single_person_groups" value="true"/>
+      <remap from="/spencer/perception/social_relations" to="/spencer/perception/long_term_social_relations" if="$(arg long_term)"/>
+    </node>
+  </group>
+
+</launch>

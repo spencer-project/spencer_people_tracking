@@ -1,0 +1,12 @@
+<launch>
+    <arg name="ground_plane" value="/rgbd_front_top/ground_plane" />
+    <arg name="rate" default="30.0"/>
+
+    <node pkg="rwth_ground_plane" type="ground_plane_tf_based_fixed" name="ground_plane_front_top" output="screen">
+        <param name="base_footprint" value="base_footprint" type="string"/>
+        <param name="camera_frame" value="rgbd_front_top_depth_optical_frame" type="string"/>
+        <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
+        <param name="rate" value="$(arg rate)"/>
+    </node>
+
+</launch>

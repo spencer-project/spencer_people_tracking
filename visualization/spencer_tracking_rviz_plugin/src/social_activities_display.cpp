@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <rviz/visualization_manager.h>
 #include <rviz/frame_manager.h>
 #include "rviz/selection/selection_manager.h"
@@ -6,14 +36,14 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>    
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/foreach.hpp>
 
 #define foreach BOOST_FOREACH
 
 // required to fix orientation of any Cylinder shapes
-const Ogre::Quaternion shapeQuaternion( Ogre::Degree(90), Ogre::Vector3(1,0,0) ); 
+const Ogre::Quaternion shapeQuaternion( Ogre::Degree(90), Ogre::Vector3(1,0,0) );
 
 
 namespace sr = spencer_social_relation_msgs;
@@ -24,7 +54,7 @@ void SocialActivitiesDisplay::onInitialize()
 {
     m_trackedPersonsCache.initialize(this, context_, update_nh_);
     PersonDisplayCommon::onInitialize();
-    
+
     QObject::connect(m_commonProperties->style, SIGNAL(changed()), this, SLOT(personVisualTypeChanged()) );
 
     m_excluded_activity_types_property = new rviz::StringProperty( "Excluded activity types", "", "Comma-separated list of activity types whose visualization should be hidden", this, SLOT(stylesChanged()) );
@@ -32,7 +62,7 @@ void SocialActivitiesDisplay::onInitialize()
 
     m_min_confidence_property = new rviz::FloatProperty( "Min. confidence", 0.0, "Minimum confidence for a social activity to be shown", this, SLOT(stylesChanged()) );
     m_min_confidence_property->setMin( 0.0 );
-    
+
     m_hide_with_no_activity_property = new rviz::BoolProperty( "Hide tracks with no activity", false, "Hide all tracks which do not have at least one social activity assigned", this, SLOT(stylesChanged()));
 
     m_render_intraactivity_connections_property = new rviz::BoolProperty( "Connect tracks sharing the same activity", true, "Connect all tracks that share the same activity", this, SLOT(stylesChanged()));
@@ -42,7 +72,7 @@ void SocialActivitiesDisplay::onInitialize()
     m_render_activity_types_property = new rviz::BoolProperty( "Render activity type texts", true, "Render activity types as text", this, SLOT(stylesChanged()));
     m_activity_type_per_track_property = new rviz::BoolProperty( "Activity type per track", false, "Show activity type for each individual track", this, SLOT(stylesChanged()));
     m_render_confidences_property = new rviz::BoolProperty( "Render confidences", true, "Render confidence values next to activity type", this, SLOT(stylesChanged()));
-    
+
     m_render_circles_property = new rviz::BoolProperty( "Render circles below person", true, "Render circles below person", this, SLOT(stylesChanged()));
     m_circle_radius_property = new rviz::FloatProperty( "Radius", 0.45, "Radius of circles below person in meters", m_render_circles_property, SLOT(stylesChanged()), this );
     m_circle_radius_property->setMin( 0.0 );
@@ -72,6 +102,7 @@ void SocialActivitiesDisplay::onInitialize()
     m_activity_color_flow = new rviz::ColorProperty( sr::SocialActivity::TYPE_FLOW_WITH_ROBOT.c_str(), QColor(0,255,0), "", m_activity_colors, SLOT(stylesChanged()), this);
     m_activity_color_antiflow = new rviz::ColorProperty( sr::SocialActivity::TYPE_ANTIFLOW_AGAINST_ROBOT.c_str(), QColor(255,0,0), "", m_activity_colors, SLOT(stylesChanged()), this);
     m_activity_color_waiting_for_others = new rviz::ColorProperty( sr::SocialActivity::TYPE_WAITING_FOR_OTHERS.c_str(), QColor(255,170,255), "", m_activity_colors, SLOT(stylesChanged()), this);
+    m_activity_color_looking_for_help = new rviz::ColorProperty( sr::SocialActivity::TYPE_LOOKING_FOR_HELP.c_str(), QColor(155,170,255), "", m_activity_colors, SLOT(stylesChanged()), this);
 
     m_commonProperties->color_transform->setHidden(true);
     m_commonProperties->color_map_offset->setHidden(true);
@@ -115,7 +146,7 @@ void SocialActivitiesDisplay::stylesChanged()
         char_separator<char> separator(",");
         tokenizer< char_separator<char> > tokens(inputString, separator);
         foreach(const string& token, tokens) {
-            string tmp = token; 
+            string tmp = token;
             boost::algorithm::to_lower(tmp);
             m_excludedActivityTypes.insert(tmp);
         }
@@ -126,7 +157,7 @@ void SocialActivitiesDisplay::stylesChanged()
         char_separator<char> separator(",");
         tokenizer< char_separator<char> > tokens(inputString, separator);
         foreach(const string& token, tokens) {
-            string tmp = token; 
+            string tmp = token;
             boost::algorithm::to_lower(tmp);
             m_includedActivityTypes.insert(tmp);
         }
@@ -154,7 +185,7 @@ void SocialActivitiesDisplay::stylesChanged()
                 if(m_hide_with_no_activity_property->getBool()) confidence = -999;
             }
             activityColor = getActivityColor(activityType, confidence);
-        
+
             personVisualContainer.personVisual->setColor(activityColor);
         }
     }
@@ -175,32 +206,34 @@ Ogre::ColourValue SocialActivitiesDisplay::getActivityColor(activity_type activi
 
     // Determine color
     rviz::ColorProperty* colorProperty = NULL;
-    
+
     // Add new social activity types here, and also add a property in constructor at top of file!
     if(activityType.empty())
         colorProperty = m_activity_color_none;
     else if(activityType == sr::SocialActivity::TYPE_SHOPPING)
         colorProperty = m_activity_color_shopping;
     else if(activityType == sr::SocialActivity::TYPE_STANDING)
-        colorProperty = m_activity_color_standing; 
+        colorProperty = m_activity_color_standing;
     else if(activityType == sr::SocialActivity::TYPE_INDIVIDUAL_MOVING)
-        colorProperty = m_activity_color_individual_moving; 
+        colorProperty = m_activity_color_individual_moving;
     else if(activityType == sr::SocialActivity::TYPE_WAITING_IN_QUEUE)
-        colorProperty = m_activity_color_waiting_in_queue; 
+        colorProperty = m_activity_color_waiting_in_queue;
     else if(activityType == sr::SocialActivity::TYPE_LOOKING_AT_INFORMATION_SCREEN)
-        colorProperty = m_activity_color_looking_at_information_screen; 
+        colorProperty = m_activity_color_looking_at_information_screen;
     else if(activityType == sr::SocialActivity::TYPE_LOOKING_AT_KIOSK)
-        colorProperty = m_activity_color_looking_at_kiosk; 
+        colorProperty = m_activity_color_looking_at_kiosk;
     else if(activityType == sr::SocialActivity::TYPE_GROUP_ASSEMBLING)
-        colorProperty = m_activity_color_group_assembling; 
+        colorProperty = m_activity_color_group_assembling;
     else if(activityType == sr::SocialActivity::TYPE_GROUP_MOVING)
-        colorProperty = m_activity_color_group_moving; 
+        colorProperty = m_activity_color_group_moving;
     else if(activityType == sr::SocialActivity::TYPE_FLOW_WITH_ROBOT)
         colorProperty = m_activity_color_flow;
     else if(activityType == sr::SocialActivity::TYPE_ANTIFLOW_AGAINST_ROBOT)
-        colorProperty = m_activity_color_antiflow; 
+        colorProperty = m_activity_color_antiflow;
     else if(activityType == sr::SocialActivity::TYPE_WAITING_FOR_OTHERS)
         colorProperty = m_activity_color_waiting_for_others;
+    else if(activityType == sr::SocialActivity::TYPE_LOOKING_FOR_HELP)
+        colorProperty = m_activity_color_looking_for_help;
     else
         colorProperty = m_activity_color_unknown;
 
@@ -249,7 +282,7 @@ void SocialActivitiesDisplay::updateSocialActivityVisualStyles(shared_ptr<Social
     // Update text colors, size and visibility
     ss.str(""); ss << socialActivityVisual->activityType;
     if(m_render_confidences_property->getBool()) ss << fixed << setprecision(1) << " (" << 100*socialActivityVisual->confidence << "%)";
-            
+
     for(int i = 0; i < socialActivityVisual->typeTexts.size(); i++) {
         shared_ptr<TextNode>& typeText = socialActivityVisual->typeTexts[i];
 
@@ -263,7 +296,7 @@ void SocialActivitiesDisplay::updateSocialActivityVisualStyles(shared_ptr<Social
                 centerAt = Ogre::Vector3(trackedPerson->center.x, trackedPerson->center.y, m_commonProperties->z_offset->getFloat());
             }
             else centerAt = Ogre::Vector3(socialActivityVisual->socialActivityCenter.x, socialActivityVisual->socialActivityCenter.y, socialActivityVisual->socialActivityCenter.z);
-         
+
             Ogre::ColourValue fontColor = m_commonProperties->font_color_style->getOptionInt() == FONT_COLOR_CONSTANT ? m_commonProperties->constant_font_color->getOgreColor() : activityColor;
             fontColor.a = m_commonProperties->alpha->getFloat();
             if(hideActivity) fontColor.a = 0;
@@ -281,8 +314,8 @@ void SocialActivitiesDisplay::updateSocialActivityVisualStyles(shared_ptr<Social
 }
 
 // Helper function for guaranteeing consistent ordering of activity labels
-bool CompareActivityByType (const SocialActivitiesDisplay::ActivityWithConfidence& first, const SocialActivitiesDisplay::ActivityWithConfidence& second) { 
-    return first.type < second.type; 
+bool CompareActivityByType (const SocialActivitiesDisplay::ActivityWithConfidence& first, const SocialActivitiesDisplay::ActivityWithConfidence& second) {
+    return first.type < second.type;
 }
 
 // This is our callback to handle an incoming group message.
@@ -303,7 +336,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
 
     m_highestConfidenceActivityPerTrack.clear(); // used later on to determine color of person visuals
     m_allActivitiesPerTrack.clear();
-    
+
     unsigned int numTracksWithUnknownPosition = 0;
 
 
@@ -346,7 +379,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
                 m_allActivitiesPerTrack[trackId] = vector<ActivityWithConfidence>();
             }
             m_allActivitiesPerTrack[trackId].push_back(activityWithConfidence);
-    
+
 
             // Get current track position
             if(!trackedPerson) {
@@ -475,12 +508,12 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
         }
         else {
             personVisualContainer.trackId = trackId;
-            personVisualContainer.sceneNode = shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode()); // This scene node is the parent of all visualization elements for the tracked person    
+            personVisualContainer.sceneNode = shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode()); // This scene node is the parent of all visualization elements for the tracked person
         }
-        
+
         // Create new visual for the person itself, if needed
         createPersonVisualIfRequired(personVisualContainer.sceneNode.get(), personVisualContainer.personVisual);
-        
+
         const double personHeight = personVisualContainer.personVisual ? personVisualContainer.personVisual->getHeight() : 0;
         const Ogre::Matrix3 covXYZinTargetFrame = covarianceXYZIntoTargetFrame(trackedPerson->pose);
         setPoseOrientation(personVisualContainer.sceneNode.get(), trackedPerson->pose, covXYZinTargetFrame, personHeight);

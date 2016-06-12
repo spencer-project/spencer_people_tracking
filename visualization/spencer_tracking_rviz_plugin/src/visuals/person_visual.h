@@ -1,3 +1,33 @@
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef PERSON_VISUAL_H
 #define PERSON_VISUAL_H
 
@@ -191,6 +221,65 @@ namespace spencer_tracking_rviz_plugin {
     private:
         rviz::BillboardLine *m_wireframe;
         double m_width, m_height, m_scalingFactor, m_lineWidth;
+    };
+
+
+    /// Visualization of a person as a crosshair
+    class CrosshairPersonVisual : public PersonVisual, public HasLineWidth {
+    public:
+        CrosshairPersonVisual(const PersonVisualDefaultArgs& args, double height = 1.0, double width = 1.0) : PersonVisual(args)
+        {
+            m_width = width; m_height = height; m_lineWidth = 0.03;
+            m_crosshair = NULL;
+            generateCrosshair();
+        }
+
+        virtual ~CrosshairPersonVisual() {
+            delete m_crosshair;
+        }
+
+        virtual void setColor(const Ogre::ColourValue& c) {
+            m_crosshair->setColor(c.r, c.g, c.b, c.a);
+        }
+
+        virtual double getHeight() {
+            return m_height;
+        }
+
+        virtual void setLineWidth(double lineWidth) {
+            m_crosshair->setLineWidth(lineWidth);
+        }
+
+
+    protected:
+        virtual void generateCrosshair() {
+            delete m_crosshair;
+            m_crosshair = new rviz::BillboardLine(m_sceneManager, m_sceneNode);
+            
+            m_crosshair->setLineWidth(m_lineWidth);   
+            m_crosshair->setMaxPointsPerLine(2);
+            m_crosshair->setNumLines(5);
+
+            double w = m_width / 2.0;
+            Ogre::Vector3 p1a(-w, 0, 0), p1b(+w, 0, 0);
+            Ogre::Vector3 p2a(0, -w, 0), p2b(0, +w, 0);
+            Ogre::Vector3 p3a(0, 0, -w), p3b(0, 0, +w);
+
+            Ogre::Vector3 arrow_a(0.7*w, -0.2*w, 0), arrow_m(w, 0, 0), arrow_b(0.7*w, +0.2*w, 0);
+
+                                        m_crosshair->addPoint(p1a);         m_crosshair->addPoint(p1b);
+            m_crosshair->newLine();     m_crosshair->addPoint(p2a);         m_crosshair->addPoint(p2b);
+            m_crosshair->newLine();     m_crosshair->addPoint(p3a);         m_crosshair->addPoint(p3b);
+
+            m_crosshair->newLine();     m_crosshair->addPoint(arrow_m);     m_crosshair->addPoint(arrow_a);
+            m_crosshair->newLine();     m_crosshair->addPoint(arrow_m);     m_crosshair->addPoint(arrow_b);
+
+            m_crosshair->setPosition(Ogre::Vector3(0, 0, 0));
+        } 
+
+    private:
+        rviz::BillboardLine *m_crosshair;
+        double m_width, m_height, m_lineWidth;
     };
 
 

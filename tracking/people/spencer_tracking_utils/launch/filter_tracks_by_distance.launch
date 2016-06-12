@@ -1,0 +1,21 @@
+<!-- Filter tracks by distance from the robot -->
+<launch>
+    <arg name="input_tracks" default="/spencer/perception/tracked_persons_confirmed_by_HOG_or_upper_body_or_moving"/>
+
+    <arg name="output_tracks" default="/spencer/perception/tracked_persons_filtered_by_distance"/>
+
+    <arg name="min_distance" default="0.0"/>
+
+    <arg name="max_distance" default="5.0"/>
+
+    <!-- This nodes filters tracks by distance -->
+    <node name="filter_tracks_by_distance" type="filter_tracks_by_distance" pkg="spencer_tracking_utils">
+        <remap from="input_tracks" to="$(arg input_tracks)"/>
+        <remap from="output_tracks" to="$(arg output_tracks)"/>
+
+        <param name="min_distance" value="$(arg min_distance)"/>
+        <param name="max_distance" value="$(arg max_distance)"/>
+        <param name="sensor_target_frame" value="laser_center_link"/>
+    </node>
+
+</launch>

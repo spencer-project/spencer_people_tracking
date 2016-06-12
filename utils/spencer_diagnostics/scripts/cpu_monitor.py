@@ -46,6 +46,7 @@ import sys, os, time
 from time import sleep
 import subprocess
 import string
+from multiprocessing import cpu_count
 
 import socket
 
@@ -297,9 +298,9 @@ def check_uptime(load1_threshold, load5_threshold):
             return DiagnosticStatus.ERROR, vals
 
         upvals = stdout.split()
-        load1 = upvals[-3].rstrip(',')
-        load5 = upvals[-2].rstrip(',')
-        load15 = upvals[-1]
+        load1 = upvals[-3].rstrip(',').replace(',', '.')
+        load5 = upvals[-2].rstrip(',').replace(',', '.')
+        load15 = upvals[-1].replace(',', '.')
         num_users = upvals[-7]
 
         # Give warning if we go over load limit 
@@ -519,7 +520,7 @@ def update_status_stale(stat, last_update_time):
 
 class CPUMonitor():
     def __init__(self, hostname, diag_hostname):
-        self._diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray)
+        self._diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=3)
 
         self._mutex = threading.Lock()
 
@@ -533,8 +534,9 @@ class CPUMonitor():
         if self._check_nfs:
             rospy.logwarn('NFS checking is deprecated for CPU monitor. This will be removed in D-turtle')
 
-        self._load1_threshold = rospy.get_param('~load1_threshold', 5.0)
-        self._load5_threshold = rospy.get_param('~load5_threshold', 3.0)
+        # sane defaults according to http://blog.scoutapp.com/articles/2009/07/31/understanding-load-averages
+        self._load1_threshold = rospy.get_param('~load1_threshold', 0.7*cpu_count())
+        self._load5_threshold = rospy.get_param('~load5_threshold', 1.0*cpu_count())
 
         self._num_cores = rospy.get_param('~num_cores', 8.0)
 

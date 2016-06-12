@@ -25,10 +25,10 @@ int main(int argc, char **argv)
     // Use a private node handle so that multiple instances of the node can be run simultaneously
     // while using different parameters.
     ros::NodeHandle private_node_handle_("~");
-    private_node_handle_.param("distance", _distance, 1.7);
+    private_node_handle_.param("distance", _distance, 1.67);
     XmlRpc::XmlRpcValue read_normal;
     if(!private_node_handle_.getParam("normal", read_normal)) { //Did not find a nicer way of setting a default
-        ROS_INFO("No normal given. Will use default: 0.0, 0.0, 1.0");
+        ROS_INFO("No normal given. Will use default: 0.0, -1.0, 0.0");
         _normal.setX(0.0); _normal.setY(-1.0); _normal.setZ(0.0);
     } else {
         ROS_ASSERT(read_normal.getType() == XmlRpc::XmlRpcValue::TypeArray);

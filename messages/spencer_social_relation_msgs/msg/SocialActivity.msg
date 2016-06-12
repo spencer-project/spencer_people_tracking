@@ -16,6 +16,8 @@ string      TYPE_GROUP_MOVING = group_moving
 string      TYPE_FLOW_WITH_ROBOT = flow
 string      TYPE_ANTIFLOW_AGAINST_ROBOT = antiflow
 string      TYPE_WAITING_FOR_OTHERS = waiting_for_others
+string      TYPE_LOOKING_FOR_HELP = looking_for_help
+
 
 #string      TYPE_COMMUNICATING = communicating
 #string      TYPE_TAKING_PHOTOGRAPH = taking_photograph

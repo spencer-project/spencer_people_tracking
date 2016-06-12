@@ -80,12 +80,14 @@ include_directories(include
 add_executable(ground_plane_estimated src/estimated_gp.cpp src/Camera.cpp src/ConfigFile.cpp src/Globals.cpp src/groundplaneestimator.cpp src/Math.cpp src/pointcloud.cpp)
 add_executable(ground_plane_fixed src/fixed_gp.cpp)
 add_executable(ground_plane_really_fixed src/really_fixed_gp.cpp)
+add_executable(ground_plane_tf_based_fixed src/tf_based_fixed_gp.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(ground_plane_estimated rwth_perception_people_msgs_generate_messages_cpp rwth_perception_people_msgs_gencpp)
 add_dependencies(ground_plane_fixed rwth_perception_people_msgs_generate_messages_cpp rwth_perception_people_msgs_gencpp)
 add_dependencies(ground_plane_really_fixed rwth_perception_people_msgs_generate_messages_cpp rwth_perception_people_msgs_gencpp)
+add_dependencies(ground_plane_tf_based_fixed rwth_perception_people_msgs_generate_messages_cpp rwth_perception_people_msgs_gencpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ground_plane_estimated
@@ -95,6 +97,9 @@ target_link_libraries(ground_plane_fixed
    ${catkin_LIBRARIES}
 )
 target_link_libraries(ground_plane_really_fixed
+   ${catkin_LIBRARIES}
+)
+target_link_libraries(ground_plane_tf_based_fixed
    ${catkin_LIBRARIES}
 )
 

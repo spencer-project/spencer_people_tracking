@@ -203,8 +203,8 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 
 1. Start your own launch files for starting person detectors, or use a combination of the launch files we provide in [`spencer_people_tracking_launch/launch/detectors`](/launch/spencer_people_tracking_launch/launch/detectors). You may have to remap input and output topics as needed.
 2. Create a copy of [`detection_to_detection_fusion_pipeline.launch`](/detection/spencer_detected_person_association/launch/detection_to_detection_fusion_pipeline.launch) and its children, such as [`fuse_lasers_and_rgbd.launch`](detection/spencer_detected_person_association/launch/fuse_lasers_and_rgbd.launch), in [`spencer_detected_person_association`](/detection/spencer_detected_person_association). Based upon the provided example, create your own pipeline that step-by-step fuses detections from different detectors. For more information, see the corresponding package.
-3. Create a copy of the `people_tracking.launch` file in `spencer_people_tracking_launch`. Adjust it to refer to your own fusion launch file created in step 2.
-3. Start your copy of `people_tracking.launch`.
+3. Create a copy of the `freiburg_people_tracking.launch` file in `spencer_people_tracking_launch`. Adjust it to refer to your own fusion launch file created in step 2.
+3. Start your copy of `freiburg_people_tracking.launch`.
 4. If needed, start group tracking via `roslaunch spencer_people_tracking_launch group_tracking.launch`.
 
 #### Example dataset (bagfile)

@@ -58,7 +58,7 @@ if sys.version_info[:3] == (2, 7, 3):
 #####
 
 low_hd_level = 5
-critical_hd_level = 1
+critical_hd_level = 2
 
 hd_temp_warn = 55 #3580, setting to 55C to after checking manual
 hd_temp_error = 70 # Above this temperature, hard drives will have serious problems
@@ -140,13 +140,12 @@ class hd_monitor():
     def __init__(self, hostname, diag_hostname, home_dir = ''):
         self._mutex = threading.Lock()
         
-        self._hostname = hostname
         self._no_temp_warn = rospy.get_param('~no_hd_temp_warn', False)
         if self._no_temp_warn:
             rospy.logwarn('Not warning for HD temperatures is deprecated. This will be removed in D-turtle')
         self._home_dir = home_dir
 
-        self._diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray)
+        self._diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=1)
 
         self._last_temp_time = 0
         self._last_usage_time = 0
@@ -172,7 +171,7 @@ class hd_monitor():
                                         KeyValue(key = 'Time Since Last Update', value = 'N/A') ]
             self.check_disk_usage()
 
-        self.check_temps()
+        #self.check_temps()
 
     ## Must have the lock to cancel everything
     def cancel_timers(self):
@@ -285,9 +284,9 @@ class hd_monitor():
                     diag_vals.append(KeyValue(
                             key = 'Disk %d Name' % row_count, value = name))
                     diag_vals.append(KeyValue(
-                            key = 'Disk %d Available' % row_count, value = g_available))
+                            key = 'Disk %d Available' % row_count, value = g_available + ' GB'))
                     diag_vals.append(KeyValue(
-                            key = 'Disk %d Size' % row_count, value = size))
+                            key = 'Disk %d Size' % row_count, value = size + ' GB'))
                     diag_vals.append(KeyValue(
                             key = 'Disk %d Status' % row_count, value = stat_dict[level]))
                     diag_vals.append(KeyValue(
@@ -331,7 +330,7 @@ class hd_monitor():
             
             msg = DiagnosticArray()
             msg.header.stamp = rospy.get_rostime()
-            msg.status.append(self._temp_stat)
+            #msg.status.append(self._temp_stat)
             if self._home_dir != '':
                 update_status_stale(self._usage_stat, self._last_usage_time)
                 msg.status.append(self._usage_stat)
@@ -361,7 +360,7 @@ if __name__ == '__main__':
         home_dir = args[1]
 
     try:
-        rospy.init_node('hd_monitor_%s' % hostname)
+        rospy.init_node('hd_monitor_%s' % hostname.replace('-', '_'))
     except rospy.exceptions.ROSInitException:
         print 'HD monitor is unable to initialize node. Master may not be running.'
         sys.exit(0)

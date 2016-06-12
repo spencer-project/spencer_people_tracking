@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Author: Marieke van Rooij (m.m.j.w.vanrooij@tudelft.nl), Evgeni Pavlidis (evgenipavlidis@yahoo.de)
+# Author: Lu Zhang(lu.zhang@tudelft.nl)
 
 import rospy
 
@@ -13,9 +13,18 @@ def newDataAvailable(trackedPersons):
 
   for trackedPerson in trackedPersons.tracks:
     spokesperson.subject_id.append(trackedPerson.track_id)
-    spokesperson.spokesperson_prob.append(trackedPerson.track_id ** 2)
+    spokesperson.spokesperson_prob.append((trackedPerson.track_id /1.0)**1.0)
 
   sum = 0
+  for i in range(0, len(spokesperson.subject_id)):
+    sum += spokesperson.spokesperson_prob[i]
+
+  for i in range(0, len(spokesperson.subject_id)):
+    spokesperson.spokesperson_prob[i] /= sum;
+
+  for i in range(0, len(spokesperson.subject_id)):
+    spokesperson.spokesperson_prob[i] = 1-spokesperson.spokesperson_prob[i];
+
   for i in range(0, len(spokesperson.subject_id)):
     sum += spokesperson.spokesperson_prob[i]
 

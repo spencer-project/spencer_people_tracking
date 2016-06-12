@@ -1,13 +1,42 @@
 #!/usr/bin/env python
-# Author: Timm Linder, linder@cs.uni-freiburg.de
+
+# Software License Agreement (BSD License)
 #
-# Subscribes to /spencer/perception/social_relations and /spencer/perception/tracked_persons, and publishes at /spencer/perception/tracked_groups
-# groups generated using single-linkage clustering based upon social relation strengths. Group ID consistency is maintained by
-# comparing contained track IDs.
+#  Copyright (c) 2014-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+#  All rights reserved.
 #
-# Parameters:
-# publish_single_person_groups (bool):      self-explanatory, defaults to false
-# relation_threshold (float):               relation strength above which persons are considered to be in a group
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"""
+Subscribes to /spencer/perception/social_relations and /spencer/perception/tracked_persons, and publishes at /spencer/perception/tracked_groups
+groups generated using single-linkage clustering based upon social relation strengths. Group ID consistency is maintained by
+comparing contained track IDs.
+
+Parameters:
+publish_single_person_groups (bool):      self-explanatory, defaults to false
+relation_threshold (float):               relation strength above which persons are considered to be in a group
+"""
 
 import os, sys, math, time
 from collections import deque
@@ -260,7 +289,7 @@ def main():
     rospy.loginfo("Subscribing to " + socialRelationsTopic + " and " + trackedPersonsTopic)
 
     global pub
-    pub = rospy.Publisher(trackedGroupsTopic, TrackedGroups)
+    pub = rospy.Publisher(trackedGroupsTopic, TrackedGroups, queue_size=3)
     rospy.loginfo("Publishing tracked groups on " + trackedGroupsTopic)
 
     rospy.spin()

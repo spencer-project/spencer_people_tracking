@@ -45,20 +45,20 @@ import rospy
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 from pr2_msgs.msg import GPUStatus
 
-import pr2_computer_monitor
+import spencer_diagnostics
 
 class NVidiaTempMonitor(object):
     def __init__(self):
-        self._pub = rospy.Publisher('/diagnostics', DiagnosticArray)
-        self._gpu_pub = rospy.Publisher('gpu_status', GPUStatus)
+        self._pub = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=3)
+        self._gpu_pub = rospy.Publisher('gpu_status', GPUStatus, queue_size=3)
 
     def pub_status(self):
         gpu_stat = GPUStatus()
         stat = DiagnosticStatus()
         try:
-            card_out = pr2_computer_monitor.get_gpu_status()
-            gpu_stat = pr2_computer_monitor.parse_smi_output(card_out)
-            stat = pr2_computer_monitor.gpu_status_to_diag(gpu_stat)
+            card_out = spencer_diagnostics.get_gpu_status()
+            gpu_stat = spencer_diagnostics.parse_smi_output(card_out)
+            stat = spencer_diagnostics.gpu_status_to_diag(gpu_stat)
         except Exception, e:
             import traceback
             rospy.logerr('Unable to process nVidia GPU data')

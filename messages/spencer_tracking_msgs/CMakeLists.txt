@@ -22,8 +22,13 @@ add_message_files(
    CompositeDetectedPersons.msg
    TrackedPerson.msg
    TrackedPersons.msg
+   TrackedPerson2d.msg
+   TrackedPersons2d.msg
    TrackedGroup.msg
    TrackedGroups.msg
+   ImmDebugInfo.msg
+   ImmDebugInfos.msg
+   TrackingTimingMetrics.msg
 )
 
 # Generate services in the 'srv' folder

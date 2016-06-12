@@ -1,22 +1,39 @@
 <launch>
     <arg name="filename"/>
-    <arg name="rate" default="1.0"/>
+    <arg name="rate" default="1.0"/> <!-- use this to change publishing rate while keeping ROS time unchanged. if clock_rate != 1.0, this will cause timestamp drift / latency!!! -->
+    <arg name="clock_rate" default="1.0"/> <!-- use this to slow down time (if publish_clock is enabled), and subsequently publishing of logfile data -->
     <arg name="publish_clock" default="true"/>
+    <arg name="queue_size" default="100000"/>
     <arg name="timing_mode" default="1"/> <!-- 0 = use original timestamps from logfile, 1 = similar, but shift them into the present / 2 = fixed rate / 3 = as fast as possible -->
     <arg name="extra_args" default=""/>
-    <arg name="visualization" default="true"/>
+    <arg name="start" default="-9999999999.9"/>
+    <arg name="end" default="9999999999.9"/>
+    <arg name="initial_wait" default="1.0"/>
+    <arg name="paused" default="false"/>
 
+    <arg name="visualization" default="true"/>
+    <arg name="gt_tracks" default="true"/>
+    <arg name="publish_tracks_directly" default="false"/>
+    
+    <param name="use_sim_time" value="true" if="$(arg publish_clock)" />
+    
     <remap from="tracked_persons" to="/groundtruth/tracked_persons"/>
     <remap from="detected_persons" to="/groundtruth/detected_persons"/>
 
 
-    <node name="publish_logfile" type="publish_logfile.py" pkg="srl_tracking_logfile_import" args="_timing_mode:=$(arg timing_mode) _rate:=$(arg rate) _publish_clock:=$(arg publish_clock) $(arg extra_args) $(arg filename)" output="screen"/>
-
-    <node name="visualize_annotations" type="visualize_segmentation.py" pkg="srl_laser_segmentation" output="screen">
-        <remap from="laser_segmentation" to="laser_annotations"/>
+    <node name="publish_logfile" type="publish_logfile.py" pkg="srl_tracking_logfile_import" args="_start:=$(arg start) _end:=$(arg end) _timing_mode:=$(arg timing_mode) _rate:=$(arg rate) _publish_clock:=$(arg publish_clock) _clock_rate:=$(arg clock_rate) _initial_wait:=$(arg initial_wait) _paused:=$(arg paused) $(arg extra_args) $(arg filename)" output="screen">
+        <param name="publish_tracks" value="$(arg publish_tracks_directly)" />
     </node>
+        
+    
+    <node name="visualize_annotations" type="visualize_segmentation.py" pkg="srl_laser_segmentation" output="screen" if="$(arg visualization)">
+            <remap from="laser_segmentation" to="laser_segmentation_unfiltered"/>
+    </node>
+    
+    <group unless="$(arg publish_tracks_directly)">
+        <node name="annotations_to_tracks" type="segmentation_to_tracks.py" pkg="srl_laser_segmentation" output="screen" if="$(arg gt_tracks)"/>
+    </group>
 
-    <node name="annotations_to_tracks" type="segmentation_to_tracks.py" pkg="srl_laser_segmentation" output="screen"/>
 
     <node name="logfile_visualization" type="rviz" pkg="rviz" args="-d $(find srl_tracking_logfile_import)/launch/logfile_visualization.rviz" if="$(arg visualization)"/>
 </launch>
