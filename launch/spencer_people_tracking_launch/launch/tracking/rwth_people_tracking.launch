@@ -1,3 +1,5 @@
+<!-- Starts the vision-based RWTH tracking system, which connects directly to the upper-body and/or groundHOG detector. -->
+<!-- Multi-modality or other detectors are not currently supported. -->
 <launch>
     <arg name="hog" default="false"/>
     <arg name="sensor_frame" default="front"/>

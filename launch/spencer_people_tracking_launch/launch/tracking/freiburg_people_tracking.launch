@@ -1,3 +1,4 @@
+<!-- Starts the multi-modal, plug-and-play people tracking framework developed mainly at the Social Robotics Lab, University of Freiburg. -->
 <launch>
     <!-- Launch file arguments -->
     <arg name="subscriber_queue_size" default="1"/>
