@@ -1,0 +1,19 @@
+<launch>
+    <arg name="hog" default="false"/>
+    <arg name="sensor_frame" default="front"/>
+
+    <!-- Robot odometry -->
+    <include file="$(find odometry_to_motion_matrix)/launch/tf2visual.launch">
+        <arg name="sensor_frame" value="$(arg sensor_frame)"/>
+    </include>
+
+    <!-- People tracking -->
+    <include if="$(arg hog)" file="$(find rwth_pedestrian_tracking)/launch/pedestrian_tracking.launch">
+        <arg name="sensor_frame" value="$(arg sensor_frame)"/>
+    </include>
+
+    <include unless="$(arg hog)" file="$(find rwth_pedestrian_tracking)/launch/pedestrian_tracking_no_HOG.launch">
+        <arg name="sensor_frame" value="$(arg sensor_frame)"/>
+    </include>
+
+</launch>

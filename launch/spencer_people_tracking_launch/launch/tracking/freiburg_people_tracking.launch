@@ -1,0 +1,65 @@
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="subscriber_queue_size" default="1"/>
+
+    <arg name="fuse_detections" default="true"/>
+    <arg name="static_map_filter" default="true"/>
+    <arg name="rgbd" default="false"/>
+    <arg name="laser_low_confidence_detections" default="true"/>
+    
+    <arg name="tracker" default="true"/>
+    <arg name="occlusion_geodesics" default="false"/>
+    
+    <!-- Detection-to-detection fusion pipeline. NOTE: Detectors need to be launched separately via
+         roslaunch spencer_people_tracking_launch front_rgbd_detectors.launch
+         roslaunch spencer_people_tracking_launch rear_rgbd_detectors.launch
+         roslaunch spencer_people_tracking_launch laser_detectors.launch rear:=true
+    -->
+    <group if="$(arg fuse_detections)">
+        <!-- Resulting detections will be filtered by static map later on, see further below -->
+        <remap from="/spencer/perception/detected_persons" to="/spencer/perception/detected_persons_unfiltered" if="$(arg static_map_filter)"/>
+        <remap from="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated" to="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated_unfiltered" if="$(arg static_map_filter)"/>
+
+        <include file="$(find spencer_detected_person_association)/launch/detection_to_detection_fusion_pipeline.launch">
+            <!-- Also fuse RGB-D detectors, or just use high-recall and high-precision lasers? -->
+            <arg name="rgbd" value="$(arg rgbd)"/>
+        </include>
+    </group>
+
+    <!-- Filter detections by static map -->
+    <group ns="/spencer/perception_internal/people_detection" if="$(arg static_map_filter)">
+        <!-- Normal detections -->
+        <node name="filter_detections_by_static_map" pkg="spencer_tracking_utils" type="filter_detections_by_static_map" output="screen">
+            <remap from="input_detections" to="/spencer/perception/detected_persons_unfiltered"/>
+            <remap from="output_detections" to="/spencer/perception/detected_persons"/>
+            <rosparam param="modalities_to_always_passthrough">[rgbd]</rosparam>  <!-- only filter out laser and monocular vision, as RGB-D does not have many false positives -->
+        </node>
+
+        <!-- High-recall detections -->
+        <node name="filter_low_confidence_detections_by_static_map" pkg="spencer_tracking_utils" type="filter_detections_by_static_map" output="screen">
+            <remap from="input_detections" to="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated_unfiltered"/>
+            <remap from="output_detections" to="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated"/>
+            <rosparam param="modalities_to_always_passthrough">[rgbd]</rosparam>  <!-- only filter out laser and monocular vision, as RGB-D does not have many false positives -->
+        </node>
+    </group>
+
+    <!-- People tracker -->
+    <group ns="/spencer/perception_internal/people_tracking" if="$(arg tracker)">
+
+        <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch">
+            <arg name="subscriber_queue_size" value="$(arg subscriber_queue_size)"/>
+            <arg name="use_imm" value="true"/>
+            
+            <arg name="occlusion_param_file" value="occlusion_geodesics_manager_dynamic.yaml" if="$(arg occlusion_geodesics)"/> <!-- NOTE: Only uses front laser!!! -->
+            <arg name="use_laser_shade_occlusion_manager" value="true" if="$(arg occlusion_geodesics)"/>
+        </include>
+
+        <rosparam param="srl_nearest_neighbor_tracker/additional_low_confidence_detections" if="$(arg laser_low_confidence_detections)">/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated</rosparam>
+        <rosparam param="srl_nearest_neighbor_tracker/additional_low_confidence_detections" unless="$(arg laser_low_confidence_detections)"></rosparam>
+
+    </group>
+
+    <!-- Filter tracks that are output by people tracker (e.g. visually confirmed tracks, moving tracks etc. on separate topics) -->
+    <include file="$(find spencer_people_tracking_launch)/launch/filter_tracks.launch"/>
+
+</launch>

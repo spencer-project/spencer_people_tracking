@@ -1,58 +1,67 @@
 <launch>
     <arg name="rear"  default="true"/>
-    <arg name="adaboost_model" default="lms500"/>
+    <arg name="detector_model" default="$(find srl_laser_detectors)/models/lms500_0.25deg_height70cm_rathausgasse.random_forest"/>
+    <arg name="detector_type" default="random_forest"/>
 
     <arg name="detection_id_increment" default="20"/>
     <arg name="laser_max_distance" default="15"/>
 
+    <arg name="low_confidence_detections" default="true"/>
+
     <group ns="/spencer/perception_internal/people_detection">
         <group>
             <!-- Front laser detector (Adaboost) -->
-            <include file="$(find srl_laser_detectors)/launch/adaboost_detector_with_ahc_$(arg adaboost_model).launch" ns="laser_front">
+            <include file="$(find srl_laser_detectors)/launch/learned_detector_with_segmentation.launch" ns="laser_front">
+                <arg name="model" value="$(arg detector_model)"/>
+                <arg name="type" value="$(arg detector_type)"/>
                 <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/laser_front"/>
                 <arg name="laser" value="/spencer/sensors/laser_front/echo0"/>
                 <arg name="max_avg_distance_from_sensor" value="$(arg laser_max_distance)"/>
                 <arg name="detection_id_offset" value="1"/>
                 <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
-                <arg name="pose_variance" value="0.01"/> <!-- affects gain of Kalman filter! -->
+                <arg name="pose_variance" value="0.1"/> <!-- affects gain of Kalman filter! may be overriden in nnt.launch! -->
             </include>
 
             <!-- Front laser detector (Blob detector with high recall, but low precision) -->
-            <include file="$(find srl_laser_detectors)/launch/blob_detector.launch" ns="laser_front_high_recall">
+            <!-- TODO: Use same segmentation as for high-precision detector -->
+            <include file="$(find srl_laser_detectors)/launch/blob_detector.launch" ns="laser_front_high_recall" if="$(arg low_confidence_detections)">
                 <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/laser_front_high_recall"/>
                 <arg name="laser" value="/spencer/sensors/laser_front/echo0"/>
                 <arg name="min_avg_distance_from_sensor" value="0.0"/>
                 <arg name="max_avg_distance_from_sensor" value="$(arg laser_max_distance)"/>
-                <arg name="min_points_per_segment" value="5"/>
+                <arg name="min_points_per_segment" value="3"/>
                 <arg name="max_points_per_segment" value="999"/>
                 <arg name="detection_id_offset" value="9"/>
                 <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
-                <arg name="pose_variance" value="0.01"/> <!-- affects gain of Kalman filter! -->
+                <arg name="pose_variance" value="0.01"/>
             </include>
         </group>
 
         <group if="$(arg rear)">
             <!-- Rear laser detector (Adaboost) -->
-            <include file="$(find srl_laser_detectors)/launch/adaboost_detector_with_ahc_$(arg adaboost_model).launch" ns="laser_rear">
+            <include file="$(find srl_laser_detectors)/launch/learned_detector_with_segmentation.launch" ns="laser_rear">
+                <arg name="model" value="$(arg detector_model)"/>
+                <arg name="type" value="$(arg detector_type)"/>
                 <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/laser_rear"/>
                 <arg name="laser" value="/spencer/sensors/laser_rear/echo0"/>
                 <arg name="max_avg_distance_from_sensor" value="$(arg laser_max_distance)"/>
                 <arg name="detection_id_offset" value="2"/>
                 <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
-                <arg name="pose_variance" value="0.01"/> <!-- affects gain of Kalman filter! -->
+                <arg name="pose_variance" value="0.1"/> <!-- affects gain of Kalman filter! may be overriden in nnt.launch! -->
             </include>
 
             <!-- Rear laser detector (Blob detector with high recall, but low precision) -->
-            <include file="$(find srl_laser_detectors)/launch/blob_detector.launch" ns="laser_rear_high_recall">
+            <!-- TODO: Use same segmentation as for high-precision detector -->
+            <include file="$(find srl_laser_detectors)/launch/blob_detector.launch" ns="laser_rear_high_recall" if="$(arg low_confidence_detections)">
                 <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/laser_rear_high_recall"/>
                 <arg name="laser" value="/spencer/sensors/laser_rear/echo0"/>
                 <arg name="min_avg_distance_from_sensor" value="0.0"/>
                 <arg name="max_avg_distance_from_sensor" value="$(arg laser_max_distance)"/>
-                <arg name="min_points_per_segment" value="5"/>
+                <arg name="min_points_per_segment" value="3"/>
                 <arg name="max_points_per_segment" value="999"/>
                 <arg name="detection_id_offset" value="10"/>
                 <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
-                <arg name="pose_variance" value="0.01"/> <!-- affects gain of Kalman filter! -->
+                <arg name="pose_variance" value="0.01"/>
             </include>
         </group>
 

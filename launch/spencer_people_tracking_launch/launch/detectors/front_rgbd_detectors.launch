@@ -1,16 +1,26 @@
 <launch>
     <arg name="upper_body" default="true"/>
-    <arg name="hog" default="true"/>
+    <arg name="hog" default="false"/>
+
+    <arg name="ground_plane" value="/spencer/sensors/rgbd_front_top/ground_plane"/>
 
     <arg name="detection_id_increment" default="20"/>
 
     <group ns="/spencer/perception_internal/people_detection">
 
-        <!-- RWTH fixed groundplane -->
-        <include file="$(find rwth_ground_plane)/launch/ground_plane_fixed.launch">
-            <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane"/>
-            <arg name="rate" value="30.0"/> <!-- limits how fast upper-body and HOG detector can run -->     
-        </include>
+        <!-- RWTH tf based groundplane -->
+        <node pkg="rwth_ground_plane" type="ground_plane_tf_based_fixed" name="ground_plane_front_top" output="screen">
+            <param name="base_footprint" value="base_footprint" type="string"/>
+            <param name="camera_frame" value="rgbd_front_top_depth_optical_frame" type="string"/>
+            <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
+            <param name="rate" value="30.0"/>
+        </node>
+
+        <!-- RWTH really fixed groundplane
+        <node pkg="rwth_ground_plane" type="ground_plane_really_fixed" name="ground_plane_front_top" output="screen">
+            <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
+            <param name="rate" value="30.0"/>
+        </node>-->
 
         <!-- Front RGB-D upper body -->
         <include file="$(find rwth_upper_body_detector)/launch/upper_body_detector.launch" ns="rgbd_front_top" if="$(arg upper_body)">
@@ -19,7 +29,7 @@
             <arg name="upper_body_detections" value="upper_body_detector/detections" />
             <arg name="upper_body_bb_centres" value="upper_body_detector/bounding_box_centres" />
             <arg name="upper_body_image" value="image" />
-            <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane" />
+            <arg name="ground_plane" value="$(arg ground_plane)" />
             <arg name="detection_id_offset" value="3"/>
             <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
         </include>
@@ -27,11 +37,12 @@
         <!-- Front RGB-D HOG -->
         <include file="$(find rwth_ground_hog)/launch/ground_hog_with_GP.launch" ns="rgbd_front_top" if="$(arg hog)">
             <arg name="world_scale" value="0.001"/>
+            <arg name="score_thresh" value="0.3"/>
             <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/rgbd_front_top/hog"/>
             <arg name="camera_namespace" value="/spencer/sensors/rgbd_front_top"/>
             <arg name="detections" value="hog/detections" />
             <arg name="result_image" value="hog/image" />
-            <arg name="ground_plane" value="/spencer/perception_internal/rwth_ground_plane" />
+            <arg name="ground_plane" value="$(arg ground_plane)" />
             <arg name="detection_id_offset" value="4"/>
             <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
         </include>
