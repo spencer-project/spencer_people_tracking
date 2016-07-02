@@ -1,4 +1,33 @@
-/* Created on: May 07, 2014. Author: Timm Linder, Fabian Girrbach */
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014, Timm Linder, Fabian Girrbach, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <srl_nearest_neighbor_tracker/ekf.h>
 #include <srl_nearest_neighbor_tracker/ros/params.h>
 #include <srl_nearest_neighbor_tracker/base/defs.h>
@@ -6,6 +35,8 @@
 #include <srl_nearest_neighbor_tracker/motion_models/constant_motion_model.h>
 #include <srl_nearest_neighbor_tracker/motion_models/coordinated_turn_motion_model.h>
 #include <srl_nearest_neighbor_tracker/motion_models/brownian_motion_model.h>
+#include <srl_nearest_neighbor_tracker/motion_models/wiener_process_acceleration_motion_model.h>
+
 
 
 namespace srl_nnt
@@ -18,17 +49,38 @@ EKF::EKF(string parameterPrefix)
         ROS_INFO_STREAM("Initializing EKF for IMM with parameter prefix " << parameterPrefix);
     }
 
-    string modelType = Params::get<string>(parameterPrefix+"motion_model", "ConstantVelocity");
-    if (modelType.compare("ConstantVelocity") == 0)     m_motionModel.reset(new ConstantMotionModel);
-    else if (modelType.compare("CoordinatedTurn") == 0) m_motionModel.reset(new CoordinatedTurnMotionModel);
-    else if (modelType.compare("BrownianMotion") == 0)  m_motionModel.reset(new BrownianMotionModel);
-
     // initial covariance matrix for each track
-    m_initialC(0, 0) = Params::get<double>(parameterPrefix+"cosxx", 0.7);   // initial x positional variance (=squared stddev)
-    m_initialC(1, 1) = Params::get<double>(parameterPrefix+"cosyy", 0.7);
-    m_initialC(2, 2) = Params::get<double>(parameterPrefix+"cosvxx", 2.0);  // initial assumed variance in x velocity
-    m_initialC(3, 3) = Params::get<double>(parameterPrefix+"cosvyy", 2.0);
-    if (STATE_DIM == 5) m_initialC(4, 4) = Params::get<double>(parameterPrefix+"cosw", 0.0);
+    m_initialC = StateMatrix::Zero();
+    m_initialC(STATE_X_IDX, STATE_X_IDX) = Params::get<double>(parameterPrefix+"cosxx", 0.7);   // initial x positional variance (=squared stddev)
+    m_initialC(STATE_Y_IDX, STATE_Y_IDX) = Params::get<double>(parameterPrefix+"cosyy", 0.7);
+
+    string modelType = Params::get<string>(parameterPrefix+"motion_model", "ConstantVelocity");
+    if (modelType.compare("ConstantVelocity") == 0){
+        m_motionModel.reset(new ConstantMotionModel);
+        m_initialC(STATE_VX_IDX, STATE_VX_IDX) = Params::get<double>(parameterPrefix+"cosvxx", 2.0);  // initial assumed variance in x velocity
+        m_initialC(STATE_VY_IDX, STATE_VY_IDX) = Params::get<double>(parameterPrefix+"cosvyy", 2.0);
+    }
+    else if (modelType.compare("CoordinatedTurn") == 0){
+        m_motionModel.reset(new CoordinatedTurnMotionModel);
+        m_initialC(STATE_VX_IDX, STATE_VX_IDX) = Params::get<double>(parameterPrefix+"cosvxx", 2.0);  // initial assumed variance in x velocity
+        m_initialC(STATE_VY_IDX, STATE_VY_IDX) = Params::get<double>(parameterPrefix+"cosvyy", 2.0);
+        m_initialC(STATE_OMEGA_IDX, STATE_OMEGA_IDX) = Params::get<double>(parameterPrefix+"cosw", 0.8);
+    }
+    else if (modelType.compare("BrownianMotion") == 0){
+        m_motionModel.reset(new BrownianMotionModel);
+    }
+    else if (modelType.compare("WienerAcceleration") == 0){
+        m_motionModel.reset(new WienerProcessAccelerationModel);
+        m_initialC(STATE_VX_IDX, STATE_VX_IDX) = Params::get<double>(parameterPrefix+"cosvxx", 2.0);  // initial assumed variance in x velocity
+        m_initialC(STATE_VY_IDX, STATE_VY_IDX) = Params::get<double>(parameterPrefix+"cosvyy", 2.0);
+        m_initialC(STATE_AX_IDX, STATE_AX_IDX) = Params::get<double>(parameterPrefix+"cosaxx", 0.2);  // initial assumed variance in x velocity
+        m_initialC(STATE_AY_IDX, STATE_AY_IDX) = Params::get<double>(parameterPrefix+"cosayy", 0.2);
+    }
+    else
+        ROS_FATAL_STREAM("Unknown motion model for EKF filter with name :" << modelType << "\nReview settings!");
+
+
+
 
     // noise
     m_useProcessNoise = Params::get<bool>(parameterPrefix+"use_process_noise", true);
@@ -84,7 +136,7 @@ void EKF::predictTrackState(FilterState::Ptr state, double deltatime)
     KalmanFilterState& kfs = dynamic_cast<KalmanFilterState&>(*state);
 
     // Noise
-    StateMatrix Q;
+    MotionModel::MotionModelMatrix Q;
     if (m_useProcessNoise) {
         Q = m_motionModel->getProcessNoiseQ(deltatime, m_processNoiseLevel);
     }
@@ -92,9 +144,16 @@ void EKF::predictTrackState(FilterState::Ptr state, double deltatime)
         Q = m_defaultQ;
     }
 
+    MotionModel::MotionModelVector x, xp;
+    MotionModel::MotionModelMatrix A, Cp;
     // Apply state transition matrix
-    kfs.m_xp = m_A * kfs.m_x;
-    kfs.m_Cp = m_A * kfs.m_C * m_A.transpose() + Q;
+    A = m_motionModel->A(kfs.m_x,deltatime);
+    xp = A * m_motionModel->convertToMotionModel(kfs.m_x);
+    Cp = A * m_motionModel->convertToMotionModel(kfs.m_C) * A.transpose() + Q;
+
+
+    kfs.m_xp = m_motionModel->convertToState(xp);
+    kfs.m_Cp =  m_motionModel->convertToState(Cp);
     //  ROS_INFO_STREAM("A " << m_A);
     //  ROS_INFO_STREAM("x " << kfs.m_x);
     //  ROS_INFO_STREAM("C " << kfs.m_C);
@@ -127,8 +186,9 @@ void EKF::updateOccludedTrack(FilterState::Ptr state)
 
 
 void EKF::setTransitionMatrix(const StateVector& x, double deltaT) {
-    m_A = m_motionModel->A(x,deltaT);
-    ROS_DEBUG_STREAM("EKF Transition Matrix A\n "<< m_A);
+    // Unused since use of Motion Model Matrices and Vectors
+    // m_A = m_motionModel->A(x,deltaT);
+    // ROS_DEBUG_STREAM("EKF Transition Matrix A\n "<< m_A);
 }
 
 

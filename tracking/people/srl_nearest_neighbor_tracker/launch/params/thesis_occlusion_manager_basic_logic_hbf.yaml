@@ -1,0 +1,11 @@
+#Basic occlusion manager parameters
+{
+#Number of updtates to classify track as mature track
+track_is_mature_after_total_num_matches: 80,
+#Number of consecutive occlusion before a mature track should be deleted
+max_occlusions_before_deletion_of_mature_track: 30,
+#Number of consecutive occlusion before a non-mature track should be deleted
+max_occlusions_before_deletion: 15,
+#To be sure deactivate other occlusion managers
+use_laser_shade_occlusion_manager: false,
+}

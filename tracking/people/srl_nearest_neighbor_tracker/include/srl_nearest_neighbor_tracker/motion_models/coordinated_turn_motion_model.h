@@ -1,4 +1,33 @@
-/* Created on: Feb 06, 2015. Author: Fabian Girrbach */
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2015, Fabian Girrbach, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef _MOTION_MODELS_COORDINATED_TURN_MOTION_MODEL_H_
 #define _MOTION_MODELS_COORDINATED_TURN_MOTION_MODEL_H_
 
@@ -11,8 +40,14 @@ namespace srl_nnt {
 class CoordinatedTurnMotionModel: public MotionModel
 {
 public:
-    virtual const StateMatrix& A (const StateVector& x, const double deltaT)  {
-        m_A = StateMatrix::Identity();
+    CoordinatedTurnMotionModel()
+{
+        m_A = MotionModelMatrix::Zero(DIM,DIM);
+        m_Q = MotionModelMatrix::Zero(DIM,DIM);
+}
+
+    virtual const MotionModelMatrix& A (const StateVector& x, const double deltaT)  {
+        m_A = MotionModelMatrix::Identity(DIM,DIM);
         ///get readable access to current state
         double omegak = x(STATE_OMEGA_IDX);
         double xk = x(STATE_X_IDX);
@@ -23,7 +58,7 @@ public:
         if (fabs(omegak) > 1e-6)
         {
             ROS_DEBUG_STREAM("Taking exact form for Coordinated turn " << fabs(omegak)
-                    << " deltaT " << deltaT);
+                             << " deltaT " << deltaT);
 
             /// calculate often needed values
             double sinOmegaT = sin(omegak *deltaT);
@@ -62,13 +97,13 @@ public:
     }
 
 
-    virtual const StateMatrix& getProcessNoiseQ(const double deltaT, const double processNoise)
+    virtual const MotionModelMatrix& getProcessNoiseQ(const double deltaT, const double processNoise)
     {
         // get variance for turn rate omega in rad/s (default: 10 deg/s)
         double sigmaOmega = Params::get<double>("ct_turn_rate_variance", 0.17453292519);
 
         //Process noise according to "Modern Tracking Systems" page 210
-        m_Q = StateMatrix::Zero();
+        m_Q = MotionModelMatrix::Zero(DIM,DIM);
         /*m_Q(0, 0) = (deltaT * deltaT * deltaT * deltaT) * processNoise / 4.0;
         m_Q(1, 1) = m_Q(0, 0);
         m_Q(0, 2) = 0.5 * (deltaT * deltaT* deltaT) * processNoise;
@@ -87,17 +122,44 @@ public:
         m_Q(3, 1) = m_Q(0, 2);
         m_Q(2, 2) = deltaT * processNoise;
         m_Q(3, 3) = m_Q(2, 2);
-        m_Q(4, 4) = (sigmaOmega * sigmaOmega) * (deltaT * deltaT);
+        //m_Q(4, 4) = (sigmaOmega * sigmaOmega) * (deltaT * deltaT);
+        m_Q(4, 4) = sigmaOmega * deltaT;
 
         return m_Q;
+    }
+
+
+    virtual const MotionModelMatrix convertToMotionModel(const StateMatrix& matrix)
+    {
+        MotionModelMatrix model = matrix.block<DIM,DIM>(0,0);
+        return model;
+    }
+
+    virtual const MotionModelVector convertToMotionModel(const StateVector& vector)
+    {
+        MotionModelVector model = vector.head(DIM);
+        return model;
+    }
+
+    virtual const StateMatrix convertToState(const MotionModelMatrix& matrix)
+    {
+        StateMatrix state = StateMatrix::Identity();
+        state.block<DIM,DIM>(0,0) = matrix.block<DIM,DIM>(0,0);
+        return state;
+    }
+    virtual const StateVector convertToState(const MotionModelVector& vector)
+    {
+        StateVector state = StateVector::Zero();
+        state.head(DIM) = vector.head(DIM);
+        return state;
     }
 
 
     /* --- Other stuff --- */
 
     /// Typedefs for easier readability
-    typedef boost::shared_ptr<ConstantMotionModel> Ptr;
-    typedef boost::shared_ptr<const ConstantMotionModel> ConstPtr;
+    typedef boost::shared_ptr<CoordinatedTurnMotionModel> Ptr;
+    typedef boost::shared_ptr<const CoordinatedTurnMotionModel> ConstPtr;
 
     /// Return a deep copy of this motion model as a shared pointer
     virtual MotionModel::Ptr deepCopy() {
@@ -105,6 +167,9 @@ public:
         *copy = *this;
         return MotionModel::Ptr(copy);
     }
+
+private:
+    const static int DIM = 5;
 };
 
 }

@@ -1,0 +1,31 @@
+{
+use_imm: true,
+#Define number of models
+number_of_models: 2,
+#Setting Markov transition probabilites
+markov_trans_prob_0_0: 0.944,
+markov_trans_prob_0_1: 0.056,
+markov_trans_prob_1_0: 0.292,
+markov_trans_prob_1_1: 0.708,
+#Configuration of models used
+IMM0_motion_model: ConstantVelocity,
+    IMM0_cosvxx: 2.0,
+    IMM0_cosvyy: 2.0,
+    IMM0_cosw: 0.8,
+    IMM0_cosxx: 0.7,
+    IMM0_cosyy: 0.7,
+    IMM0_cosayy: 0.2,
+    IMM0_cosaxx: 0.2,
+    IMM0_process_noise_level: 0.035,
+    IMM0_use_process_noise: true,
+IMM1_motion_model: ConstantVelocity,
+    IMM1_cosvxx: 2.0,
+    IMM1_cosvyy: 2.0,
+    IMM1_cosw: 0.8,
+    IMM1_cosxx: 0.7,
+    IMM1_cosyy: 0.7,
+    IMM1_cosayy: 0.2,
+    IMM1_cosaxx: 0.2,
+    IMM1_process_noise_level: 0.267,
+    IMM1_use_process_noise: true,
+}

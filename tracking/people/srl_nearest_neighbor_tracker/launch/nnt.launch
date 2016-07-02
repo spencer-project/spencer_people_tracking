@@ -1,57 +1,74 @@
-<!-- 
+<!--
 Launches the nearest-neighbor tracker with a set of parameters that worked well in practice.
 -->
 
 <launch>
-    <arg name="tracker_queue_size" default="3"/>
+    <arg name="subscriber_queue_size" default="1"/>
 
-    <node name="srl_nearest_neighbor_tracker" type="nnt_node" pkg="srl_nearest_neighbor_tracker" output="screen">
+    <arg name="use_laser_shade_occlusion_manager" default="false"/>
+    <arg name="use_imm" default="false"/>
+    <arg name="imm_param_file" default="imm_CT_CV.yaml"/>
+    <arg name="use_initiation_logic" default="true"/>
+    <arg name="initiation_logic_param_file" default="logic_initiator.yaml"/>
+    <arg name="ekf_param_file" default="ekf_default.yaml"/>
+    <arg name="data_association_type" default="greedy_nearest_neighbor"/>
+    <arg name="low_confidence_observations_topic" default=""/>
+    <arg name="occlusion_param_file" default="occlusion_manager_polygon.yaml"/>
+
+
+    <node name="srl_nearest_neighbor_tracker" type="nnt_node" pkg="srl_nearest_neighbor_tracker" output="screen" clear_params="true" launch-prefix=""> <!-- launch-prefix="gdb -ex run -args " -->
         <!-- Topic of secondary low-confidence detections that can be matched against an existing track, but not initiate a new one -->
-        <param name="additional_low_confidence_detections" value=""/>
+        <param name="additional_low_confidence_detections" value="$(arg low_confidence_observations_topic)"/>
 
-        <!-- For synchronization with additional low confidence observations (if topic is set above) -->
-        <param name="synchronizer_queue_size" value="3"/>
-        <param name="synchronizer_age_penalty" value="10000"/>
+        <param name="min_distance_for_low_confidence_observations_to_tracks" value="0.5"/>
+        <param name="min_num_matches_to_allow_low_confidence_match" value="10"/>
+        <param name="max_consecutive_low_confidence_matches" value="60"/>
+        <param name="max_timestamp_difference_for_missed_observation_recovery" value="0.07"/>
 
-        <!-- Publisher and subscriber queue (only used for subscriber if not synchronizing with additional low-confidence observations) -->
-        <param name="queue_size" value="$(arg tracker_queue_size)"/>
+        <!-- Publisher and subscriber queue lengths -->
+        <param name="queue_size" value="$(arg subscriber_queue_size)"/>
+
+        <!-- Only used when publishing tracks, to take latencies into account -->
+        <param name="published_track_forward_predict_time" value="0.10"/>
 
         <!-- Gating -->
         <param name="max_gating_distance" value="1.0"/>
+        <param name="use_correlation_log" value="false"/>
+        
+        <!-- Data Association -->
+        <param name="data_association_type" value="$(arg data_association_type)"/>
         
         <!-- Occlusion handling -->
-        <param name="max_occlusions_before_deletion" value="20"/>
-        <param name="max_occlusions_before_deletion_of_mature_track" value="50"/>
-        <param name="track_is_mature_after_total_num_matches" value="100"/>
-
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/launch/params/occlusion_manager_basic_timm.yaml" command="load" unless="$(arg use_laser_shade_occlusion_manager)" />
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/launch/params/$(arg occlusion_param_file)" command="load" if="$(arg use_laser_shade_occlusion_manager)" />
+        
         <!-- History of track states for duplicate elimination and debugging -->
         <param name="state_history_length" value="30"/>
-        
+
         <!-- Duplicate track elimination -->
         <param name="duplicate_track_num_history_entries_to_compare" value="5"/>
         <param name="duplicate_track_num_history_entries_must_match" value="3"/>
         <param name="duplicate_track_max_dist" value="0.15"/>
 
         <!-- Track initiation -->
-        <param name="use_initiation_logic" value="true"/>
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/launch/params/$(arg initiation_logic_param_file)" command="load" if="$(arg use_initiation_logic)"/>
+        <param name="use_initiation_logic" value="$(arg use_initiation_logic)"/>
 
-        <!-- IMM settings (not yet enabled in this version, requires correct parameters) -->
-        <param name="use_imm" value="false"/>
+        <!-- General IMM filter parameters -->
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/launch/params/$(arg imm_param_file)" command="load" if="$(arg use_imm)"/>
+        
+        <!-- Default Kalman filter parameters -->
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/launch/params/$(arg ekf_param_file)" command="load"/>
+        
+        <!-- Override measurement noise values from detectors -->
+        <param name="overwrite_measurement_noise" value="false"/>
+        <param name="measurement_noise" value="0.05"/>
 
-        <!-- Default Kalman filter parameters (only used by track initiation logic, and when IMM is not active!) -->
-        <param name="cosxx" value="0.7"/> <!-- initial x positional variance (=squared stddev) -->
-        <param name="cosyy" value="0.7"/>
-        <param name="cosvxx" value="2.0"/> <!-- initial assumed variance in x velocity -->
-        <param name="cosvyy" value="2.0"/>
-        
-        <!-- Kalman filter noise -->
-        <param name="use_process_noise" value="true"/>
-        <param name="process_noise_level" value="0.1"/>  <!-- increase noise level for better reaction to sudden maneuvers (and less precise matching...) -->
-        <param name="qsxx" value="0.0081"/>  <!-- only used when use_process_noise is "false" -->
-        <param name="qsyy" value="0.0081"/>  <!-- only used when use_process_noise is "false" -->
-        <param name="qsvxx" value="0.0064"/> <!-- only used when use_process_noise is "false" -->
-        <param name="qsvyy" value="0.0064"/> <!-- only used when use_process_noise is "false" -->
-        
-    </node> 
+        <!-- Settings to reproduce results of ICRA16 paper (disable features that were added afterwards) -->
+        <param name="logic_initiator_high_confidence_modalities" value=""/>
+        <param name="published_track_forward_predict_time" value="0.0"/>
+
+    </node>
+
 
 </launch>

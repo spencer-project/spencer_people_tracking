@@ -1,0 +1,9 @@
+{
+    logic_initiator_max_number_consecutive_missed_observations: 1,
+    logic_initiator_max_velocity: 2.17,
+    logic_initiator_min_velocity: 0.24,
+    logic_initiator_number_scans_before_acceptance: 11,
+    logic_initiator_systematic_scan_error: 0.025,
+    logic_initiator_use_incremental_checking: True,
+    use_logic_initiation: True
+}

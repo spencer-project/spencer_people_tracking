@@ -1,0 +1,12 @@
+{
+#Default Kalman filter parameters
+cosxx: 0.7,  #initial x positional variance (=squared stddev) 
+cosyy: 0.7,  #initial y positional variance (=squared stddev) 
+cosvxx: 2.0, #initial assumed variance in x velocity 
+cosvyy: 2.0, #initial assumed variance in y velocity 
+#Kalman filter noise 
+use_process_noise: True,
+process_noise_level: 0.1, #increase noise level for better reaction to sudden maneuvers (and less precise matching...) -->
+measurement_noise: 0.1,
+overwrite_measurement_noise: true,
+}

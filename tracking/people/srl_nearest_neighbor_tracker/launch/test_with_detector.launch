@@ -22,12 +22,11 @@ roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=12
     <node name="visualize_segments" type="visualize_segmentation.py" pkg="srl_laser_segmentation" output="screen"/>
 
     <!-- Person detector -->
-    <node name="laser_detector" type="blob_detector" pkg="srl_laser_detectors" args="_min_points:=4 _max_points:=25 _min_width:=0.2 _max_width:=0.7 _max_range:=20.0 _use_median_for_pose:=true" output="screen">
-        <remap from="detected_persons" to="/spencer/perception/detected_persons"/>
-    </node>
+    <remap from="detected_persons" to="/spencer/perception/detected_persons"/>
+    <node name="laser_detector" type="blob_detector" pkg="srl_laser_detectors" args="_min_points:=4 _max_points:=25 _min_width:=0.2 _max_width:=0.7 _max_range:=20.0 _use_median_for_pose:=true" output="screen"/>
 
     <!-- The nearest-neighbor tracker itself -->
-    <node name="nnt" type="nnt_node" pkg="srl_nearest_neighbor_tracker" output="screen"/> <!-- launch-prefix="gdb -ex run -args " -->
+    <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch"/>
 
     <!-- Visualization -->
     <node name="rviz" type="rviz" pkg="rviz" args="-d $(find srl_nearest_neighbor_tracker)/launch/visualization_with_detector.rviz"/>

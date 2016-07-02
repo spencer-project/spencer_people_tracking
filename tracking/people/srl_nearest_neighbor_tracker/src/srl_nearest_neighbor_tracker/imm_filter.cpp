@@ -1,4 +1,33 @@
-/* Created on: Jan 28, 2015. Author: Fabian Girrbach */
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2015, Fabian Girrbach, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <srl_nearest_neighbor_tracker/base/stl_helpers.h>
 #include <srl_nearest_neighbor_tracker/ros/params.h>
 #include <srl_nearest_neighbor_tracker/imm_filter.h>
@@ -10,8 +39,11 @@
 #include <map>
 
 #include <std_msgs/ColorRGBA.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <geometry_msgs/Point.h>
 #include <visualization_msgs/Marker.h>
+
+#define foreach BOOST_FOREACH
 
 
 namespace srl_nnt {
@@ -19,7 +51,8 @@ namespace srl_nnt {
 IMMFilter::IMMFilter(const ros::NodeHandle& nodeHandle, const ros::NodeHandle& privateNodeHandle)
 : m_nodeHandle(nodeHandle),
   m_privateNodeHandle(privateNodeHandle),
-  m_immVisualization(false)
+  m_immVisualization(false),
+  m_sendDebugInformation(false)
 {
     // TODO Initialization of filter with parameters and prefixes
     m_numberModels = Params::get<int>("number_of_models", 2);
@@ -37,7 +70,6 @@ IMMFilter::IMMFilter(const ros::NodeHandle& nodeHandle, const ros::NodeHandle& p
             ROS_DEBUG_STREAM("Markov transition probability from " << i << " to " << j << " set to " << m_markovTransitionProbabilities(i,j));
 
         }
-
         if(std::abs(checksum - 1.0) > 0.01) ROS_ERROR_STREAM_NAMED("IMM", "Markov transition probabilities have to sum up to one!");
     }
 
@@ -52,6 +84,14 @@ IMMFilter::IMMFilter(const ros::NodeHandle& nodeHandle, const ros::NodeHandle& p
     privateNodeHandle.getParam("use_imm_visualization", m_immVisualization);
     if (m_immVisualization)
         m_immVisualizationPublisher = m_privateNodeHandle.advertise<visualization_msgs::Marker>("imm_visualization", 10);
+    privateNodeHandle.getParam("send_imm_debug_information", m_sendDebugInformation);
+    if(m_sendDebugInformation){
+        m_immDebugPublisher = m_privateNodeHandle.advertise<spencer_tracking_msgs::ImmDebugInfos>("imm_debug_infos",10);
+        m_debugMessages.header.seq = 0;
+        m_debugMessages.header.frame_id = "odom";
+    }
+
+
 }
 
 
@@ -77,6 +117,7 @@ FilterState::Ptr IMMFilter::initializeTrackState(Observation::ConstPtr observati
         hypothesis->m_probability = 1.0/(double) m_numberModels;
         immState->m_hypotheses.push_back(hypothesis);
         //ROS_INFO_STREAM("Initialize ekf with hypothesis C" << hypothesis->C() << " x " << hypothesis->x());
+        m_debugMessages.header.frame_id = "odom";
 
     }
 
@@ -118,6 +159,7 @@ FilterState::Ptr IMMFilter::initializeTrackStateFromLogicInitiator(InitiatorCand
 
 void IMMFilter::predictTrackState(FilterState::Ptr state, double deltatime)
 {
+    sendDebugInformation();
     ROS_DEBUG_NAMED("IMM", "Predict IMM track states!");
 
     IMMState::Ptr imm = boost::dynamic_pointer_cast<IMMState>(state);
@@ -191,8 +233,8 @@ void IMMFilter::updateMatchedTrack(FilterState::Ptr state, Pairing::ConstPtr pai
             pairing->singular = true;
 
             ROS_WARN_STREAM("Singular pairing encountered!\nTrack  measurement prediction:\n" << state->zp() << "\nTrack covariance prediction:\n" << hyp->Cp()
-                    << "\nObservation " << pairing->observation->id << " mean:\n" << pairing->observation->z << "\nObservation covariance:\n" << pairing->observation->R
-                    << "\nH:\n" << hyp->H() << "\nS:\n" << S << "\nR:\n" << pairing->observation->R);
+                            << "\nObservation " << pairing->observation->id << " mean:\n" << pairing->observation->z << "\nObservation covariance:\n" << pairing->observation->R
+                            << "\nH:\n" << hyp->H() << "\nS:\n" << S << "\nR:\n" << pairing->observation->R);
         }
 
         // update kalman filter with pairing for current filter
@@ -207,14 +249,18 @@ void IMMFilter::updateMatchedTrack(FilterState::Ptr state, Pairing::ConstPtr pai
 
     modeProbabilityUpdate(imm);
     updateStateEstimate(imm);
+    getDebugInformation(imm,pairingTracker);
     updateCurrentHypothesis(imm, pairingTracker->track);
 }
 
 
 double IMMFilter::calcLikelihood(double d, double detS)
 {
-    double likelihood;
-    likelihood = exp(-(d*d)/2.0) / (sqrt(pow((2*M_PI),N_MODELS) * detS ));
+    //REVIEW showed that this is wrong: NMODELS should not be here and also the square of mahlanobis distance d is shit
+    //likelihood = exp(-(d * d) / 2.0) / (sqrt(pow((2 * M_PI), N_MODELS) * detS ));
+    //ROS_INFO_STREAM("Exp likelihood " << likelihood);
+    //Java implementation does it like this--> we can get rid of the pi factor because its just normalizing and constant for all hypotheses
+    double likelihood = exp(-d/2.0) / sqrt(detS);
     return likelihood;
 }
 
@@ -326,155 +372,192 @@ void IMMFilter::updateStateEstimate(IMMState::Ptr state)
 
 
 
-void IMMFilter::updateCurrentHypothesis(IMMState::Ptr state, Track::Ptr track)
-{
-    ROS_DEBUG_NAMED("IMM", "Updating current hypothesis");
 
-    double bestHypothesis = 0.0;
-    unsigned int bestHypothesisIdx = 0;
-    for (unsigned int i = 0; i < state->m_hypotheses.size(); i++)
+
+    void IMMFilter::updateCurrentHypothesis(IMMState::Ptr state, Track::Ptr track)
     {
-        if (state->getHypothesis(i)->m_probability > bestHypothesis)
+        ROS_DEBUG_NAMED("IMM", "Updating current hypothesis");
+
+        double bestHypothesis = 0.0;
+        unsigned int bestHypothesisIdx = 0;
+        for (unsigned int i = 0; i < state->m_hypotheses.size(); i++)
         {
-            bestHypothesis = state->getHypothesis(i)->m_probability;
-            bestHypothesisIdx = i;
+            if (state->getHypothesis(i)->m_probability > bestHypothesis)
+            {
+                bestHypothesis = state->getHypothesis(i)->m_probability;
+                bestHypothesisIdx = i;
+            }
+        }
+
+        if (state->m_currentHypothesis != state->getHypothesis(bestHypothesisIdx))
+            ROS_ERROR_STREAM_NAMED("IMM", "Best Hypothesis switched to model "<< bestHypothesisIdx);
+
+        state->m_currentHypothesis = state->getHypothesis(bestHypothesisIdx);
+        state->m_currentHypothesisIdx =bestHypothesisIdx;
+        track->model_idx = bestHypothesisIdx;
+        //track->state = state->m_currentHypothesis;
+    }
+
+
+    void IMMFilter::modeProbabilityUpdate(IMMState::Ptr state)
+    {
+        ROS_DEBUG_NAMED("IMM", "Updating mode probability");
+
+        double normalizer = 0.0;
+        for (int i = 0; i < state->m_hypotheses.size(); i++)
+        {
+            IMMHypothesis::Ptr hyp = state->m_hypotheses.at(i);
+            normalizer += hyp->m_likelihood * hyp->m_cNormalizer;
+        }
+        for (int i = 0; i < state->m_hypotheses.size(); i++)
+        {
+            IMMHypothesis::Ptr hyp = state->m_hypotheses.at(i);
+            hyp->m_probability = hyp->m_likelihood*hyp->m_cNormalizer / normalizer;
+            ROS_DEBUG_STREAM_NAMED("IMM", "Mode Probability of hypothesis " << i << "is " << hyp->m_probability);
         }
     }
 
-    if (state->m_currentHypothesis != state->getHypothesis(bestHypothesisIdx))
-        ROS_DEBUG_STREAM_NAMED("IMM", "Best Hypothesis switched to model "<< bestHypothesisIdx);
 
-    state->m_currentHypothesis = state->getHypothesis(bestHypothesisIdx);
-    state->m_currentHypothesisIdx =bestHypothesisIdx;
-    track->model_idx = bestHypothesisIdx;
-    //track->state = state->m_currentHypothesis;
-}
-
-
-void IMMFilter::modeProbabilityUpdate(IMMState::Ptr state)
-{
-    ROS_DEBUG("IMM", "Updating mode probability");
-
-    double normalizer = 0.0;
-    for (int i = 0; i < state->m_hypotheses.size(); i++)
+    void IMMFilter::visualizeFilterProperties(const ros::Time& time, const string& trackerFrame, const Tracks tracks)
     {
-        IMMHypothesis::Ptr hyp = state->m_hypotheses.at(i);
-        normalizer += hyp->m_likelihood * hyp->m_cNormalizer;
-    }
-    for (int i = 0; i < state->m_hypotheses.size(); i++)
-    {
-        IMMHypothesis::Ptr hyp = state->m_hypotheses.at(i);
-        hyp->m_probability = hyp->m_likelihood*hyp->m_cNormalizer / normalizer;
-        ROS_DEBUG_STREAM_NAMED("IMM", "Mode Probability of hypothesis " << i << "is " << hyp->m_probability);
-    }
-}
+        // check if visualization is enabled
+        if (m_immVisualization)
+        {
+            // Create marker lists for vertical and horizontal probability bars
+            visualization_msgs::Marker marker_top, marker_side;
+            marker_top.header.stamp = marker_side.header.stamp =time;
+            marker_top.header.frame_id = marker_side.header.frame_id =trackerFrame;
+            marker_top.id = marker_side.id =0;
+            marker_top.scale.x = marker_side.scale.x =0.1;
+            marker_top.pose.orientation.w = marker_side.pose.orientation.w =1.0;
+            marker_top.action = marker_side.action =visualization_msgs::Marker::ADD;
+            marker_top.type = marker_side.type =visualization_msgs::Marker::LINE_LIST;
+            marker_top.lifetime = marker_side.lifetime =ros::Duration();
+            marker_top.ns = "imm_probabilites_vertical";
+            marker_side.ns = "imm_probabilites_horizontal";
+
+            // SRL People Tracker colors
+            const size_t NUM_COLOR = 10, NUM_BW = 4;
+            const unsigned int rainbow_colors[NUM_COLOR + NUM_BW] = {
+                                                                     0xaf1f90, 0x000846, 0x00468a, 0x00953d, 0xb2c908, 0xfcd22a, 0xffa800, 0xff4500, 0xe0000b, 0xb22222,
+                                                                     0xffffff, 0xb8b8b8, 0x555555, 0x000000
+            };
+            unsigned int id =0;
+            foreach(Track::Ptr track, tracks){
+                IMMState::Ptr imm = boost::dynamic_pointer_cast<IMMState>(track->state);
+
+                const double spacer = 0.4;
+                double offset = (imm->getHypotheses().size()-1)/2.0 * (-1*spacer);
+                std_msgs::ColorRGBA color ;
+
+                double x = track->state->x()(STATE_X_IDX);
+                double y = track->state->x()(STATE_Y_IDX);
 
 
-void IMMFilter::visualizeFilterProperties(const ros::Time& time, const string& trackerFrame, const Tracks tracks)
-{
-    // check if visualization is enabled
-    if (m_immVisualization)
-    {
-        // Create marker lists for vertical and horizontal probability bars
-        visualization_msgs::Marker marker_top, marker_side;
-        marker_top.header.stamp = marker_side.header.stamp =time;
-        marker_top.header.frame_id = marker_side.header.frame_id =trackerFrame;
-        marker_top.id = marker_side.id =0;
-        marker_top.scale.x = marker_side.scale.x =0.1;
-        marker_top.pose.orientation.w = marker_side.pose.orientation.w =1.0;
-        marker_top.action = marker_side.action =visualization_msgs::Marker::ADD;
-        marker_top.type = marker_side.type =visualization_msgs::Marker::LINE_LIST;
-        marker_top.lifetime = marker_side.lifetime =ros::Duration();
-        marker_top.ns = "imm_probabilites_vertical";
-        marker_side.ns = "imm_probabilites_horizontal";
+                double vx = track->state->x()(STATE_VX_IDX);
+                double vy = track->state->x()(STATE_VY_IDX);
+                double yaw =atan2(vy, vx);
 
-        // SRL People Tracker colors
-        const size_t NUM_COLOR = 10, NUM_BW = 4;
-        const unsigned int rainbow_colors[NUM_COLOR + NUM_BW] = {
-                0xaf1f90, 0x000846, 0x00468a, 0x00953d, 0xb2c908, 0xfcd22a, 0xffa800, 0xff4500, 0xe0000b, 0xb22222,
-                0xffffff, 0xb8b8b8, 0x555555, 0x000000
-        };
-        unsigned int id =0;
-        foreach(Track::Ptr track, tracks){
-            IMMState::Ptr imm = boost::dynamic_pointer_cast<IMMState>(track->state);
+                // get bar values for each hypothesis and add them to line list
+                for (int i =0; i < imm->getHypotheses().size(); i++)
+                {
+                    //unsigned int rgb= spencer_colors[i*NUM_SRL_COLOR_SHADES];
+                    unsigned int rgb= rainbow_colors[i];
 
-            const double spacer = 0.4;
-            double offset = (imm->getHypotheses().size()-1)/2.0 * (-1*spacer);
-            std_msgs::ColorRGBA color ;
-
-            double x = track->state->x()(STATE_X_IDX);
-            double y = track->state->x()(STATE_Y_IDX);
+                    // get color
+                    color.r = ((rgb >> 16) & 0xff) / 255.0f;
+                    color.g = ((rgb >> 8)  & 0xff) / 255.0f;
+                    color.b = ((rgb >> 0)  & 0xff) / 255.0f;
+                    color.a = 0.8;
+                    marker_top.colors.push_back(color);
+                    marker_top.colors.push_back(color);
+                    marker_side.colors.push_back(color);
+                    marker_side.colors.push_back(color);
 
 
-            double vx = track->state->x()(STATE_VX_IDX);
-            double vy = track->state->x()(STATE_VY_IDX);
-            double yaw =atan2(vy, vx);
+                    // set position and orientation for horizontal and vertical bar
+                    geometry_msgs::Point p;
+                    p.x = x + cos(yaw+ M_PI_2)* offset;
+                    p.y = y + sin(yaw+ M_PI_2)* offset;
+                    p.z = 1.8;
+                    marker_top.points.push_back(p);
+                    marker_side.points.push_back(p);
 
-            // get bar values for each hypothesis and add them to line list
-            for (int i =0; i < imm->getHypotheses().size(); i++)
-            {
-                //unsigned int rgb= spencer_colors[i*NUM_SRL_COLOR_SHADES];
-                unsigned int rgb= rainbow_colors[i];
 
-                // get color
+                    p.z += imm->getHypothesis(i)->getProbability();
+                    marker_top.points.push_back(p);
+
+                    p.x += cos(yaw) * imm->getHypothesis(i)->getProbability();
+                    p.y += sin(yaw) * imm->getHypothesis(i)->getProbability();
+                    p.z = 1.8;
+                    marker_side.points.push_back(p);
+
+                    offset += spacer;
+
+                }
+
+                // for each track visualize most probable model as colored dot
+                visualization_msgs::Marker activModelMarker;
+                activModelMarker.header.stamp = time; ;
+                activModelMarker.header.frame_id = trackerFrame;
+                activModelMarker.id =   time.toNSec() + id++;
+                activModelMarker.action =       visualization_msgs::Marker::ADD;
+                activModelMarker.type =     visualization_msgs::Marker::SPHERE;
+                activModelMarker.lifetime =     ros::Duration().fromSec(20);
+                activModelMarker.ns =       "imm_active_model_path";
+                activModelMarker.scale.x = activModelMarker.scale.y = activModelMarker.scale.z = 0.1;
+                unsigned int rgb= rainbow_colors[imm->getCurrentHypothesisIndex()];
+
                 color.r = ((rgb >> 16) & 0xff) / 255.0f;
                 color.g = ((rgb >> 8)  & 0xff) / 255.0f;
                 color.b = ((rgb >> 0)  & 0xff) / 255.0f;
                 color.a = 0.8;
-                marker_top.colors.push_back(color);
-                marker_top.colors.push_back(color);
-                marker_side.colors.push_back(color);
-                marker_side.colors.push_back(color);
 
-
-                // set position and orientation for horizontal and vertical bar
-                geometry_msgs::Point p;
-                p.x = x + cos(yaw+ M_PI_2)* offset;
-                p.y = y + sin(yaw+ M_PI_2)* offset;
-                p.z = 1.8;
-                marker_top.points.push_back(p);
-                marker_side.points.push_back(p);
-
-
-                p.z += imm->getHypothesis(i)->getProbability();
-                marker_top.points.push_back(p);
-
-                p.x += cos(yaw) * imm->getHypothesis(i)->getProbability();
-                p.y += sin(yaw) * imm->getHypothesis(i)->getProbability();
-                p.z = 1.8;
-                marker_side.points.push_back(p);
-
-                offset += spacer;
-
+                activModelMarker.color = color;
+                activModelMarker.pose.position.x = x;
+                activModelMarker.pose.position.y = y;
+                m_immVisualizationPublisher.publish(activModelMarker);
             }
-
-            // for each track visualize most probable model as colored dot
-            visualization_msgs::Marker activModelMarker;
-            activModelMarker.header.stamp = time; ;
-            activModelMarker.header.frame_id = trackerFrame;
-            activModelMarker.id =   time.toNSec() + id++;
-            activModelMarker.action =       visualization_msgs::Marker::ADD;
-            activModelMarker.type =     visualization_msgs::Marker::SPHERE;
-            activModelMarker.lifetime =     ros::Duration().fromSec(20);
-            activModelMarker.ns =       "imm_active_model_path";
-            activModelMarker.scale.x = activModelMarker.scale.y = activModelMarker.scale.z = 0.1;
-            unsigned int rgb= rainbow_colors[imm->getCurrentHypothesisIndex()];
-
-            color.r = ((rgb >> 16) & 0xff) / 255.0f;
-            color.g = ((rgb >> 8)  & 0xff) / 255.0f;
-            color.b = ((rgb >> 0)  & 0xff) / 255.0f;
-            color.a = 0.8;
-
-            activModelMarker.color = color;
-            activModelMarker.pose.position.x = x;
-            activModelMarker.pose.position.y = y;
-            m_immVisualizationPublisher.publish(activModelMarker);
+            m_immVisualizationPublisher.publish(marker_top);
+            m_immVisualizationPublisher.publish(marker_side);
         }
-        m_immVisualizationPublisher.publish(marker_top);
-        m_immVisualizationPublisher.publish(marker_side);
     }
-}
 
+
+    void IMMFilter::getDebugInformation(IMMState::Ptr state, Pairing::ConstPtr pairingTracker)
+    {
+        //calculate innovation from Mixed state estimates
+        if (m_sendDebugInformation)
+        {
+            ROS_WARN_STREAM("packing new debug message");
+            spencer_tracking_msgs::ImmDebugInfo debug;
+            debug.track_id = pairingTracker->track->id;
+            debug.CXX = state->m_C(STATE_X_IDX, STATE_X_IDX);
+            debug.CYY = state->m_C(STATE_Y_IDX, STATE_Y_IDX);
+            debug.CpXX = state->m_Cp(STATE_X_IDX, STATE_X_IDX);
+            debug.CpYY = state->m_Cp(STATE_Y_IDX, STATE_Y_IDX);
+            ObsVector innovation = state->m_xp.head(OBS_DIM) - pairingTracker->observation->z;
+            debug.innovation = innovation.norm();
+            for (int i = 0; i < state->m_hypotheses.size(); i++)
+            {
+                debug.modeProbabilities.push_back(state->m_hypotheses.at(i)->getProbability());
+            }
+            m_debugMessages.infos.push_back(debug);
+        }
+    }
+
+    void IMMFilter::sendDebugInformation()
+    {
+        //calculate innovation from Mixed state estimates
+        if (m_sendDebugInformation && m_debugMessages.infos.size() > 0){
+            m_debugMessages.header.stamp = ros::Time::now();
+            m_debugMessages.header.seq++;
+            ROS_WARN_STREAM("Publishing " << m_debugMessages.infos.size() << " info messages");
+            m_immDebugPublisher.publish(m_debugMessages);
+            m_debugMessages.infos.clear();
+        }
+
+    }
 
 
 }

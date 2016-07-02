@@ -1,4 +1,33 @@
-/* Created on: May 07, 2014. Author: Timm Linder */
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014-2016, Timm Linder, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef _ROSINTERFACE_H
 #define _ROSINTERFACE_H
 
@@ -45,33 +74,22 @@ public:
 
 
 private:
-    /// Callback that is invoked when new detections, and additional supporting low-confidence detections (can be NULL), arrive via ROS.
-    void incomingObservations(const spencer_tracking_msgs::DetectedPersons::ConstPtr detectedPersons, const spencer_tracking_msgs::DetectedPersons::ConstPtr additionalLowConfidenceDetections);
-
-    /// Converts the ROS DetectedPersons messages into Observation instances, and transforms them into our world frame.
-    void convertObservations(const spencer_tracking_msgs::DetectedPersons::ConstPtr& detectedPersons, Observations& observations);
+    /// Callback that is invoked when new detections arrive via ROS.
+    void incomingObservations(const spencer_tracking_msgs::DetectedPersons::ConstPtr detectedPersons);
 
     /// Publishes tracks on ROS after completion of a tracking cycle.
     void publishTracks(ros::Time currentRosTime, const Tracks& tracks);
 
     // Publishes statistics, such as average processing cycle duration and processing rate.
-    void publishStatistics();
+    void publishStatistics(ros::Time currentRosTime, const unsigned int numberTracks);
 
     /// ROS handles for publisher and subscriber management
     ros::NodeHandle m_nodeHandle, m_privateNodeHandle;
     ros::Subscriber m_detectedPersonsSubscriber;
 
     spencer_diagnostics::MonitoredPublisher m_trackedPersonsPublisher;
-    ros::Publisher m_averageProcessingRatePublisher, m_averageCycleTimePublisher, m_trackCountPublisher;
+    ros::Publisher m_averageProcessingRatePublisher, m_averageCycleTimePublisher, m_trackCountPublisher, m_averageLoadPublisher, m_timingMetricsPublisher;
     
-    /// Message filters and subscribers for the case where we additionally subscribe to supporting low-confidence detections.
-    typedef message_filters::Subscriber<spencer_tracking_msgs::DetectedPersons> SubscriberType;
-    boost::shared_ptr<SubscriberType> m_mainSubscriber, m_additionalSubscriber;
-
-    typedef message_filters::sync_policies::ApproximateTime<spencer_tracking_msgs::DetectedPersons, spencer_tracking_msgs::DetectedPersons> SyncPolicyWithTwoInputs;
-    typedef message_filters::Synchronizer<SyncPolicyWithTwoInputs> SynchronizerWithTwoInputs;
-    boost::shared_ptr<SynchronizerWithTwoInputs> m_synchronizerWithTwoInputs;
-
     /// Tracker instance
     Tracker* m_tracker;
 
@@ -80,7 +98,14 @@ private:
 
     /// Utility classes
     GeometryUtils m_geometryUtils;
-    boost::circular_buffer<double> m_lastCycleTimes; 
+    boost::circular_buffer<double> m_lastCycleTimes;
+    clock_t m_startClock;
+    clock_t m_clockBefore;
+    ros::WallTime m_startWallTime;
+    ros::WallTime m_wallTimeBefore;
+    bool m_timingInitialized;
+    bool m_overwriteMeasurementNoise;
+    float m_forwardPredictTime;
 };
 
 

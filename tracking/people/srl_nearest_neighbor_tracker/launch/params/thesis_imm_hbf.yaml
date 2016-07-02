@@ -1,0 +1,27 @@
+{
+use_imm: true,
+#Define number of models
+number_of_models: 3,
+#Setting Markov transition probabilites
+markov_trans_prob_0_0: 0.4196056401,
+markov_trans_prob_0_1: 0.5350386228,
+markov_trans_prob_0_2: 0.0453557371,
+markov_trans_prob_1_0: 0.7663444643,
+markov_trans_prob_1_1: 0.2289577161,
+markov_trans_prob_1_2: 0.0046978196,
+markov_trans_prob_2_0: 0.3861331014,
+markov_trans_prob_2_1: 0.4890320493,
+markov_trans_prob_2_2: 0.1248348493,
+#Configuration of models used
+IMM0_motion_model: ConstantVelocity,
+    IMM0_process_noise_level: 0.9990618642249438,
+    IMM0_use_process_noise: true,
+IMM1_motion_model: CoordinatedTurn,
+    IMM1_cosw: 0.8,
+    IMM1_process_noise_level: 2.4630540643091505,
+    IMM1_use_process_noise: true,
+IMM2_motion_model: BrownianMotion,
+    IMM2_process_noise_level: 1.2102997710287298,
+    IMM2_use_process_noise: true,
+ct_turn_rate_variance: 3.518902664466206,
+}

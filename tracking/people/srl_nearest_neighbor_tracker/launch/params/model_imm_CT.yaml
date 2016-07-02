@@ -1,0 +1,22 @@
+{
+use_imm: true,
+#Define number of models
+number_of_models: 1,
+#Setting Markov transition probabilites
+markov_trans_prob_0_0: 1,
+#Configuration of models used
+IMM0_motion_model: CoordinatedTurn,
+    IMM0_cosxx: 0.4,
+    IMM0_cosyy: 0.4,
+    IMM0_cosw: 1.6,
+    IMM0_cosvxx: 2.0,
+    IMM0_cosvyy: 2.0,
+    IMM0_use_process_noise: true,
+    IMM0_process_noise_level: 1,
+    IMM0_qsvxx: 0,
+    IMM0_qsvyy: 0,
+    IMM0_qsxx: 0.0081,
+    IMM0_qsyy: 0.0081,
+ct_turn_rate_variance: 0.2,
+send_imm_debug_information: true,
+}

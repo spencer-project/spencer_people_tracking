@@ -1,0 +1,10 @@
+{
+use_logic_initiation: True,
+#Default Logic Initiator parameters
+logic_initiator_max_velocity: 2.0,  #Maximal velocity of person for initiation 
+logic_initiator_min_velocity: 0.2,  #Minimal velocity of person for initiation  
+logic_initiator_number_scans_before_acceptance: 6, #number of frames which should be accepted 
+logic_initiator_max_number_consecutive_missed_observations: 3, #number of allowed misses 
+logic_initiator_use_incremental_checking: True,
+logic_initiator_systematic_scan_error: 0.05, #Systematic error of sensor for euclidean distance check
+}

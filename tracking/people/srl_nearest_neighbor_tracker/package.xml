@@ -8,10 +8,10 @@
   <maintainer email="linder@cs.uni-freiburg.de">Timm Linder</maintainer>
 
   <license>BSD</license>
-  
+
   <author>Timm Linder</author>
   <author>Fabian Girrbach</author>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>tf</build_depend>
@@ -19,6 +19,7 @@
   <build_depend>eigen_conversions</build_depend>
   <build_depend>tf_conversions</build_depend>
   <build_depend>spencer_diagnostics</build_depend>
+  <build_depend>cmake_modules</build_depend>
 
   <run_depend>tf</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>

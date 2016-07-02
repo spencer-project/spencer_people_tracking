@@ -1,4 +1,33 @@
-/* Created on: Jan 22, 2015. Author: Fabian Girrbach */
+/*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2015, Fabian Girrbach, Social Robotics Lab, University of Freiburg
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions are met:
+*
+*  * Redistributions of source code must retain the above copyright notice, this
+*    list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright notice,
+*    this list of conditions and the following disclaimer in the documentation
+*    and/or other materials provided with the distribution.
+*  * Neither the name of the copyright holder nor the names of its contributors
+*    may be used to endorse or promote products derived from this software
+*    without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+*  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef _IMM_STATE_H_
 #define _IMM_STATE_H_
 
@@ -22,6 +51,9 @@ typedef unsigned int IMMHypothesisIndex;
 
 class IMMState : public FilterState {
 public:
+
+
+
     /// Typedefs for easier readability
     typedef boost::shared_ptr<IMMState> Ptr;
     typedef boost::shared_ptr<const IMMState> ConstPtr;
@@ -31,6 +63,13 @@ public:
     virtual const StateMatrix& C()  const { return m_C; }
     virtual const StateVector& xp() const { return m_xp; }
     virtual const StateMatrix& Cp() const { return m_Cp; }
+
+    // Public setters, as specified in FilterState interface
+    virtual void setX(const StateVector& x) { m_x = x;}
+    virtual void setXp(const StateVector& xp) { m_xp = xp;}
+    virtual void setC(const StateMatrix& C) { m_C = C;}
+    virtual void setCp(const StateMatrix& Cp) { m_Cp = Cp;}
+
 
     /// Return a deep copy of this filter state as a shared pointer
     virtual FilterState::Ptr deepCopy() {
@@ -88,8 +127,6 @@ private:
     IMMHypothesis::Ptr m_currentHypothesis;
     IMMHypothesisIndex m_currentHypothesisIdx;
     IMMHypotheses m_hypotheses;
-    IMMMatrix m_d;
-    IMMVector m_outer;
 
     IMMMatrix m_mixingProbabilities;
 

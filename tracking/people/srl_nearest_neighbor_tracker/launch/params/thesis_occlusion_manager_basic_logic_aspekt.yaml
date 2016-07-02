@@ -1,0 +1,6 @@
+{
+    max_occlusions_before_deletion: 20,
+    max_occlusions_before_deletion_of_mature_track: 30,
+    track_is_mature_after_total_num_matches: 240,
+    use_laser_shade_occlusion_manager: false
+}

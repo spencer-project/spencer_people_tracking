@@ -1,0 +1,10 @@
+{
+    cosvxx: 2.0,
+    cosvyy: 2.0,
+    cosxx: 0.7,
+    cosyy: 0.7,
+    measurement_noise: 0.022351425337602253,
+    overwrite_measurement_noise: true,
+    process_noise_level: 0.34,
+    use_process_noise: true
+}

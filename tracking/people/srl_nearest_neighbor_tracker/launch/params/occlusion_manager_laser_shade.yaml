@@ -1,0 +1,8 @@
+#Configuration file for laser shade occlusion manager
+{
+    use_laser_shade_occlusion_manager: true,
+    occlusion_manager_visualization_enabled: true,
+    occlusion_manager_number_samples: 1,
+    occlusion_manager_time_uncertainty_factor: 1.3,
+    occlusion_manager_max_range: 20,
+}
