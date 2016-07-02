@@ -1,0 +1,77 @@
+<launch>
+    <arg name="evaluation_prefix"/>
+    <arg name="dataset_folder" default="$(optenv DATASET_FOLDER /home/linder/Datasets/toulouse_mocap_people_tracking)"/>
+    <!--<arg name="dataset_folder" default="$(optenv DATASET_FOLDER /home/stefan/data/spencer/toulouse_mocap_people_tracking)"/> -->
+
+    <arg name="rgbd" default="true"/>
+    <arg name="laser" default="true"/>
+    <arg name="hog" default="true"/>
+
+    <arg name="sync_slop" default="0.05"/>
+    <arg name="sync_queue_size" default="10"/>
+    <arg name="rate" default="0.75"/>
+    <arg name="initial_wait_time" default="$(optenv INITIAL_WAIT_TIME 40.0)"/>
+
+
+    <!-- Do not change anything starting from here -->
+    <arg name="rgbd_bagfile" value="$(arg dataset_folder)/dynamic_walking/front_rgbd.bag" if="$(arg rgbd)"/>
+    <arg name="rgbd_bagfile" value="" unless="$(arg rgbd)"/>
+
+    <rosparam param="/use_sim_time">true</rosparam>
+    
+    <include file="$(find spencer_bagfile_tools)/launch/playback_from_robot.launch">
+        <arg name="uncompress_rgbd" value="true" if="$(arg rgbd)"/>
+        <arg name="visualization" value="false"/>
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="pause" value="false"/>
+        <arg name="required" value="false"/>
+        <arg name="initial_wait_time" value="$(arg initial_wait_time)"/>
+        
+        <arg name="files" value="$(arg dataset_folder)/dynamic_walking/lasers.bag $(arg rgbd_bagfile)"/>
+    </include>
+
+    <!-- Evaluation -->
+    <node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen" clear_params="true">
+        <param name="approximate_sync" value="true"/>
+        <param name="sync_slop" value="$(arg sync_slop)"/> 
+        <param name="sync_queue_size" value="$(arg sync_queue_size)"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="true"/>
+        <param name="timing_metrics" value="true"/>
+        <param name="matching_threshold" value="1.0"/>
+        <param name="subscriber_timeout" value="5"/>
+        <param name="transform_flag" value="true"/>
+        <param name="evaluation_prefix" value="$(arg evaluation_prefix)"/>
+        <param name="aggregate_results" value="true"/>
+        <param name="num_expected_gt_cycles" value="2400"/>
+        <rosparam param="groundtruth_track_ids_to_ignore">[1]</rosparam>
+
+        <remap from="/groundtruth" to="/tracks_with_simulated_occlusions"/>
+        <remap from="/srl_nearest_neighbor_tracker/tracking_timing_metrics" to="/tracking_timing_metrics"/>
+    </node>  
+    
+    <include file="$(find spencer_tracking_utils)/launch/simulate_occluded_tracks_via_lasers.launch">
+        <arg name="max_distance" value="12.0"/>
+        <arg name="input_tracks" value="/ground_truth/tracked_persons"/>
+        <arg name="output_tracks" value="/tracks_with_simulated_occlusions"/>
+    </include>
+
+
+    <!-- Detectors -->
+
+    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch" if="$(arg laser)">
+        <arg name="rear" value="false"/>  <!-- people in rear of robot are not wearing mocap markers!!! -->
+        <arg name="low_confidence_detections" value="true"/>
+    </include>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/front_rgbd_detectors.launch" if="$(arg rgbd)">
+        <arg name="hog" value="$(arg hog)"/>
+    </include>
+
+    <node name="map_server" type="map_server" pkg="map_server" args="$(arg dataset_folder)/laas_static_mocap.yaml">
+        <param name="frame_id" value="map"/>
+        <remap from="/map" to="/occ_map"/>
+    </node>
+
+
+</launch>

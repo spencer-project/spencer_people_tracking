@@ -1,0 +1,23 @@
+<launch>
+    <!-- Evaluation script, this should be on top of the launch file -->
+    <group>
+        <remap from="/tracking_timing_metrics" to="/spencer/perception_internal/people_tracking/srl_nearest_neighbor_tracker/tracking_timing_metrics"/>
+        <include file="$(find srl_nearest_neighbor_tracker)/launch/icra16_experiments/toulouse/toulouse_evaluation.launch">
+            <arg name="evaluation_prefix" value="toulouse/front_rgbd_only/nnt/with_static_map"/>
+            <arg name="rgbd" value="true"/>
+            <arg name="laser" value="false"/>
+        </include>
+    </group>
+
+
+    <!-- Tracker -->
+
+    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+        <arg name="rgbd" value="true"/>
+        <arg name="laser_low_confidence_detections" value="false"/>
+        <arg name="static_map_filter" value="true"/>
+        <arg name="subscriber_queue_size" value="3"/>
+    </include>
+
+
+</launch>

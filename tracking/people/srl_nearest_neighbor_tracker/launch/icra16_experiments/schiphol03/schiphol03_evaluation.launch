@@ -1,0 +1,86 @@
+<launch>
+    <arg name="evaluation_prefix"/>
+    <arg name="dataset_folder" default="$(optenv DATASET_FOLDER /media/linder/spencer/june2014/03-gate-e19-e20-bejing-japan)"/>
+
+    <!-- Set to true for RWTH tracker which requires original images during tracking -->
+    <arg name="rgbd_images" default="false"/>
+
+    <!-- Exactly one of these must be set to true -->
+    <arg name="all_modalities" default="false"/>
+    <arg name="laser_only" default="false"/>
+    <arg name="no_hog" default="false"/>
+    <arg name="front_rgbd_only" default="false"/>
+    
+    <arg name="rate" default="1.0"/>
+    <arg name="sync_slop" default="0.05"/>
+    <arg name="sync_queue_size" default="10"/>
+    <arg name="initial_wait_time" default="$(optenv INITIAL_WAIT_TIME 30.0)"/>
+
+
+    <rosparam param="/use_sim_time">true</rosparam>
+
+
+
+    <arg name="detections_file" value="detected_persons_all_modalities.bag" if="$(arg all_modalities)"/>
+    <arg name="groundtruth_file" value="groundtruth_tracked_persons.bag" if="$(arg all_modalities)"/>
+
+    <arg name="detections_file" value="detected_persons_laser_only.bag" if="$(arg laser_only)"/>
+    <arg name="groundtruth_file" value="groundtruth_tracked_persons.bag" if="$(arg laser_only)"/>
+
+    <arg name="detections_file" value="detected_persons_no_hog.bag" if="$(arg no_hog)"/>
+    <arg name="groundtruth_file" value="groundtruth_tracked_persons.bag" if="$(arg no_hog)"/>
+
+    <arg name="detections_file" value="detected_persons_front_rgbd_only.bag" if="$(arg front_rgbd_only)"/>
+    <arg name="groundtruth_file" value="groundtruth_tracked_persons_front_rgbd_only.bag" if="$(arg front_rgbd_only)"/>  <!-- TODO: Check if this bagfile contains the correct groundtruth -->
+
+
+
+    <!-- Do not change anything starting from here -->
+    
+    <include file="$(find spencer_bagfile_tools)/launch/playback.launch">
+        <arg name="folder" value="$(arg dataset_folder)"/>
+        <arg name="extra_bagfiles" value="$(arg dataset_folder)/$(arg detections_file) $(arg dataset_folder)/$(arg groundtruth_file)"/>
+
+        <arg name="laser" value="true"/>
+        <arg name="dslr" value="false"/>
+        <arg name="kinect2" value="false"/>
+        <arg name="reconstruct_odometry" value="false"/>
+        
+        <arg name="front_rgbd" value="$(arg rgbd_images)"/> 
+        <arg name="rear_rgbd" value="$(arg rgbd_images)"/>
+        <arg name="no_point_clouds" value="false"/>
+        
+        <arg name="rqt" value="false"/>
+        <arg name="visualization" value="false"/>
+        <arg name="rviz" value="false"/>
+
+        <!-- do not change these unless you know what you do -->
+        <arg name="required" value="false" />
+        <arg name="pause" value="false"/>
+        <arg name="initial_wait_time" value="$(arg initial_wait_time)"/>
+        <arg name="loop" value="false"/>
+        <arg name="rate" value="$(arg rate)"/> 
+        <arg name="start" value="1733.5"/>
+        <arg name="duration" value="230.0"/>
+    </include>
+
+    <!-- Evaluation -->
+    <node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen" clear_params="true">
+        <param name="approximate_sync" value="true"/>
+        <param name="sync_slop" value="$(arg sync_slop)"/> 
+        <param name="sync_queue_size" value="$(arg sync_queue_size)"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="true"/>
+        <param name="timing_metrics" value="true"/>
+        <param name="matching_threshold" value="1.0"/>
+        <param name="subscriber_timeout" value="5"/>
+        <param name="transform_flag" value="true"/>
+        <param name="evaluation_prefix" value="$(arg evaluation_prefix)"/>
+        <param name="aggregate_results" value="true"/>
+        <param name="num_expected_gt_cycles" value="6000"/>
+
+        <remap from="/groundtruth" to="/groundtruth/tracked_persons_with_occlusions"/>
+        <remap from="/srl_nearest_neighbor_tracker/tracking_timing_metrics" to="/tracking_timing_metrics"/>
+    </node>  
+
+</launch>
