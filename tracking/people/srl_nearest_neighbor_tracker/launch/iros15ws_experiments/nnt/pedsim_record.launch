@@ -1,0 +1,58 @@
+<!--
+Record script for creating bag file with detections  for pedsim dataset
+-->
+
+
+<launch>    
+
+    <!-- Optional command-line arguments -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/pedsim_converted.bag"/>
+    <arg name="rate" default="0.25"/>
+    <arg name="online_detection" default="true"/> <!-- if true, do not use detections from bagfile -->
+    <arg name="adaboost_model" default="lms200"/>
+    <arg name="max_distance" default="20.0"/> <!-- should set online_detection to true for this, or use same value as used for offline detections in bagfile -->
+
+    <param name="use_sim_time" value="true"/>
+    
+    
+    <!-- Fuse detections -->
+    <include file="$(find spencer_detected_person_association)/launch/fuse_lasers_only.launch"/>
+
+    <!-- Fuse high-recall laser detectors -->
+    <include file="$(find spencer_detected_person_association)/launch/fuse_high_recall_lasers.launch"/>
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->       
+     <node name="rosbag_play" type="play" pkg="rosbag" args="$(arg filename) -r $(arg rate) --clock --pause" output="screen">
+        <remap from="/spencer/perception/detected_persons" to="/unused/detected_persons_from_bagfile" if="$(arg online_detection)"/>
+        <remap from="/spencer/perception_internal/detected_person_association/lasers_fused_high_recall" to="/unused/lasers_fused_high_recall_from_bagfile" if="$(arg online_detection)"/>
+    </node>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch" if="$(arg online_detection)">
+        <arg name="adaboost_model" value="$(arg adaboost_model)"/>
+        <arg name="laser_max_distance" value="$(arg max_distance)"/>
+    </include>
+    
+    <node name="visible_area_front" type="visualize_visible_laser_area.py" pkg="srl_laser_segmentation" output="screen">
+        <param name="laser" value="/spencer/sensors/laser_front/echo0"/>
+        <rosparam param="fill_color">[1.000, 0.647, 0.000, 0.3]</rosparam>
+        <rosparam param="line_color">[1.000, 0.647, 0.000, 0.7]</rosparam>
+    </node>
+    
+    <node name="visible_area_rear" type="visualize_visible_laser_area.py" pkg="srl_laser_segmentation" output="screen">
+        <param name="laser" value="/spencer/sensors/laser_rear/echo0"/>
+        <rosparam param="fill_color">[0.255, 0.412, 0.88, 0.3]</rosparam>
+        <rosparam param="line_color">[0.255, 0.412, 0.88, 0.7]</rosparam>
+    </node>
+
+    <include file="$(find spencer_tracking_utils)/launch/simulate_occluded_tracks_via_lasers.launch">
+        <arg name="max_distance" value="$(arg max_distance)"/>
+        <arg name="input_tracks" value="/pedsim_to_spencer/tracked_persons"/>
+        <arg name="output_tracks" value="/tracks_with_simulated_occlusions"/>
+    </include>
+    
+     
+
+  
+
+
+</launch>

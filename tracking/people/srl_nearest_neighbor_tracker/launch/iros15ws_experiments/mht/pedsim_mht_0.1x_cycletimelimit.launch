@@ -1,0 +1,43 @@
+<launch>
+    <arg name="detector_queue_size" default="100"/>  <!-- For MHT, this must be configured in the configuration INI file! -->
+    <arg name="latency_monitoring" default="false"/>
+
+    <rosparam param="/use_sim_time">true</rosparam>
+
+    <!-- Optional command-line arguments -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/pedsim_20m_offline.bag"/>
+    <arg name="rate" default="0.1"/>
+
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <group>
+        <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->       
+        <node name="rosbag_play" type="play" pkg="rosbag" args="$(arg filename) -r $(arg rate) --pause" output="screen">
+        </node>
+
+        <include file="$(find srl_mht)/launch/people_tracking.launch">
+            <arg name="debug" value="false"/>
+            <arg name="config_file" value="pedsim_1x_cycletimelimit.ini"/> <!-- MHT CONFIG IS SET HERE, THIS IS IMPORTANT! -->
+        </include>
+    </group>
+
+	<!-- Evaluation -->
+	<node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen"> <!-- launch-prefix="xterm -e python -m pdb " -->
+        <param name="approximate_sync" value="true"/>
+        <param name="sync_slop" value="0.15"/> 
+        <param name="sync_queue_size" value="50"/>
+
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="false"/>
+        <param name="timing_metrics" value="true"/>
+
+        <param name="matching_threshold" value="1.0"/>
+        <param name="subscriber_timeout" value="20"/>
+
+        <remap from="/groundtruth" to="/tracks_with_simulated_occlusions"/>
+        <remap from="/srl_nearest_neighbor_tracker/tracking_timing_metrics" to="/spencer/perception_internal/people_tracking/mht/tracking_timing_metrics"/>
+	</node>  
+    
+    <include file="$(find srl_nearest_neighbor_tracker)/launch/latency_monitors.launch" if="$(arg latency_monitoring)"/>
+
+</launch>
