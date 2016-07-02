@@ -1,0 +1,30 @@
+<!-- 
+Test script for the nearest-neighbor tracker which loads an annotated logfile, visualizes the laser segments, detections and tracks,
+and uses the groundtruth detections as an input to the tracker.
+
+Supply a different logfile, if desired, by passing in a filename, e.g.
+roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=123.log
+-->
+<launch>
+    <!-- Optional command-line arguments -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_mainstation1_cut.lab"/>
+    <arg name="rate" default="0.1"/>
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+        <arg name="visualization" value="false"/>
+        <arg name="filename" value="$(arg filename)"/>
+        <arg name="rate" value="$(arg rate)"/>
+    </include>
+
+    <!-- The nearest-neighbor tracker itself -->
+    <remap from="/spencer/perception/detected_persons" to="/groundtruth/detected_persons"/>
+    <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch"/>
+
+    <!-- Logger -->
+    <node name="logger" type="logger_node" pkg="srl_nearest_neighbor_tracker" output="screen"> <!-- launch-prefix="gdb -ex run -args " -->
+    </node>
+
+    <!-- Visualization -->
+    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find srl_nearest_neighbor_tracker)/launch/visualization_with_groundtruth.rviz"/>
+</launch>

@@ -1,0 +1,23 @@
+<launch>
+
+    <group ns="/latency_monitoring">
+
+        <node name="monitor_laser" pkg="spencer_diagnostics" type="topic_monitor.py">
+            <param name="topic" value="/laser"/>
+            <param name="type" value="sensor_msgs/LaserScan"/>
+        </node>
+
+        <node name="monitor_detections" pkg="spencer_diagnostics" type="topic_monitor.py">
+            <param name="topic" value="/spencer/perception/detected_persons"/>
+            <param name="type" value="spencer_tracking_msgs/DetectedPersons"/>
+        </node>
+
+        <node name="monitor_tracks" pkg="spencer_diagnostics" type="topic_monitor.py">
+            <param name="topic" value="/spencer/perception/tracked_persons"/>
+            <param name="type" value="spencer_tracking_msgs/TrackedPersons"/>
+        </node>
+
+    </group>
+
+
+</launch>
