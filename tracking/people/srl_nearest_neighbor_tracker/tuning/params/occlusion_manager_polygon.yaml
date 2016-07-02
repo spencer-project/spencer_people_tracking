@@ -1,0 +1,5 @@
+{max_misses_before_deletion: 6, max_misses_before_deletion_of_mature_track: 24, occlusion_geodesics_inertia_variance: 2.260600430395397,
+  occlusion_geodesics_motion_variance: 3.840875144661871, occlusion_geodesics_plausibility_cut_off: 0.7573554597030829,
+  occlusion_geodesics_total_cut_off: 0.19156646553598566, occlusion_manager_max_range: 20,
+  occlusion_manager_number_samples: 1, occlusion_manager_time_uncertainty_factor: 1.3,
+  occlusion_manager_visualization_enabled: false, use_polygon_occlusion_manager: true}

@@ -1,0 +1,77 @@
+<!--
+Test script for the nearest-neighbor tracker which loads an annotated logfile, visualizes the laser segments, detections and tracks,
+and uses the groundtruth detections as an input to the tracker.
+
+Supply a different logfile, if desired, by passing in a filename, e.g.
+roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=123.log
+-->
+
+
+<launch>
+    <arg name="tracker_queue_size" default="100"/>
+    <arg name="use_laser_shade_occlusion_manager" default="false"/>
+    <arg name="use_imm" default="false"/>
+    <arg name="use_initiation_logic" default="true"/>
+    
+
+    <!-- Optional command-line arguments
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_aspekt1.lab"/> -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_mainstation1_cut_eval.lab"/>
+    <arg name="rate" default="1.0"/>
+    <arg name="timing_mode" default="0"/>
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <group>
+        <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+            <arg name="visualization" value="false"/>
+            <arg name="filename" value="$(arg filename)"/>
+            <arg name="rate" value="$(arg rate)"/>
+            <arg name="timing_mode" value="$(arg timing_mode)"/>
+        </include>
+
+        <!-- AHC lasersegmentation -->
+    	<node name="ahc_segmentation" type="ahc_segmentation" pkg="srl_laser_segmentation" output="screen"/> <!-- launch-prefix="gdb -ex run -args " -->
+
+    	<!-- The blob detector -->
+    	<node name="blob_detector" type="blob_detector" pkg="srl_laser_detectors" output="screen"> <!-- launch-prefix="gdb -ex run -args " -->
+        <remap from="/detected_persons" to="/spencer/perception/detected_persons"/>
+        <param name="min_points" value="2" />
+        <param name="max_points" value="150" />
+        <param name="min_width" value="0.02" />
+        <param name="max_width" value="1.2" />
+        <param name="max_range" value="80" />
+    	</node>
+    </group>
+
+    <!-- The nearest-neighbor tracker itself -->
+    <include file="$(find srl_nearest_neighbor_tracker)/tuning/tune_nnt.launch">
+        <arg name="tracker_queue_size" value="$(arg tracker_queue_size)"/>
+        <arg name="use_laser_shade_occlusion_manager" default="$(arg use_laser_shade_occlusion_manager)"/>
+    	<arg name="use_imm" default="$(arg use_imm)"/>
+    	<arg name="use_initiation_logic" default="$(arg use_initiation_logic)"/>
+     </include>
+
+
+    <!-- Show visible laser area
+    <node name="visible_area" type="visualize_visible_laser_area.py" pkg="srl_laser_segmentation" output="screen">
+        <param name="laser" value="/laser"/>
+    </node> -->
+
+
+    <!-- Visualization
+    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find srl_nearest_neighbor_tracker)/launch/visualization_with_groundtruth.rviz"/>-->
+
+	<!-- Evaluation -->
+	<node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen">
+        <param name="approximate_sync" value="false"/>
+        <param name="sync_slop" value="0.05"/> 
+        <param name="syncQueueSize" value="500"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="false"/>
+        <param name="matching_threshold" value="1.0"/>
+        <remap from="/groundtruth" to="/groundtruth/tracked_persons"/>
+	</node>  
+    
+
+
+</launch>

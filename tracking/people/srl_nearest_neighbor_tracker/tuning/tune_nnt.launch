@@ -1,0 +1,60 @@
+<!--
+Launches the nearest-neighbor tracker with a set of parameters that worked well in practice.
+-->
+
+<launch>
+    <arg name="tracker_queue_size" default="100"/>
+    <arg name="use_laser_shade_occlusion_manager" default="false"/>
+    <arg name="use_imm" default="false"/>
+    <arg name="use_initiation_logic" default="true"/>
+    
+
+
+
+    <node name="srl_nearest_neighbor_tracker" type="nnt_node" pkg="srl_nearest_neighbor_tracker" output="screen"> <!-- launch-prefix="gdb -ex run -args " -->
+        <!-- Topic of secondary low-confidence detections that can be matched against an existing track, but not initiate a new one -->
+        <param name="additional_low_confidence_detections" value=""/>
+
+        <!-- For synchronization with additional low confidence observations (if topic is set above) -->
+        <param name="synchronizer_queue_size" value="35"/>
+        <param name="synchronizer_age_penalty" value="10000"/>
+
+        <!-- Publisher and subscriber queue (only used for subscriber if not synchronizing with additional low-confidence observations) -->
+        <param name="queue_size" value="$(arg tracker_queue_size)"/>
+
+        <!-- Gating -->
+        <param name="max_gating_distance" value="1.0"/>
+        
+        <!-- Data Associaction -->
+        <param name="data_association_type" value="greedy_nearest_neighbor"/>
+        
+
+        <!-- Occlusion handling -->
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/occlusion_manager_basic.yaml" command="load" unless="$(arg use_laser_shade_occlusion_manager)" />
+        <!-- <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/occlusion_manager_laser_shade.yaml" command="load" if="$(arg use_laser_shade_occlusion_manager)" /> -->
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/occlusion_manager_polygon.yaml" command="load" if="$(arg use_laser_shade_occlusion_manager)" />
+        		
+        <!-- History of track states for duplicate elimination and debugging -->
+        <param name="state_history_length" value="30"/>
+
+        <!-- Duplicate track elimination -->
+        <param name="duplicate_track_num_history_entries_to_compare" value="5"/>
+        <param name="duplicate_track_num_history_entries_must_match" value="3"/>
+        <param name="duplicate_track_max_dist" value="0.15"/>
+
+        <!-- Track initiation -->
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/logic_initiator.yaml" command="load" if="$(arg use_initiation_logic)"/>
+
+        <!-- General IMM filter parameters -->
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/imm_CT_CV.yaml" command="load" if="$(arg use_imm)"/>
+        <!-- <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/imm_CT_CT_BM.yaml" command="load" if="$(arg use_imm)"/> -->
+        <!-- <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/imm_CT_CV_CT.yaml" command="load" if="$(arg use_imm)"/> -->
+
+
+        <rosparam file="$(find srl_nearest_neighbor_tracker)/tuning/params/ekf_default.yaml" command="load"/>
+      
+
+    </node>
+
+
+</launch>
