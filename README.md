@@ -3,9 +3,6 @@
 
 ![Tracked persons projected into the front RGB-D camera](/../screenshots/screenshots/full-system-3-front-cam-edited.png?raw=true "Tracked persons projected into the front RGB-D camera")
 
-
-*This is an ongoing research project. Code, documentation and videos are continuously being added.*
-
 #### Features at a glance
 
 - **Multi-modal detection:** Multiple RGB-D & 2D laser detectors in one common framework.
@@ -21,7 +18,7 @@
 
 #### Motivation
 
-The aim of the EU FP7 research project SPENCER is to develop algorithms for service robots that can guide groups of people through highly dynamic and crowded pedestrian environments, such as airports or shopping malls, while behaving in a socially compliant manner by e.g. not crossing in between families or couples. Exemplary situations that such a robot could encounter are visualized in below image on the right. To this end, robust and computationally efficient components for the perception of humans in the robot's surroundings need to be developed.
+The aim of the EU FP7 research project SPENCER was to develop algorithms for service robots that can guide groups of people through highly dynamic and crowded pedestrian environments, such as airports or shopping malls, while behaving in a socially compliant manner by e.g. not crossing in between families or couples. Exemplary situations that such a robot could encounter are visualized in below image on the right. To this end, robust and computationally efficient components for the perception of humans in the robot's surroundings needed to be developed.
 
 ![SPENCER Use-Case](/../screenshots/screenshots/spencer-use-case-2.jpg?raw=true "SPENCER Use-Case") &nbsp;&nbsp; ![SPENCER Use-Case](/../screenshots/screenshots/use-case-1-bw.png?raw=true "SPENCER Use-Case")
 
@@ -63,7 +60,7 @@ For detection-to-detection fusion, we have implemented a series of nodelets whic
 In case of detection-to-track fusion (currently not implemented), it is still advisable to publish a [CompositeDetectedPerson](/messages/spencer_tracking_msgs/msg/CompositeDetectedPerson.msg) message (via [CompositeDetectedPersons](/messages/spencer_tracking_msgs/msg/CompositeDetectedPersons.msg)) for each set of detections associated with a track, such that later on it is possible to go back to the original detections from a track, and lookup associated image bounding boxes etc. via the associated detection_id.
 
 ##### Person and group tracking
-For person and group tracking, we currently provide exemplary code based upon a nearest-neighbor standard filter data association, which is robust enough in most use cases (especially if multi-modal detectors are being used). The **[people tracker](/tracking/people/srl_nearest_neighbor_tracker)** has been enhanced with a track initiation logic and 4 different IMM-based motion models (constant velocity with low process noise, high process noise, coordinated turn and Brownian motion) to make tracking more robust. *NOTE: The IMM version of the tracker will be added shortly.*
+For person and group tracking, we currently provide exemplary code based upon a nearest-neighbor standard filter data association, which is robust enough in most use cases (especially if multi-modal detectors are being used). The **[people tracker](/tracking/people/srl_nearest_neighbor_tracker)** has been enhanced with a track initiation logic and 4 different IMM-based motion models (constant velocity with low process noise, high process noise, coordinated turn and Brownian motion) to make tracking more robust.
 
 The [group tracker](/tracking/groups/spencer_group_tracking) relies on [social/spatial relations](/tracking/groups/spencer_social_relations) determined via the same coherent motion indicator features as described in [1].
 
@@ -135,7 +132,7 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
 
-*NOTE: The entire framework has only been tested on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). This will be fixed at a later point in time. See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
+*NOTE: The entire framework has only been tested on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
 
 ##### Required dependencies
 
@@ -209,7 +206,7 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 
 #### Example dataset (bagfile)
 
-A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework will be linked here shortly.
+A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework will be linked here in the future.
 
 In case you just want to test one of the detectors, we will also provide a launch file that remaps the bagfile topics to the ones expected by the detector launch files (e.g. `laser` instead of `/spencer/sensors/laser_front/echo0`). 
 
@@ -236,7 +233,7 @@ also optionally:
 > Robot Operating System (ROS): The Complete Reference (Vol. 1).   
 > Springer Studies in Systems, Decision and Control, 2016   
 
-Most of the software in this repository is released under a BSD (2-clause) license. For details, however, please check the individual ROS packages.
+Most of the software in this repository is released under a BSD license. For details, however, please check the individual ROS packages.
 
 
 #### References

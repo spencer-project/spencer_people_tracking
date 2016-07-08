@@ -10,7 +10,7 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/libcudaHOG/pkgconfig/cudaHOG.pc
     @ONLY
 )
-set(groundHOG_tar http://www.vision.rwth-aachen.de/projects/groundHOG_v1.1_b.tar.gz)
+set(groundHOG_tar http://www.vision.rwth-aachen.de/media/resource_files/groundHOG_v1.1_b.tar.gz)
 message(STATUS "Will download libcudaHOG from: ${groundHOG_tar}")
 include(ExternalProject)
 ExternalProject_Add(
