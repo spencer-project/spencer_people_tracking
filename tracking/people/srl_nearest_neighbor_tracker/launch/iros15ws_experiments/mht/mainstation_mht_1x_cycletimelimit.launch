@@ -1,0 +1,61 @@
+<launch>
+    <arg name="detector_queue_size" default="10"/>  <!-- For MHT, this must be configured in the configuration INI file! -->
+    <arg name="latency_monitoring" default="false"/>
+    <arg name="pose_variance" default="0.1"/>
+
+    <rosparam param="/use_sim_time">true</rosparam>
+
+    <!-- Optional command-line arguments -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_mainstation1_cut.lab"/>
+
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <group>
+        <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+            <arg name="visualization" value="false"/>
+            <arg name="filename" value="$(arg filename)"/>
+            <arg name="rate" value="1.0"/>  <!-- better not change this, will cause timestamp drift / latency -->
+            <arg name="clock_rate" value="1.0"/> <!-- change this instead to slow down playback -->
+            <arg name="queue_size" value="3"/>
+            <arg name="timing_mode" value="0"/> 
+            <arg name="initial_wait" value="10.0"/>
+            <arg name="publish_clock" value="true"/>
+
+            <arg name="publish_tracks_directly" value="true"/>
+            <arg name="end" value="1247741807.192"/>
+        </include>
+
+        <include file="$(find srl_laser_detectors)/launch/adaboost_detector_with_ahc_lms200.launch">
+            <arg name="detected_persons" value="/spencer/perception/detected_persons"/>
+            <arg name="detector_queue_size" value="$(arg detector_queue_size)"/>
+
+            <arg name="segmentation_type" value="ahc_segmentation"/>
+            <arg name="pose_variance" value="$(arg pose_variance)"/>
+        </include>
+
+        <include file="$(find srl_mht)/launch/people_tracking.launch">
+            <arg name="debug" value="false"/>
+            <arg name="config_file" value="iros15ws_mainstation_with_deletionlogic.ini"/> <!-- MHT CONFIG IS SET HERE, THIS IS IMPORTANT! -->
+        </include>
+    </group>
+
+	<!-- Evaluation -->
+	<node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen"> <!-- launch-prefix="xterm -e python -m pdb " -->
+        <param name="approximate_sync" value="true"/>
+        <param name="sync_slop" value="0.15"/> 
+        <param name="sync_queue_size" value="100"/>
+
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="false"/>
+        <param name="timing_metrics" value="true"/>
+
+        <param name="matching_threshold" value="1.0"/>
+        <param name="subscriber_timeout" value="40"/>
+
+        <remap from="/groundtruth" to="/groundtruth/tracked_persons"/>
+        <remap from="/srl_nearest_neighbor_tracker/tracking_timing_metrics" to="/spencer/perception_internal/people_tracking/mht/tracking_timing_metrics"/>
+	</node>  
+    
+    <include file="$(find srl_nearest_neighbor_tracker)/launch/latency_monitors.launch" if="$(arg latency_monitoring)"/>
+
+</launch>
