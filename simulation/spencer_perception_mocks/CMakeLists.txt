@@ -4,7 +4,6 @@ project(spencer_perception_mocks)
 
 set(PACKAGE_DEPENDENCIES
     spencer_tracking_msgs 
-    spencer_spokesperson_msgs
 )
 
 find_package(catkin REQUIRED COMPONENTS
