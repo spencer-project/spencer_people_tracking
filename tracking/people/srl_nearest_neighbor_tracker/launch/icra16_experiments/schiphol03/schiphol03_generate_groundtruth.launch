@@ -1,0 +1,68 @@
+<launch>
+    <arg name="max_distance" default="12.0"/>
+    <arg name="front_rgbd_only" default="false"/>  <!-- if true, groundtruth outside of sensor FOV will be set to occluded (=don't care) -->
+    <arg name="simulate_gt_occlusions" default="true"/> <!-- if false, groundtruth will never be occluded inside FOV, therefore not be set to don't care in metrics (good for evaluating occlusion handling) -->
+
+    <param name="use_sim_time" value="true"/>
+
+
+    <!-- Must unpause playback manually, AFTER track annotation editor has finished loading tracks AND the transform cache!!! -->
+    <include file="$(find spencer_bagfile_tools)/launch/playback.launch">
+        <arg name="folder" value="/media/linder/spencer/june2014/03-gate-e19-e20-bejing-japan/"/>
+        
+        <arg name="laser" value="true"/>
+        <arg name="dslr" value="false"/>
+        <arg name="kinect2" value="false"/>
+        <arg name="groundtruth_tracked_persons" value="false"/>
+        <arg name="detected_persons" value="false"/>
+        <arg name="reconstruct_odometry" value="false"/>
+        
+        <arg name="front_rgbd" value="true"/>  <!-- not really needed since everything is laser-based, just for visualization -->
+        <arg name="rear_rgbd" value="true"/>   <!-- not really needed since everything is laser-based, just for visualization -->
+        <arg name="no_point_clouds" value="true"/>
+        
+        <arg name="rqt" value="false"/>
+        <arg name="visualization" value="true"/>
+        <arg name="rviz" value="false"/>
+
+        <!-- do not change these unless you know what you do -->
+        <arg name="pause" value="true"/>
+        <arg name="loop" value="false"/>
+        <arg name="rate" value="0.2"/>     
+        <arg name="start" value="1733.5"/>
+        <arg name="duration" value="230.0"/>
+    </include>
+
+
+    <node name="track_annotation_simulator" pkg="track_annotation_tool" type="simulator.py" output="screen">
+        <param name="filename" value="/home/linder/Code/spencer-workspace/src/track_annotation_tool/saved_data/03-gate-e19-e20-bejing-japan.tracks"/>
+        <param name="clock" value="false"/>
+        <param name="use_wall_rate" value="false"/>
+    </node>
+    
+
+    <group>
+        <include file="$(find spencer_tracking_utils)/launch/simulate_occluded_tracks_via_lasers.launch">
+            <arg name="match_against_lasers" value="$(arg simulate_gt_occlusions)"/>
+            <arg name="max_distance" value="$(arg max_distance)"/>
+            <arg name="input_tracks" value="/groundtruth/tracked_persons"/>
+            <arg name="output_tracks" value="/groundtruth/tracked_persons_with_occlusions" unless="$(arg front_rgbd_only)"/>
+            <arg name="output_tracks" value="/groundtruth/tracked_persons_with_occlusions_full_fov" if="$(arg front_rgbd_only)"/>
+            <arg name="sensor_target_frame_for_distance" value="laser_front_link"/>
+        </include>
+
+        <node name="filter_fov_front_rgbd" pkg="spencer_tracking_utils" type="filter_tracks_by_fov" if="$(arg front_rgbd_only)">
+            <param name="set_to_occluded" value="true"/>
+            <param name="horizontal_fov_degrees" value="58.0"/>
+            <rosparam param="sensor_frames">[rgbd_front_top_link]</rosparam>
+            <remap from="input_tracks" to="/groundtruth/tracked_persons_with_occlusions_full_fov"/>
+            <remap from="output_tracks" to="/groundtruth/tracked_persons_with_occlusions"/>
+        </node>
+    </group>
+
+
+    <!-- Resulting bagfile will end up in ~/.ros -->
+    <node name="record_groundtruth_tracks" pkg="rosbag" type="record" args="-o groundtruth_tracked_persons /groundtruth/tracked_persons /groundtruth/tracked_persons_with_occlusions" output="screen"/>
+
+
+</launch>

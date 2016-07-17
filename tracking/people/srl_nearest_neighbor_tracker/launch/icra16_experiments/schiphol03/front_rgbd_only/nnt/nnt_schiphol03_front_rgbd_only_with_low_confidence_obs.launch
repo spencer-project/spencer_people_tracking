@@ -1,0 +1,32 @@
+<launch>
+    
+    <!-- Evaluation script, this should be on top of the launch file -->
+    <group>
+        <remap from="/tracking_timing_metrics" to="/spencer/perception_internal/people_tracking/srl_nearest_neighbor_tracker/tracking_timing_metrics"/>
+        <include file="$(find srl_nearest_neighbor_tracker)/launch/icra16_experiments/schiphol03/schiphol03_evaluation.launch">
+            <arg name="evaluation_prefix" value="schiphol03/front_rgbd_only/nnt/with_low_confidence_obs_from_laser"/>
+            <arg name="front_rgbd_only" value="true"/>
+            <arg name="sync_slop" value="0.15"/>
+        </include>
+    </group>
+    
+
+    <!-- Tracker -->
+
+    <remap from="/spencer/perception/detected_persons" to="/unused/detected_persons"/>
+    <remap from="/spencer/perception/detected_persons_composite" to="/unused/detected_persons_composite"/>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+        <arg name="rgbd" value="false"/>
+        <arg name="static_map_filter" value="false"/>
+        <arg name="fuse_detections" value="true"/> <!-- special case, to fuse low-confidence observations -->
+        <arg name="laser_low_confidence_detections" value="true"/>
+        <arg name="subscriber_queue_size" value="3"/>
+    </include>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch">
+        <arg name="low_confidence_detections" value="true"/>
+    </include>
+
+
+</launch>

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+source ~/Code/spencer-workspace/devel/setup.bash
+
+# Laser only
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_laser_only_baseline.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_laser_only_with_static_map_and_low_confidence_obs.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_laser_only_with_static_map_and_low_confidence_obs_and_geodesics.launch
+
+
+
+# Multimodal
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_multimodal_baseline.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_multimodal_with_static_map.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_multimodal_with_static_map_and_low_confidence_obs.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_multimodal_with_static_map_and_low_confidence_obs_and_geodesics.launch
+
+
+# Front RGB-D only
+
+#roslaunch srl_nearest_neighbor_tracker nnt_toulouse_front_rgbd_only_with_static_map.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_front_rgbd_only_baseline.launch
+
+roslaunch srl_nearest_neighbor_tracker nnt_toulouse_front_rgbd_only_with_low_confidence_obs.launch
+
+
+
+

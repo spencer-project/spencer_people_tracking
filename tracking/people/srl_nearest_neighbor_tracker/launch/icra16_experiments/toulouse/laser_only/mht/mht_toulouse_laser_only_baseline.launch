@@ -1,0 +1,29 @@
+<launch>
+    <!-- Evaluation script, this should be on top of the launch file -->
+    <group>
+        <remap from="/tracking_timing_metrics" to="/spencer/perception_internal/people_tracking/mht/tracking_timing_metrics"/>
+        <include file="$(find srl_nearest_neighbor_tracker)/launch/icra16_experiments/toulouse/toulouse_evaluation.launch">
+            <arg name="rgbd" value="false"/>
+            <arg name="sync_slop" value="0.15"/>
+            <arg name="rate" value="0.5"/>
+            <arg name="evaluation_prefix" value="toulouse/laser_only/mht/baseline"/>
+        </include>
+    </group>
+
+
+    <!-- Tracker -->
+
+    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+        <arg name="rgbd" value="false"/>
+        <arg name="static_map_filter" value="false"/>
+        <arg name="subscriber_queue_size" value="5"/>
+        <arg name="tracker" value="false"/>
+    </include>
+
+    <include file="$(find srl_mht)/launch/people_tracking.launch">
+        <arg name="debug" value="false"/>
+        <arg name="config_file" value="toulouse_dynamic_cycletimelimit.ini"/> <!-- MHT CONFIG IS SET HERE, THIS IS IMPORTANT! -->
+    </include>
+
+
+</launch>

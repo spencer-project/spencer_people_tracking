@@ -1,0 +1,71 @@
+<launch>
+    <arg name="max_distance" default="12.5"/>  <!-- groundtruth evaluation distance + 0.5 meters -->
+    
+    <arg name="laser" default="true"/>
+    <arg name="front_rgbd" default="true"/>
+    <arg name="rear_rgbd" default="true"/>
+    <arg name="hog" default="true"/>
+
+    <arg name="static_map_filter" default="false"/>  <!-- no static map available for Schiphol right now -->
+
+
+
+    <param name="use_sim_time" value="true"/>
+
+    <include file="$(find spencer_bagfile_tools)/launch/playback.launch">
+        <arg name="folder" value="/media/linder/spencer/june2014/03-gate-e19-e20-bejing-japan/"/>
+        
+        <arg name="laser" value="true"/>
+        <arg name="dslr" value="false"/>
+        <arg name="kinect2" value="false"/>
+        <arg name="reconstruct_odometry" value="false"/>
+        
+        <arg name="front_rgbd" value="$(arg front_rgbd)"/> 
+        <arg name="rear_rgbd" value="$(arg rear_rgbd)"/>
+        <arg name="no_point_clouds" value="false"/>
+        
+        <arg name="rqt" value="false"/>
+        <arg name="visualization" value="true"/>
+        <arg name="rviz" value="false"/>
+
+        <!-- do not change these unless you know what you do -->
+        <arg name="pause" value="false"/>
+        <arg name="loop" value="false"/>
+        <arg name="rate" value="0.2"/>     
+        <arg name="start" value="1733.5"/>
+        <arg name="duration" value="230.0"/>
+    </include>
+
+
+    <!-- Resulting bagfile will end up in ~/.ros -->
+    <node name="record_detected_persons" pkg="rosbag" type="record" args="-o detected_persons /spencer/perception/detected_persons /spencer/perception/detected_persons_composite /spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated /spencer/sensors/rgbd_front_top/ground_plane /spencer/sensors/rgbd_rear_top/ground_plane /spencer/perception_internal/people_detection/rgbd_front_top/upper_body_detector/detections /spencer/perception_internal/people_detection/rgbd_rear_top/upper_body_detector/detections /spencer/perception_internal/people_detection/rgbd_front_top/hog/detections /spencer/perception_internal/people_detection/rgbd_rear_top/hog/detections" output="screen"/>
+
+
+    <!-- Detectors -->
+
+    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch" if="$(arg laser)">
+        <arg name="rear" value="true"/>
+        <arg name="low_confidence_detections" value="true"/>
+        <arg name="laser_max_distance" value="$(arg max_distance)"/>
+    </include>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/front_rgbd_detectors.launch" if="$(arg front_rgbd)">
+        <arg name="hog" value="$(arg hog)"/>
+    </include>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/rear_rgbd_detectors.launch" if="$(arg rear_rgbd)">
+        <arg name="hog" value="$(arg hog)"/>
+    </include>
+
+
+    <!-- Fuse detections -->
+
+    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+        <arg name="rgbd" value="$(arg front_rgbd)"/>
+        <arg name="laser_low_confidence_detections" value="true"/>
+        <arg name="static_map_filter" value="$(arg static_map_filter)"/>
+        <arg name="subscriber_queue_size" value="3"/>
+        <arg name="tracker" value="false"/>
+    </include>
+
+</launch>

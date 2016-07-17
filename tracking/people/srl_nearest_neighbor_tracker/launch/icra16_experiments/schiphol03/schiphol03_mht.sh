@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source ~/Code/spencer-workspace/devel/setup.bash
+
+roslaunch srl_nearest_neighbor_tracker mht_schiphol03_all_modalities_baseline.launch
+
+roslaunch srl_nearest_neighbor_tracker mht_schiphol03_laser_only_baseline.launch
+
+roslaunch srl_nearest_neighbor_tracker mht_schiphol03_no_hog_baseline.launch
+
+roslaunch srl_nearest_neighbor_tracker mht_schiphol03_front_rgbd_only_baseline.launch
+
+
+
+

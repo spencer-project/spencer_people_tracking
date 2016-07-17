@@ -1,0 +1,23 @@
+<launch>
+    
+    <!-- Evaluation script, this should be on top of the launch file -->
+    <group>
+        <remap from="/tracking_timing_metrics" to="/spencer/perception_internal/people_tracking/pedestrian_tracking/tracking_timing_metrics"/>
+        <include file="$(find srl_nearest_neighbor_tracker)/launch/icra16_experiments/schiphol03/schiphol03_evaluation.launch">
+            <arg name="evaluation_prefix" value="schiphol03/front_rgbd_only/mdl/baseline"/>
+            <arg name="front_rgbd_only" value="true"/>
+            <arg name="rgbd_images" value="true"/>
+            <arg name="rate" value="0.5"/>
+            <arg name="sync_slop" value="0.1"/>
+        </include>
+    </group>
+    
+
+    <!-- Tracker -->
+    <include file="$(find spencer_people_tracking_launch)/launch/rwth_people_tracking.launch">
+        <arg name="hog" value="true"/>
+    </include>
+
+    <param name="/mdl_tracker_config" textfile="$(find rwth_pedestrian_tracking)/config/config_Asus.inp"/>
+
+</launch>
