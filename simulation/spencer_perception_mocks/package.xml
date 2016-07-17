@@ -22,7 +22,6 @@
   <build_depend>spencer_tracking_msgs</build_depend> 
   <build_depend>spencer_vision_msgs</build_depend>
   <build_depend>spencer_human_attribute_msgs</build_depend>
-  <build_depend>spencer_spokesperson_msgs</build_depend> 
   
   <run_depend>rospy</run_depend>
   <run_depend>python-numpy</run_depend>
@@ -34,6 +33,5 @@
   <run_depend>spencer_tracking_msgs</run_depend>
   <run_depend>spencer_vision_msgs</run_depend>
   <run_depend>spencer_human_attribute_msgs</run_depend> 
-  <run_depend>spencer_spokesperson_msgs</run_depend> 
   
 </package>
