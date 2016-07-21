@@ -188,8 +188,8 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
     cv_depth_ptr = cv_bridge::toCvCopy(depth);
     img_depth_ = cv_depth_ptr->image;
     Matrix<double> matrix_depth(info->width, info->height);
-    for (int r = 0;r < 480;r++){
-        for (int c = 0;c < 640;c++) {
+    for (int r = 0;r < info->height;r++){
+        for (int c = 0;c < info->width;c++) {
             matrix_depth(c, r) = img_depth_.at<float>(r,c);
         }
     }

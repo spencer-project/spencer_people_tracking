@@ -337,12 +337,12 @@ double AncillaryMethods::DistanceToPlane(const Vector<double>& point, const Vect
 //    painter.drawLine(x,y+h, x+w,y+h);
 //}
 
-Vector<double> AncillaryMethods::getGaussian1D(double sigma, double precision)
+void AncillaryMethods::getGaussian1D(double sigma, double precision, Vector<double>& vecin)
 {
 
     Vector<double> kernel;
     int size = 1 + 2*ceil(precision*sigma);
-    kernel.setSize(size);
+    vecin.setSize(size);
     int center = size/2.0;
 
     double x;
@@ -351,19 +351,17 @@ Vector<double> AncillaryMethods::getGaussian1D(double sigma, double precision)
     for (int i = 0; i < size; i++)
     {
         x = i-center;
-        kernel(i) = exp(x*x/(-2.0*sigma*sigma))/(sigma*sqrt(2.0*M_PI));
-        sum +=kernel(i);
+        vecin(i) = exp(x*x/(-2.0*sigma*sigma))/(sigma*sqrt(2.0*M_PI));
+        sum +=vecin(i);
     }
 
     for (int i = 0; i < size; i++)
     {
-        kernel(i) /=sum;
+        vecin(i) /=sum;
     }
-
-    return kernel;
 }
 
-Vector<double> AncillaryMethods::conv1D(const Vector<double> &vec, const Vector<double> &kernel)
+void AncillaryMethods::conv1D(const Vector<double> &vec, const Vector<double> &kernel)
 {
     int kernelSize = kernel.getSize();
     int kCenter = floor(kernelSize/2.0);
@@ -395,7 +393,7 @@ Vector<double> AncillaryMethods::conv1D(const Vector<double> &vec, const Vector<
         }
     }
 
-    return result;
+    vec = result;
 }
 
 void AncillaryMethods::MorphologyErode(Matrix<double> &img)
@@ -703,7 +701,7 @@ void AncillaryMethods::compute_rectangle(Vector<double>& main4D, Vector<double>&
 
 
 
-Matrix<double> AncillaryMethods::conv1D(Matrix<double>& im, Vector<double>& kernel, bool dirFlag)
+void AncillaryMethods::conv1D(Matrix<double>& im, Vector<double>& kernel, bool dirFlag)
 {
 
     // dirFalg == true --> in x dir,
@@ -754,7 +752,7 @@ Matrix<double> AncillaryMethods::conv1D(Matrix<double>& im, Vector<double>& kern
         }
     }
 
-    return result;
+    im = result;
 }
 
 
@@ -784,7 +782,9 @@ void AncillaryMethods::ExtractSlopsOnBorder(const Matrix<double>& image, Vector<
     }
 
     //    Vector<double> ys = ys;
-    ys = AncillaryMethods::conv1D(ys, AncillaryMethods::getGaussian1D(3,1));
+    Vector<double> tmp;
+    AncillaryMethods::getGaussian1D(3, 1, tmp);
+    AncillaryMethods::conv1D(ys, tmp);
 
     for(int i=0; i<ys.getSize()-1; ++i)
         slopes(i) = ys(i+1) - ys(i);
