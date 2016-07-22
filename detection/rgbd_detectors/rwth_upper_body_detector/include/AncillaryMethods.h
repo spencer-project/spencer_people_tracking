@@ -58,7 +58,7 @@ public:
 //    static void RenderBBox2DWithScore(const Vector<double> &bbox, QImage& image, int r, int g, int b, int lineWidth);
 
 
-    static getGaussian1D(double sigma, double precision, Vector<double>& vecin);
+    static void getGaussian1D(double sigma, double precision, Vector<double>& vecin);
     static void conv1D(const Vector<double>& vec, const Vector<double>& kernel);
 
     static void MorphologyErode(Matrix<double> &img);
