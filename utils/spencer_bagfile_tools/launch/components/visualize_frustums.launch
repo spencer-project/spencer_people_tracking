@@ -1,0 +1,126 @@
+<!--
+Software License Agreement (BSD License)
+
+Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<!-- Visualizes view frustums of camera-like sensors -->
+<launch>
+    <arg name="alpha" default="0.5"/>
+    <arg name="line_width" default="2"/>
+
+    <group ns="visualize_frustums">
+        <node name="ground_plane" type="visualize_plane.py" pkg="spencer_bagfile_tools">
+            <param name="z" value="-0.02"/>
+            <param name="size" value="500"/>
+            <param name="r" value="0.15"/>
+            <param name="g" value="0.15"/>
+            <param name="b" value="0.15"/>
+        </node>
+
+        <node name="rgbd_front_top" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="rgbd_front_top_link"/>
+            <param name="ns" value="rgbd_front_top"/>
+            <param name="fov_h" value="58"/>
+            <param name="fov_v" value="45"/>
+            <param name="distance" value="9"/>
+            <param name="a" value="$(arg alpha)"/>
+            <param name="line_width" value="$(arg line_width)"/>
+        </node>
+
+        <node name="rgbd_front_bottom" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="rgbd_front_bottom_link"/>
+            <param name="ns" value="rgbd_front_bottom"/>
+            <param name="fov_h" value="58"/>
+            <param name="fov_v" value="45"/>
+            <param name="distance" value="9"/>
+            <param name="a" value="$(arg alpha)"/>
+            <param name="r" value="0"/>
+            <param name="b" value="1"/>
+            <param name="g" value="1"/>
+            <param name="line_width" value="$(arg line_width)"/>
+        </node>
+
+        <node name="rgbd_rear_top" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="rgbd_rear_top_link"/>
+            <param name="ns" value="rgbd_rear_top"/>
+            <param name="fov_h" value="58"/>
+            <param name="fov_v" value="45"/>
+            <param name="distance" value="9"/>
+            <param name="a" value="$(arg alpha)"/>
+            <param name="line_width" value="$(arg line_width)"/>
+        </node>
+
+        <node name="rgbd_rear_bottom" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="rgbd_rear_bottom_link"/>
+            <param name="ns" value="rgbd_rear_bottom"/>
+            <param name="fov_h" value="58"/>
+            <param name="fov_v" value="45"/>
+            <param name="distance" value="9"/>
+            <param name="a" value="$(arg alpha)"/>
+            <param name="r" value="0"/>
+            <param name="b" value="1"/>
+            <param name="g" value="1"/>
+            <param name="line_width" value="$(arg line_width)"/>
+        </node>
+
+        <node name="kinect2" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="kinect2_link"/>
+            <param name="ns" value="kinect2"/>
+            <param name="fov_h" value="84.1"/>
+            <param name="fov_v" value="53.8"/>
+            <param name="distance" value="4.5"/>
+            <param name="a" value="$(arg alpha)"/>
+            <param name="b" value="0"/>
+            <param name="line_width" value="$(arg line_width)"/>
+        </node>
+
+        <!-- Commented out because field of view is unknown
+        <node name="stereo_left" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="stereo_left_link"/>
+            <param name="ns" value="stereo_left"/>
+            <param name="fov_h" value="0"/>
+            <param name="fov_v" value="0"/>
+            <param name="distance" value="15"/>
+            <param name="a" value="$(arg alpha)"/>
+        </node>
+
+        <node name="stereo_left" type="visualize_frustum.py" pkg="spencer_bagfile_tools">
+            <param name="frame" value="stereo_right_link"/>
+            <param name="ns" value="stereo_right"/>
+            <param name="fov_h" value="0"/>
+            <param name="fov_v" value="0"/>
+            <param name="distance" value="15"/>
+            <param name="a" value="$(arg alpha)"/>
+        </node>
+        -->
+
+    </group>
+    
+</launch>

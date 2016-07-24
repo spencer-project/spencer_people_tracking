@@ -1,0 +1,1480 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /TF and Axes1
+        - /TF and Axes1/TF1/Tree1
+        - /Grid1
+        - /Odometry1/Wheel Odometry1
+        - /Front laser1/Echo 01
+        - /Front laser1/Echo 11
+        - /Rear laser1/Echo 01
+        - /Rear laser1/Echo 11
+        - /Front RGB-D1
+        - /Front RGB-D1/Front RGB panorama1
+        - /Front RGB-D1/Front top cloud1
+        - /Front RGB-D1/Front bottom cloud1
+        - /Kinect 2 (front or rear)1/Kinect2 point cloud1
+        - /Rear RGB-D1/Rear RGB panorama1
+        - /Rear RGB-D1/Rear depth panorama1
+        - /RGB Cameras1/RGB-D Front Top1/Visibility1
+        - /RGB Cameras1/RGB-D Rear Top1
+        - /Sensor view frustums1/Frustums1
+        - /Sensor view frustums1/Frustums1/Namespaces1
+        - /Robot models1
+        - /Detections front1/HOG1/Style1
+        - /Detections front1/Upper-Body1/Style1
+        - /Fused RGBD+laser1/Style1
+        - /Fused RGBD+laser1/Render covariances1
+        - /Fused detections1/Style1
+        - /Fused detections1/Render covariances1
+        - /Coll Error1
+        - /RGB-D Collision1
+      Splitter Ratio: 0.627907
+    Tree Height: 359
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded: ~
+    Name: Tool Properties
+    Splitter Ratio: 0.588679
+  - Class: rviz/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: Front bottom cloud
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Axes
+          Enabled: false
+          Length: 50
+          Name: Odom Frame Axes
+          Radius: 0.05
+          Reference Frame: odom
+          Value: false
+        - Class: rviz/Axes
+          Enabled: true
+          Length: 1
+          Name: Base Footprint
+          Radius: 0.025
+          Reference Frame: base_footprint
+          Value: true
+        - Class: rviz/TF
+          Enabled: false
+          Frame Timeout: 15
+          Frames:
+            All Enabled: true
+          Marker Scale: 1
+          Name: TF
+          Show Arrows: true
+          Show Axes: true
+          Show Names: true
+          Tree:
+            {}
+          Update Interval: 0
+          Value: false
+      Enabled: true
+      Name: TF and Axes
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 51; 51; 53
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 500
+      Reference Frame: base_footprint
+      Value: true
+    - Alpha: 0.1
+      Cell Size: 0.1
+      Class: rviz/Grid
+      Color: 77; 77; 79
+      Enabled: false
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Fine Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 5000
+      Reference Frame: odom
+      Value: false
+    - Class: rviz/Group
+      Displays:
+        - Angle Tolerance: 0.1
+          Class: rviz/Odometry
+          Color: 255; 170; 0
+          Enabled: true
+          Keep: 1000
+          Length: 0.2
+          Name: Wheel Odometry
+          Position Tolerance: 0.1
+          Topic: /spencer/sensors/odom
+          Value: true
+        - Angle Tolerance: 0.1
+          Class: rviz/Odometry
+          Color: 255; 0; 127
+          Enabled: true
+          Keep: 1000
+          Length: 1
+          Name: Laser Odometry
+          Position Tolerance: 0.1
+          Topic: /laser_odom
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /spencer_bagfile_tools/reconstructed_odom_path
+          Name: Reconstructed odometry
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+      Enabled: true
+      Name: Odometry
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 0
+            Min Value: 0
+            Value: true
+          Axis: Z
+          Channel Name: x
+          Class: rviz/LaserScan
+          Color: 0; 85; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 0; 0
+          Max Intensity: 2.61618
+          Min Color: 0; 0; 0
+          Min Intensity: 0.00218164
+          Name: Echo 0
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.1
+          Style: Points
+          Topic: /spencer/sensors/laser_front/echo0
+          Use Fixed Frame: true
+          Use rainbow: false
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 0; 255; 127
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 1
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_front/echo1
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 85; 170; 127
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 2
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: false
+          Size (Pixels): 4
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_front/echo2
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+      Enabled: true
+      Name: Front laser
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 0; 85; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 0
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_rear/echo0
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 255; 255; 255
+          Color Transformer: Intensity
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 1
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_rear/echo1
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+      Enabled: true
+      Name: Rear laser
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Image
+          Enabled: false
+          Image Topic: /spencer/sensors/rgbd_front_panorama/rgb
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Front RGB panorama
+          Normalize Range: true
+          Queue Size: 1
+          Transport Hint: raw
+          Value: false
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: rgb
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: false
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 2.3508e-38
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Front top cloud
+          Position Transformer: XYZ
+          Queue Size: 0
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.1
+          Style: Points
+          Topic: /spencer/sensors/rgbd_front_top/depth_registered/points
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: false
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Front bottom cloud
+          Position Transformer: XYZ
+          Queue Size: 0
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/rgbd_front_bottom/depth_registered/points
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Class: rviz/Image
+          Enabled: false
+          Image Topic: /spencer/sensors/rgbd_front_panorama/depth
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Front depth panorama
+          Normalize Range: true
+          Queue Size: 2
+          Transport Hint: raw
+          Value: false
+      Enabled: true
+      Name: Front RGB-D
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Kinect2 point cloud
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/kinect2/depth_registered/points
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+      Enabled: false
+      Name: Kinect 2 (front or rear)
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Image
+          Enabled: false
+          Image Topic: /spencer/sensors/rgbd_rear_panorama/rgb
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Rear RGB panorama
+          Normalize Range: true
+          Queue Size: 1
+          Transport Hint: raw
+          Value: false
+        - Class: rviz/Image
+          Enabled: false
+          Image Topic: /spencer/sensors/rgbd_rear_panorama/depth
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Rear depth panorama
+          Normalize Range: true
+          Queue Size: 1
+          Transport Hint: raw
+          Value: false
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: false
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Rear top cloud
+          Position Transformer: XYZ
+          Queue Size: 0
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/rgbd_rear_top/depth_registered/points
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: false
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: false
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Rear bottom cloud
+          Position Transformer: XYZ
+          Queue Size: 0
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/rgbd_rear_bottom/depth_registered/points
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: false
+      Enabled: true
+      Name: Rear RGB-D
+    - Class: rviz/Group
+      Displays:
+        - Class: jsk_rviz_plugin/OverlayCamera
+          Enabled: true
+          Image Rendering: background
+          Image Topic: /spencer/sensors/rgbd_front_top/rgb/image_rect_color
+          Name: RGB-D Front Top
+          Overlay Alpha: 0.5
+          Queue Size: 2
+          Transport Hint: raw
+          Value: true
+          Visibility:
+            Coll Error: true
+            Coll Safe: true
+            Coll warn: true
+            Detections front:
+              HOG: true
+              Laser: true
+              Laser high-recall: true
+              Upper-Body: true
+              Value: true
+            Detections rear:
+              "": true
+              Value: true
+            Fine Grid: false
+            Front RGB-D:
+              Front RGB panorama: true
+              Front bottom cloud: true
+              Front depth panorama: true
+              Front top cloud: true
+              Value: false
+            Front laser:
+              Echo 0: true
+              Echo 1: true
+              Echo 2: true
+              Value: true
+            Fused RGBD+laser: true
+            Fused detections: true
+            Grid: false
+            Kinect 2 (front or rear):
+              Kinect2 point cloud: true
+              Value: false
+            Moving TrackedPersons: true
+            Odometry:
+              Laser Odometry: true
+              Reconstructed odometry: true
+              Value: true
+              Wheel Odometry: true
+            RGB Cameras:
+              RGB-D Rear Top: true
+              Value: true
+            RGB-D Collision: true
+            Rear RGB-D:
+              Rear RGB panorama: true
+              Rear bottom cloud: true
+              Rear depth panorama: true
+              Rear top cloud: true
+              Value: false
+            Rear laser:
+              Echo 0: true
+              Echo 1: true
+              Value: true
+            Robot models:
+              Kindercar visual model: true
+              SPENCER robot model: true
+              Value: false
+            Sensor view frustums:
+              Frustums: true
+              Ground Plane: true
+              Value: true
+            TF and Axes:
+              "": true
+              Value: true
+            TrackedPersons: true
+            Value: true
+          Zoom Factor: 1
+          height: 240
+          left: 5
+          texture alpha: 1
+          top: 5
+          width: 320
+        - Class: jsk_rviz_plugin/OverlayCamera
+          Enabled: true
+          Image Rendering: background
+          Image Topic: /spencer/sensors/rgbd_front_bottom/rgb/image_raw
+          Name: RGB-D Rear Top
+          Overlay Alpha: 0.5
+          Queue Size: 2
+          Transport Hint: raw
+          Value: true
+          Visibility:
+            Coll Error: true
+            Coll Safe: true
+            Coll warn: true
+            Detections front:
+              HOG: true
+              Laser: true
+              Laser high-recall: true
+              Upper-Body: true
+              Value: true
+            Detections rear:
+              "": true
+              Value: true
+            Fine Grid: false
+            Front RGB-D:
+              Front RGB panorama: true
+              Front bottom cloud: true
+              Front depth panorama: true
+              Front top cloud: true
+              Value: false
+            Front laser:
+              Echo 0: true
+              Echo 1: true
+              Echo 2: true
+              Value: true
+            Fused RGBD+laser: true
+            Fused detections: true
+            Grid: false
+            Kinect 2 (front or rear):
+              Kinect2 point cloud: true
+              Value: false
+            Moving TrackedPersons: true
+            Odometry:
+              Laser Odometry: true
+              Reconstructed odometry: true
+              Value: true
+              Wheel Odometry: true
+            RGB Cameras:
+              RGB-D Front Top: true
+              Value: true
+            RGB-D Collision: true
+            Rear RGB-D:
+              Rear RGB panorama: true
+              Rear bottom cloud: true
+              Rear depth panorama: true
+              Rear top cloud: true
+              Value: false
+            Rear laser:
+              Echo 0: true
+              Echo 1: true
+              Value: true
+            Robot models:
+              Kindercar visual model: true
+              SPENCER robot model: true
+              Value: false
+            Sensor view frustums:
+              Frustums: true
+              Ground Plane: true
+              Value: true
+            TF and Axes:
+              "": true
+              Value: true
+            TrackedPersons: true
+            Value: true
+          Zoom Factor: 1
+          height: 240
+          left: 5
+          texture alpha: 1
+          top: 250
+          width: 320
+      Enabled: false
+      Name: RGB Cameras
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /spencer_bagfile_tools/visualized_plane
+          Name: Ground Plane
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /spencer_bagfile_tools/visualized_frustums
+          Name: Frustums
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+      Enabled: false
+      Name: Sensor view frustums
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: false
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Kindercar visual model
+          Position Transformer: XYZ
+          Queue Size: 1
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.008
+          Style: Flat Squares
+          Topic: /kindercar/visual_model_cloud
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: false
+        - Alpha: 1
+          Class: rviz/RobotModel
+          Collision Enabled: false
+          Enabled: true
+          Links:
+            All Links Enabled: true
+            Expand Joint Details: false
+            Expand Link Details: false
+            Expand Tree: false
+            Link Tree Style: Links in Alphabetic Order
+            base_footprint:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            central_camera_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            common_eye_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            head_beacon_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_pan_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            head_tilt_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            laser_center_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            laser_front_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            laser_rear_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            left_eye_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            rgbd_front_bottom_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_bottom_pitch_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_bottom_roll_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_bottom_x_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_bottom_y_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_bottom_yaw_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_bottom_z_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_pitch_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_roll_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_x_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_y_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_yaw_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_front_top_z_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_pitch_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_roll_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_x_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_y_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_yaw_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_bottom_z_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_pitch_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_roll_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_x_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_y_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_yaw_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            rgbd_rear_top_z_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            right_eye_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            safety_rectangle_front_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            safety_rectangle_rear_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_front_base_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_front_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_front_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_pitch_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_roll_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_x_offset_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_y_offset_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_yaw_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            stereo_z_offset_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_pitch_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_roll_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_x_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_y_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_yaw_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            velodyne_z_offset_joint_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            visual_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+          Name: SPENCER robot model
+          Robot Description: robot_description
+          TF Prefix: ""
+          Update Interval: 0
+          Value: true
+          Visual Enabled: true
+      Enabled: true
+      Name: Robot models
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Class: spencer_tracking_rviz_plugin/DetectedPersons
+          Color: 255; 255; 0
+          Color map offset: 0
+          Color transform: Constant color
+          Enabled: true
+          Excluded person IDs: ""
+          Font color: 255; 255; 255
+          Font color style: Same color
+          Font scale: 1
+          Included person IDs: ""
+          Low-confidence alpha: 0.5
+          Low-confidence threshold: 0.5
+          Name: HOG
+          Render confidences: false
+          Render covariances:
+            Line width: 0.1
+            Value: false
+          Render detection IDs: false
+          Render modality text: false
+          Render orientation arrows: false
+          Style:
+            Line width: 0.02
+            Scaling factor: 1.05
+            Value: Bounding boxes
+          Text spacing: 1
+          Topic: /spencer/perception_internal/detected_persons/rgbd_front_top/hog
+          Value: true
+          Z offset:
+            Use Z position from message: false
+            Value: 0
+        - Alpha: 1
+          Class: spencer_tracking_rviz_plugin/DetectedPersons
+          Color: 0; 170; 255
+          Color map offset: 0
+          Color transform: Constant color
+          Enabled: true
+          Excluded person IDs: ""
+          Font color: 255; 255; 255
+          Font color style: Same color
+          Font scale: 1
+          Included person IDs: ""
+          Low-confidence alpha: 0.5
+          Low-confidence threshold: 0.5
+          Name: Upper-Body
+          Render confidences: false
+          Render covariances:
+            Line width: 0.1
+            Value: false
+          Render detection IDs: false
+          Render modality text: false
+          Render orientation arrows: false
+          Style:
+            Line width: 0.02
+            Scaling factor: 1.02
+            Value: Bounding boxes
+          Text spacing: 1
+          Topic: /spencer/perception_internal/detected_persons/rgbd_front_top/upper_body
+          Value: true
+          Z offset:
+            Use Z position from message: false
+            Value: 0
+        - Alpha: 1
+          Class: spencer_tracking_rviz_plugin/DetectedPersons
+          Color: 255; 85; 0
+          Color map offset: 0
+          Color transform: Constant color
+          Enabled: true
+          Excluded person IDs: ""
+          Font color: 255; 255; 255
+          Font color style: Same color
+          Font scale: 1
+          Included person IDs: ""
+          Low-confidence alpha: 0.5
+          Low-confidence threshold: 0.5
+          Name: Laser
+          Render confidences: false
+          Render covariances:
+            Line width: 0.1
+            Value: false
+          Render detection IDs: false
+          Render modality text: false
+          Render orientation arrows: false
+          Style:
+            Line width: 0.02
+            Scaling factor: 1
+            Value: Bounding boxes
+          Text spacing: 0.7
+          Topic: /spencer/perception_internal/detected_persons/laser_front
+          Value: true
+          Z offset:
+            Use Z position from message: false
+            Value: 0
+        - Alpha: 0.4
+          Class: spencer_tracking_rviz_plugin/DetectedPersons
+          Color: 255; 85; 0
+          Color map offset: 0
+          Color transform: Constant color
+          Enabled: true
+          Excluded person IDs: ""
+          Font color: 255; 255; 255
+          Font color style: Same color
+          Font scale: 2
+          Included person IDs: ""
+          Low-confidence alpha: 0.5
+          Low-confidence threshold: 0.5
+          Name: Laser high-recall
+          Render confidences: false
+          Render covariances:
+            Line width: 0.1
+            Value: false
+          Render detection IDs: false
+          Render modality text: false
+          Render orientation arrows: false
+          Style:
+            Line width: 0.02
+            Scaling factor: 1
+            Value: Bounding boxes
+          Text spacing: 1
+          Topic: /spencer/perception_internal/detected_persons/laser_front_high_recall
+          Value: true
+          Z offset:
+            Use Z position from message: false
+            Value: 0
+      Enabled: true
+      Name: Detections front
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Class: spencer_tracking_rviz_plugin/DetectedPersons
+          Color: 255; 85; 0
+          Color map offset: 0
+          Color transform: Constant color
+          Enabled: true
+          Excluded person IDs: ""
+          Font color: 255; 255; 255
+          Font color style: Same color
+          Font scale: 2
+          Included person IDs: ""
+          Low-confidence alpha: 0.5
+          Low-confidence threshold: 0.5
+          Name: Laser
+          Render confidences: false
+          Render covariances:
+            Line width: 0.1
+            Value: false
+          Render detection IDs: false
+          Render modality text: false
+          Render orientation arrows: false
+          Style:
+            Line width: 0.05
+            Scaling factor: 1
+            Value: Bounding boxes
+          Text spacing: 1
+          Topic: /spencer/perception_internal/detected_persons/laser_rear
+          Value: true
+          Z offset:
+            Use Z position from message: false
+            Value: 0
+        - Alpha: 0.4
+          Class: spencer_tracking_rviz_plugin/DetectedPersons
+          Color: 255; 85; 0
+          Color map offset: 0
+          Color transform: Constant color
+          Enabled: true
+          Excluded person IDs: ""
+          Font color: 255; 255; 255
+          Font color style: Same color
+          Font scale: 2
+          Included person IDs: ""
+          Low-confidence alpha: 0.5
+          Low-confidence threshold: 0.5
+          Name: Laser high-recall
+          Render confidences: false
+          Render covariances:
+            Line width: 0.1
+            Value: false
+          Render detection IDs: false
+          Render modality text: false
+          Render orientation arrows: false
+          Style:
+            Line width: 0.05
+            Scaling factor: 1
+            Value: Bounding boxes
+          Text spacing: 1
+          Topic: /spencer/perception_internal/detected_persons/laser_rear_high_recall
+          Value: true
+          Z offset:
+            Use Z position from message: false
+            Value: 0
+      Enabled: true
+      Name: Detections rear
+    - Alpha: 1
+      Class: spencer_tracking_rviz_plugin/DetectedPersons
+      Color: 255; 0; 0
+      Color map offset: 0
+      Color transform: Constant color
+      Enabled: false
+      Excluded person IDs: ""
+      Font color: 255; 255; 255
+      Font color style: Same color
+      Font scale: 1
+      Included person IDs: ""
+      Low-confidence alpha: 0.5
+      Low-confidence threshold: 0.5
+      Name: Fused RGBD+laser
+      Render confidences: false
+      Render covariances:
+        Line width: 0.01
+        Value: true
+      Render detection IDs: false
+      Render modality text: false
+      Render orientation arrows: false
+      Style:
+        Line width: 0.01
+        Scaling factor: 1.08
+        Value: Bounding boxes
+      Text spacing: 1
+      Topic: /spencer/perception_internal/detected_person_association/lasers_upper_body_fused
+      Value: false
+      Z offset:
+        Use Z position from message: false
+        Value: -0.2
+    - Alpha: 1
+      Class: spencer_tracking_rviz_plugin/DetectedPersons
+      Color: 147; 147; 147
+      Color map offset: 0
+      Color transform: Constant color
+      Enabled: true
+      Excluded person IDs: ""
+      Font color: 255; 255; 255
+      Font color style: Constant color
+      Font scale: 1.2
+      Included person IDs: ""
+      Low-confidence alpha: 0.5
+      Low-confidence threshold: 0
+      Name: Fused detections
+      Render confidences: true
+      Render covariances:
+        Line width: 0.05
+        Value: true
+      Render detection IDs: false
+      Render modality text: true
+      Render orientation arrows: true
+      Style:
+        Line width: 0.05
+        Scaling factor: 1
+        Value: Cylinders
+      Text spacing: 0.7
+      Topic: /spencer/perception/detected_persons
+      Value: true
+      Z offset:
+        Use Z position from message: false
+        Value: 0
+    - Alpha: 0.5
+      Class: spencer_tracking_rviz_plugin/TrackedPersons
+      Color: 130; 130; 130
+      Color map offset: 0
+      Color transform: Constant color
+      Delete after no. cycles: 2
+      Enabled: false
+      Excluded person IDs: ""
+      Font color: 255; 255; 255
+      Font color style: Same color
+      Font scale: 1.5
+      History as line:
+        Line width: 0.05
+        Value: true
+      History size: 10
+      Included person IDs: ""
+      Min. history point distance: 0.2
+      Missed alpha: 0.5
+      Name: TrackedPersons
+      Occlusion alpha: 0.5
+      Render covariances:
+        Line width: 0.1
+        Value: false
+      Render detection IDs: false
+      Render history: true
+      Render person visual: true
+      Render track IDs: true
+      Render track state: false
+      Render velocities: true
+      Show DELETED tracks: false
+      Show MATCHED tracks: true
+      Show MISSED tracks: true
+      Show OCCLUDED tracks: true
+      Style:
+        Line width: 0.05
+        Scaling factor: 1
+        Value: Cylinders
+      Topic: /spencer/perception/tracked_persons
+      Value: false
+      Z offset:
+        Use Z position from message: false
+        Value: 0
+    - Alpha: 1
+      Class: spencer_tracking_rviz_plugin/TrackedPersons
+      Color: 130; 130; 130
+      Color map offset: 0
+      Color transform: Alternative SRL colors
+      Delete after no. cycles: 100
+      Enabled: false
+      Excluded person IDs: ""
+      Font color: 255; 255; 255
+      Font color style: Same color
+      Font scale: 1.5
+      History as line:
+        Line width: 0.05
+        Value: true
+      History size: 100
+      Included person IDs: ""
+      Min. history point distance: 0.2
+      Missed alpha: 0.5
+      Name: Moving TrackedPersons
+      Occlusion alpha: 0.5
+      Render covariances:
+        Line width: 0.1
+        Value: false
+      Render detection IDs: false
+      Render history: true
+      Render person visual: true
+      Render track IDs: true
+      Render track state: false
+      Render velocities: true
+      Show DELETED tracks: false
+      Show MATCHED tracks: true
+      Show MISSED tracks: true
+      Show OCCLUDED tracks: true
+      Style:
+        Line width: 0.05
+        Scaling factor: 1
+        Value: Cylinders
+      Topic: /spencer/perception/tracked_persons_moving
+      Value: false
+      Z offset:
+        Use Z position from message: false
+        Value: 0
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 85; 255; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Coll Safe
+      Position Transformer: XYZ
+      Queue Size: 0
+      Selectable: false
+      Size (Pixels): 5
+      Size (m): 0.01
+      Style: Points
+      Topic: /spencer/control/collision/rgbd_front_bottom/debug_safe
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Coll warn
+      Position Transformer: XYZ
+      Queue Size: 0
+      Selectable: true
+      Size (Pixels): 12
+      Size (m): 0.01
+      Style: Points
+      Topic: /spencer/control/collision/rgbd_front_bottom/debug_warning
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 0; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Coll Error
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 15
+      Size (m): 0.01
+      Style: Points
+      Topic: /spencer/control/collision/rgbd_front_bottom/debug_error
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /spencer/control/safety_rectangles/visualization/rgbd_front
+      Name: RGB-D Collision
+      Namespaces:
+        ERROR: true
+        WARNING: true
+      Queue Size: 5
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 40; 40; 40
+    Fixed Frame: base_footprint
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: track_annotation_tool/PlaceWaypoint
+    - Class: track_annotation_tool/DeleteWaypoint
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 6.13015
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0.681223
+        Y: 1.98546
+        Z: 0.0911076
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.289176
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 4.76788
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: true
+  Front RGB panorama:
+    collapsed: false
+  Front depth panorama:
+    collapsed: false
+  Height: 823
+  Hide Left Dock: true
+  Hide Right Dock: true
+  QMainWindow State: 000000ff00000000fd000000040000000000000195000002d8fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc00000041000002d80000000000fffffffa000000030100000005fb0000002800460072006f006e0074002000640065007000740068002000700061006e006f00720061006d00610000000000ffffffff000000c800fffffffb000000260052006500610072002000640065007000740068002000700061006e006f00720061006d006102000003da000000000000026600000384fb0000002400460072006f006e00740020005200470042002000700061006e006f00720061006d006102000003dc000000350000026200000337fb0000005e006b0069006e006400650072006300610072005f006f0064006f006d0065007400720079005f005f004f0064006f006d0065007400720079004700550049005f005f0031005f005f004f0064006f006d006500740072007900470055004903000001ef000001c90000057800000135fb000000100044006900730070006c00610079007300000000000000013c0000010f00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001a004b0069006e006500630074003100200043006f006c006f0072000000017d000000700000000000000000fb0000001a004b0069006e006500630074003100200044006500700074006800000001b9000000840000000000000000fb0000001a004b0069006e0065006300740030002000440065007000740068000000020d0000009d0000000000000000fb0000001c004b0069006e0065006300740020003000200043006f006c006f00720000000289000000c50000000000000000fb0000001400440053004c005200200069006d006100670065020000037e000001be000002c0000001a9fb0000002200520065006100720020005200470042002000700061006e006f00720061006d006102000003d9000000350000026500000337fb000000260052004700420020005200650061007200200054006f0070002000430061006d006500720061020000026000000035000003de0000033700000001000001d3000002d8fc0200000008fb0000005a007200710074005f0069006d006100670065005f0076006900650077005f005f0049006d0061006700650056006900650077005f005f0032005f005f0049006d006100670065005600690065007700570069006400670065007403000003100000011a0000018b00000148fb0000001a004b0069006e00650063007400310020004400650070007400680000000041000000ac0000000000000000fb0000001a004b0069006e00650063007400300020004400650070007400680000000041000001030000000000000000fb0000001a004b0069006e006500630074003100200043006f006c006f007200000000410000018a0000000000000000fb0000001c004b0069006e0065006300740020003000200043006f006c006f007200000000410000030d0000000000000000fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc00000041000002d80000000000fffffffa000000000100000002fb0000000a0049006d0061006700650100000000ffffffff0000000000000000fb0000000a005600690065007700730000000510000001300000010f00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000003ce0000003bfc0100000004fb0000000800540069006d0065020000027200000012000003ce00000043fb0000000800540069006d00650100000000000004500000000000000000fb0000004c007200710074005f0063006f006e0073006f006c0065005f005f0043006f006e0073006f006c0065005f005f0031005f005f0043006f006e0073006f006c006500570069006400670065007403000001f700000311000002890000039ffb0000005a007200710074005f0069006d006100670065005f0076006900650077005f005f0049006d0061006700650056006900650077005f005f0031005f005f0049006d006100670065005600690065007700570069006400670065007403000001e20000022e00000578000001f90000063e000002d800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Rear RGB panorama:
+    collapsed: false
+  Rear depth panorama:
+    collapsed: false
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: true
+  Width: 1598
+  X: -7
+  Y: 17
