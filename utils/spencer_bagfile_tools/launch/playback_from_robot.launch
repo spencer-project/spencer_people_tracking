@@ -15,6 +15,7 @@
   <arg name="laser" default="true"/>
   <arg name="uncompress_rgbd" default="true"/>
   <arg name="tracked_persons" default="true"/>
+  <arg name="velodyne" default="false"/>
 
   <!-- Playback options -->
   <arg name="rqt" default="false"/>
@@ -32,9 +33,9 @@
   <arg name="panoramas" default="false"/>
   <arg name="relay_rgbd_for_visualization" default="true"/>
   <arg name="rviz_config_file" default="$(find spencer_bagfile_tools)/launch/components/visualization_robot.rviz"/> <!-- configuration file for RViz to use, if visualization is enabled -->
-  
+
   <arg name="rosbag_play_args" default="--clock --queue=5 --delay=0 --start=$(arg start) --duration=$(arg duration) --rate=$(arg rate)" /> <!-- extra arguments used to play back the bagfile -->
- 
+
   <!-- Important: Use simulated time published on /clock topic, otherwise TF will be broken -->
   <param name="/use_sim_time" value="true"/>
 
@@ -175,11 +176,17 @@
   </group>
 
 
+  <!-- VELODYNE POINT CLOUD GENERATION -->
+  <group if="$(arg velodyne)">
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+  </group>
+
+
   <!-- ROBOT URDF -->
   <group if="$(arg urdf)">
     <include file="$(find spencer_description)/launch/publish.launch"/>
   </group>
-  
+
   <!-- VISUALIZATION -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config_file)" required="false" if="$(arg visualization)"/>
 

@@ -1,0 +1,13 @@
+<library path="lib/libtrack_annotation_tool_rviz_plugin">
+  <class name="track_annotation_tool/PlaceWaypoint" type="track_annotation_tool::PlaceWaypointTool" base_class_type="rviz::Tool">
+    <description>
+      Tool for placing person track waypoints on the ground plane in rviz.
+    </description>
+  </class>
+
+  <class name="track_annotation_tool/DeleteWaypoint" type="track_annotation_tool::DeleteWaypointTool" base_class_type="rviz::Tool">
+    <description>
+      Tool for deleting the last created person track waypoint.
+    </description>
+  </class>
+</library>
