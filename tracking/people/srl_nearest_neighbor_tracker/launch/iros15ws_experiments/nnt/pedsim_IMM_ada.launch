@@ -1,0 +1,57 @@
+<!--
+Test script for the nearest-neighbor tracker which loads an annotated logfile, visualizes the laser segments, detections and tracks,
+and uses the groundtruth detections as an input to the tracker.
+
+Supply a different logfile, if desired, by passing in a filename, e.g.
+roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=123.log
+-->
+
+
+<launch>
+    <arg name="tracker_queue_size" default="10"/>
+    <arg name="use_laser_shade_occlusion_manager" default="false"/>
+    <arg name="use_imm" default="true"/>
+    <arg name="use_initiation_logic" default="true"/>
+    <arg name="initiation_logic_param_file" default="logic_initiator.yaml"/>
+    <arg name="imm_param_file" default="imm_pedsim.yaml"/>
+    <arg name="ekf_param_file" default="paper_ekf_default.yaml"/>
+    <arg name="data_association_type" default="greedy_nearest_neighbor"/>
+    
+
+    <!-- Optional command-line arguments -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/pedsim_20m_offline_r01.bag"/>
+    <arg name="rate" default="1.0"/>
+    
+ <param name="use_sim_time" value="true"/>
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->       
+   <node name="rosbag_play" type="play" pkg="rosbag" args="$(arg filename) -r $(arg rate)  " output="screen">
+    </node>
+    <!-- The nearest-neighbor tracker itself -->
+    <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch">
+		<arg name="tracker_queue_size" value="$(arg tracker_queue_size)"/>
+        <arg name="use_laser_shade_occlusion_manager" default="$(arg use_laser_shade_occlusion_manager)"/>
+    	<arg name="use_imm" default="$(arg use_imm)"/>
+    	<arg name="use_initiation_logic" default="$(arg use_initiation_logic)"/> 
+    	<arg name="initiation_logic_param_file" default="$(arg initiation_logic_param_file)"/> 
+    	<arg name="imm_param_file" default="$(arg imm_param_file)"/>
+    	<arg name="ekf_param_file" default="$(arg ekf_param_file)"/> 
+    	<arg name="data_association_type" default="$(arg data_association_type)"/> 	
+    </include>
+
+	<!-- Evaluation -->
+	<node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen">
+        <param name="approximate_sync" value="false"/>
+        <param name="sync_slop" value="0.05"/> 
+        <param name="syncQueueSize" value="500"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="true"/>
+        <param name="timing_metrics" value="true"/>
+        <param name="matching_threshold" value="1.0"/>
+        <param name="subscriber_timeout" value="4"/>
+        <remap from="/groundtruth" to="/tracks_with_simulated_occlusions"/>
+	</node>  
+    
+
+
+</launch>

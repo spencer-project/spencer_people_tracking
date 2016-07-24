@@ -1,0 +1,82 @@
+<!--
+Test script for the nearest-neighbor tracker which loads an annotated logfile, visualizes the laser segments, detections and tracks,
+and uses the groundtruth detections as an input to the tracker.
+
+Supply a different logfile, if desired, by passing in a filename, e.g.
+roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=123.log
+-->
+
+
+<launch>
+    <arg name="tracker_queue_size" default="10"/>
+    <arg name="use_laser_shade_occlusion_manager" default="true"/>
+    <arg name="use_imm" default="false"/>
+    <arg name="use_initiation_logic" default="true"/>
+    <arg name="initiation_logic_param_file" default="logic_initiator.yaml"/>
+    <arg name="imm_param_file" default="imm_CT_CV_CV.yaml"/>
+    <arg name="ekf_param_file" default="paper_ekf_default.yaml"/>
+    <arg name="data_association_type" default="greedy_nearest_neighbor"/>
+    <arg name="occlusion_param_file" default="occlusion_manager_no_mature.yaml"/>
+
+    
+
+    <!-- Optional command-line arguments
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_aspekt1.lab"/> -->
+    <arg name="filename" default="$(find srl_nearest_neighbor_tracker)/data/logfiles/fr_mainstation1_cut.lab"/>
+    <arg name="rate" default="1"/>
+    <arg name="timing_mode" default="0"/>
+    
+
+    <!-- Play back annotated logfile, publish annotated laser segments as spencer_tracking_msgs/TrackedPersons and DetectedPersons, also as MarkerArray + PointCloud2 for visualization. -->
+    <group>
+        <include file="$(find srl_tracking_logfile_import)/launch/publish_logfile.launch">
+            <arg name="visualization" value="false"/>
+            <arg name="filename" value="$(arg filename)"/>
+            <arg name="clock_rate" value="$(arg rate)"/>
+            <arg name="timing_mode" value="$(arg timing_mode)"/>
+            <arg name="publish_tracks_directly" value="true"/>
+            <arg name="end" value="1247741807.192"/>
+        </include>
+
+        <include file="$(find srl_laser_detectors)/launch/adaboost_detector_with_ahc_lms200.launch">
+            <arg name="detected_persons" value="/spencer/perception/detected_persons"/>
+            <arg name="detector_queue_size" value="$(arg tracker_queue_size)"/>
+            <arg name="pose_variance" value="0.01"/>
+        </include>
+    </group>
+
+    <!-- The nearest-neighbor tracker itself -->
+    <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch">
+		<arg name="tracker_queue_size" value="$(arg tracker_queue_size)"/>
+        <arg name="use_laser_shade_occlusion_manager" default="$(arg use_laser_shade_occlusion_manager)"/>
+    	<arg name="use_imm" default="$(arg use_imm)"/>
+    	<arg name="use_initiation_logic" default="$(arg use_initiation_logic)"/> 
+    	<arg name="initiation_logic_param_file" default="$(arg initiation_logic_param_file)"/> 
+    	<arg name="imm_param_file" default="$(arg imm_param_file)"/>
+    	<arg name="ekf_param_file" default="$(arg ekf_param_file)"/> 
+    	<arg name="data_association_type" default="$(arg data_association_type)"/> 	
+        <arg name="occlusion_param_file" default="$(arg occlusion_param_file)"/>    
+    </include>
+
+    <!-- Logger 
+    <node name="logger" type="logger_node" pkg="srl_nearest_neighbor_tracker" output="screen"/>
+	-->
+    <!-- Visualization
+    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find srl_nearest_neighbor_tracker)/launch/visualization_with_groundtruth.rviz"/>-->
+
+	<!-- Evaluation -->
+	<node name="spencer_tracking_metrics" pkg="spencer_tracking_metrics" type="online_analysis.py" required="true" output="screen">
+        <param name="approximate_sync" value="false"/>
+        <param name="sync_slop" value="0.05"/> 
+        <param name="sync_queue_size" value="500"/>
+        <param name="clear_metrics" value="false"/>
+        <param name="ospa" value="true"/>
+        <param name="timing_metrics" value="true"/>
+        <param name="matching_threshold" value="1.0"/>
+        <param name="subscriber_timeout" value="5"/>
+        <remap from="/groundtruth" to="/groundtruth/tracked_persons"/>
+	</node>  
+    
+
+
+</launch>
