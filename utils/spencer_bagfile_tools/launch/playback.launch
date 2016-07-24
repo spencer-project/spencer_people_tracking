@@ -1,0 +1,245 @@
+<!--
+Software License Agreement (BSD License)
+
+Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<!-- Launch file for playing bagfiles recorded with the Kindercar -->
+<launch>
+  <!-- CONFIGURABLE ARGUMENTS -->
+
+  <!-- Folder containing bag files to play (should contain only a single sequence) -->
+  <arg name="folder"/> 
+  <arg name="extra_bagfiles" default=""/>
+
+  <!-- Which sensor modalities to play back -->
+  <arg name="tf_odom" default="true"/>
+  <arg name="front_rgbd" default="true"/>
+  <arg name="rear_rgbd" default="false"/>
+  <arg name="laser" default="true"/>
+  <arg name="stereo" default="false"/>
+  <arg name="kinect2" default="false"/>
+  <arg name="dslr" default="true"/>
+  <arg name="groundtruth_tracked_persons" default="false"/>
+  <arg name="detected_persons" default="false"/>
+
+  <!-- Playback options -->
+  <arg name="rqt" default="false"/> <!-- use rqt_bag GUI or rosbag play in command-line? -->
+  <arg name="pause" default="false"/>
+  <arg name="initial_wait_time" default="0.0" if="$(arg pause)"/>
+  <arg name="initial_wait_time" default="45.0" unless="$(arg pause)"/>
+  <arg name="loop" default="false"/>
+  <arg name="start" default="0.0"/> <!-- seconds into the bagfile at which to start playing -->
+  <arg name="duration" default="99999999.9"/> <!-- number of seconds to play -->
+  <arg name="rate" default="1.0"/> <!-- playback speed -->
+
+  <!-- Visualization options -->
+  <arg name="visualization" default="true" />  <!-- run visualization-related components? -->
+  <arg name="rviz" default="true"/> <!-- whether to run RViz with provided config, or not -->
+  <arg name="rviz_config_file" default="$(find spencer_bagfile_tools)/launch/components/visualization.rviz"/> <!-- configuration file for RViz to use, if visualization is enabled -->
+  
+  <!-- Odometry options -->
+  <arg name="reconstruct_odometry" default="false"/> <!-- Reconstruct odometry from raw encoder ticks? -->
+  <arg name="reconstruct_odometry_gui" default="false"/> <!-- Show dynamic reconfigure GUI for odometry parameter tweaking? -->
+  <arg name="hector_mapping" default="false" /> <!-- set to true to replace wheel odometry that is prone to drift by hector laser scan matching (requires package to be present in the package path) -->
+  <arg name="hector_tf" default="false"/> <!-- use odometry from hector mapping for map to base_link transform (requires hector_mapping:=true) -->
+  
+  <!-- Various other options -->
+  <arg name="joints_gui" default="false"/>
+  <arg name="depth" default="true" /> <!-- set to true to visualize depth images -->
+  <arg name="no_point_clouds" default="false" /> <!-- set to false to publish point clouds (run full OpenNi stack), "depth" must be true for this to work -->
+  <arg name="rosbag_play_args" default="--clock --queue=5 --delay=0 --start=$(arg start) --duration=$(arg duration) --rate=$(arg rate)" /> <!-- extra arguments used to play back the bagfile -->
+  <arg name="output" default="screen" /> <!-- either log or screen -->
+  <arg name="required" default="true" />
+
+  <!-- Important: Use simulated time published on /clock topic, otherwise TF will be broken -->
+  <param name="use_sim_time" value="true"/>
+
+  <!-- BAG FILE PLAYBACK -->
+  <group>
+    <remap from="/tf" to="/spencer/sensors/tf_in_bagfile"/> <!-- could also exclude that topic entirely -->
+    <remap from="/spencer/sensors/odom" to="/spencer/sensors/odom_in_bagfile" if="$(arg reconstruct_odometry)"/>
+    <remap from="/spencer/sensors/clock" to="/clock"/>
+    
+    <!-- This script launches either rosbag play or rqt_bag, and searches for all relevant bag files for the active sensor modalities in the given folder -->
+    <node name="playback_wrapper" pkg="spencer_bagfile_tools" type="play.py" output="$(arg output)" required="$(arg required)" ns="/spencer/sensors" clear_params="true"> <!-- sub-namespace only applied for relative topic names in bagfile -->
+      <param name="folder" value="$(arg folder)"/>
+      <param name="files" value="$(arg extra_bagfiles)"/>
+
+      <param name="rqt" value="$(arg rqt)"/>
+      <param name="pause" value="$(arg pause)"/>
+      <param name="loop" value="$(arg loop)"/>
+      <param name="rosbag_play_args" value="$(arg rosbag_play_args)"/>
+      <param name="initial_wait_time" value="$(arg initial_wait_time)"/>
+
+      <param name="tf_odom" value="$(arg tf_odom)"/>
+      <param name="laser" value="$(arg laser)"/>
+      <param name="front_rgbd" value="$(arg front_rgbd)"/>
+      <param name="rear_rgbd" value="$(arg rear_rgbd)"/>
+      <param name="stereo" value="$(arg stereo)"/>
+      <param name="kinect2" value="$(arg kinect2)"/>
+      <param name="dslr" value="$(arg dslr)"/>
+    </node>
+
+  </group>
+
+
+  <!-- Filter out original odometry if not needed (otherwise transforms WILL fail, because TF hierarchy must be a tree with one unique head), and default laser transform -->
+
+  <!-- Commented out: forget about old TF completely
+  <group>
+    <remap from="tf_old" to="/spencer/sensors/tf_in_bagfile"/>
+    <node name="tf_filter" pkg="spencer_bagfile_tools" type="tf_filter.py" args="_exclude:='[{parentFrame: 'odom', childFrame: 'base_link'}, {parentFrame: '/base_link', childFrame: '/front_laser'}, {parentFrame: 'base_link', childFrame: 'rgbd0_link'}, {parentFrame: 'base_link', childFrame: 'rgbd1_link'}]'"/>
+  </group>
+  -->
+
+  <!-- Publish TF transforms from URDF -->
+  <include file="$(find kindercar_description)/launch/publish.launch">
+    <arg name="joints_gui" value="$(arg joints_gui)"/>
+  </include>
+
+  <!-- Publish odometry -->
+  <include file="$(find spencer_bagfile_tools)/launch/components/reconstruct_odometry.launch" if="$(arg reconstruct_odometry)"> <!-- if off, it is assumed that there is a bagfile with reconstructed odometry, prefixed tf_odom_ -->
+    <arg name="reconstruct_odometry_gui" value="$(arg reconstruct_odometry_gui)"/>
+  </include>
+
+  <node name="odom_to_tf" pkg="spencer_bagfile_tools" type="odom_to_tf.py"/>
+
+
+  <!-- DSLR CAMERA -->
+  <group ns="/spencer/sensors/dslr" if="$(arg dslr)">
+    <node name="publish_camera_info" pkg="spencer_bagfile_tools" type="publish_camera_info" args="$(find kindercar_description)/calibration/cameras/nikon_d3100_samyang_8mm_fisheye_scale1.yaml">
+      <param name="frame" value="dslr_optical_frame"/>
+      <param name="rate" value="23.97"/>
+    </node>
+
+    <node name="republish_uncompressed" pkg="image_transport" type="republish" args="compressed in:=image raw out:=image"/>
+
+    <node pkg="tf" type="static_transform_publisher" name="tf_optical_frame" args="0 0 0 -1.57 0 -1.57 dslr_link dslr_optical_frame 20" />
+  </group>
+
+
+  <!-- RGB-D SENSORS -->
+
+  <!-- Uncompress RGB camera images -->
+  <group if="$(arg front_rgbd)">
+    <include file="$(find spencer_bagfile_tools)/launch/components/uncompress_rgbd.launch">
+      <arg name="sensor_name" value="rgbd_front_top"/>
+    </include>
+    <include file="$(find spencer_bagfile_tools)/launch/components/uncompress_rgbd.launch">
+      <arg name="sensor_name" value="rgbd_front_bottom"/>
+    </include>
+  </group>
+
+  <group if="$(arg rear_rgbd)">
+    <include file="$(find spencer_bagfile_tools)/launch/components/uncompress_rgbd.launch">
+      <arg name="sensor_name" value="rgbd_rear_top"/>
+    </include>
+    <include file="$(find spencer_bagfile_tools)/launch/components/uncompress_rgbd.launch">
+      <arg name="sensor_name" value="rgbd_rear_bottom"/>
+    </include>
+  </group>
+
+
+  <!-- Generate point clouds -->
+  <group if="$(arg depth)">
+    <group unless="$(arg no_point_clouds)" ns="/spencer/sensors/">
+      <!-- Front sensors -->
+      <group if="$(arg front_rgbd)">
+        <include file="$(find spencer_bagfile_tools)/launch/components/generate_pointcloud.launch">
+          <arg name="sensor_name" value="rgbd_front_top"/>
+        </include>
+        <include file="$(find spencer_bagfile_tools)/launch/components/generate_pointcloud.launch">
+          <arg name="sensor_name" value="rgbd_front_bottom"/>
+        </include>
+      </group>
+
+      <!-- Rear sensors -->
+      <group if="$(arg rear_rgbd)">
+        <include file="$(find spencer_bagfile_tools)/launch/components/generate_pointcloud.launch">
+          <arg name="sensor_name" value="rgbd_rear_top"/>
+        </include>
+        <include file="$(find spencer_bagfile_tools)/launch/components/generate_pointcloud.launch">
+          <arg name="sensor_name" value="rgbd_rear_bottom"/>
+        </include>
+      </group>
+
+      <!-- Kinect2 point clouds are pre-computed, the TF hierarchy is a bit of a hack since we don't know the exact transforms -->
+      <node name="kinect2_transform" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 kinect2_link kinect2_depth_optical_frame 20"/>
+
+    </group>
+  </group>
+
+
+  <!-- Create RGB and depth panoramas for visualization -->
+  <group if="$(arg visualization)" ns="/spencer/sensors">
+    <node if="$(arg front_rgbd)" name="panorama_rgb_front" pkg="spencer_bagfile_tools" type="panorama_builder" args="_topics:='/spencer/sensors/rgbd_front_top/rgb /spencer/sensors/rgbd_front_bottom/rgb' _inplane_rotations:='0.0 180.0' _vertical:=true _output_topic:='/spencer/sensors/rgbd_front_panorama/rgb'"/>
+
+    <node if="$(arg rear_rgbd)" name="panorama_rgb_rear" pkg="spencer_bagfile_tools" type="panorama_builder" args="_topics:='/spencer/sensors/rgbd_rear_top/rgb /spencer/sensors/rgbd_rear_bottom/rgb' _inplane_rotations:='0.0 180.0' _vertical:=true _output_topic:='/spencer/sensors/rgbd_rear_panorama/rgb'"/>
+
+    <group if="$(arg depth)">
+      <node if="$(arg front_rgbd)" name="panorama_depth_front" pkg="spencer_bagfile_tools" type="panorama_builder" args="_topics:='/spencer/sensors/rgbd_front_top/depth /spencer/sensors/rgbd_front_bottom/depth' _inplane_rotations:='0.0 180.0' _vertical:=true _output_topic:='/spencer/sensors/rgbd_front_panorama/depth'"/>
+
+      <node if="$(arg rear_rgbd)" name="panorama_depth_rear" pkg="spencer_bagfile_tools" type="panorama_builder" args="_topics:='/spencer/sensors/rgbd_rear_top/depth /spencer/sensors/rgbd_rear_bottom/depth' _inplane_rotations:='0.0 180.0' _vertical:=true _output_topic:='/spencer/sensors/rgbd_rear_panorama/depth'"/>
+    </group>
+  </group>
+
+
+  <!-- LASER MAPPING -->
+
+  <!-- Hector laser scan matcher for improved accuracy of world->base_link transform / odometry -->
+  <group if="$(arg hector_mapping)">
+    <node name="pose_to_odometry" pkg="spencer_bagfile_tools" type="pose_to_odometry"
+      args="odom:=/laser_odom poseWithCovarianceStamped:=/poseupdate _publish_tf:=$(arg hector_tf) _stamped:=true _odom_frame:='laser_odom'"/>
+
+    <node name="laser_odom_to_odom_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 /laser_odom /odom 20" if="$(arg hector_tf)"/> 
+
+    <param name="hector_mapping/laser_min_dist" value="1.0"/>
+    <param name="hector_mapping/laser_max_dist" value="50.0"/>
+
+    <include file="$(find hector_mapping)/launch/mapping_default.launch">
+      <arg name="pub_map_odom_transform" value="true"/>
+      <arg name="base_frame" value="base_footprint"/>
+      <arg name="odom_frame" value="laser_odom"/>
+      <arg name="map_size" value="10000"/> <!-- 500m x 500m -->
+      <arg name="scan_topic" value="/spencer/sensors/laser/front/echo0"/>
+      <arg name="scan_subscriber_queue_size" value="50"/>
+    </include>
+  </group>
+
+  <node name="tf_map_to_odom" pkg="tf" type="static_transform_publisher" args="0 0 0.0 0 0 0 map odom 20" unless="$(arg hector_mapping)"/>
+
+
+  <!-- VISUALIZATION -->
+  <include file="$(find spencer_bagfile_tools)/launch/components/visualization.launch" if="$(arg visualization)">
+    <arg name="rviz" value="$(arg rviz)"/>
+    <arg name="rviz_config_file" value="$(arg rviz_config_file)"/>
+  </include>
+
+</launch>

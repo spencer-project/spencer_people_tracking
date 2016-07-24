@@ -1,0 +1,395 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /TF and Axes1/Base Footprint1
+        - /TF and Axes1/TF1/Tree1
+        - /Grid1/Line Style1
+        - /Fine Grid1/Line Style1
+        - /Front laser1/Echo 01
+        - /Front laser1/Echo 11
+        - /Rear laser1/Echo 01
+        - /Rear laser1/Echo 11
+        - /Sensor view frustums1/Frustums1
+        - /Sensor view frustums1/Frustums1/Namespaces1
+        - /Track annotation tool1
+        - /Track annotation tool1/Active track1
+        - /Track annotation tool1/TrackedPersons1
+        - /DSLR camera1
+        - /DSLR camera1/Status1
+      Splitter Ratio: 0.627792
+    Tree Height: 765
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded: ~
+    Name: Tool Properties
+    Splitter Ratio: 0.588679
+  - Class: rviz/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: Echo 2
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Axes
+          Enabled: false
+          Length: 50
+          Name: Odom Frame Axes
+          Radius: 0.05
+          Reference Frame: odom
+          Value: false
+        - Class: rviz/Axes
+          Enabled: false
+          Length: 2
+          Name: Base Footprint
+          Radius: 0.025
+          Reference Frame: base_footprint
+          Value: false
+        - Class: rviz/TF
+          Enabled: false
+          Frame Timeout: 15
+          Frames:
+            All Enabled: true
+          Marker Scale: 1
+          Name: TF
+          Show Arrows: true
+          Show Axes: true
+          Show Names: true
+          Tree:
+            {}
+          Update Interval: 0
+          Value: false
+      Enabled: true
+      Name: TF and Axes
+    - Alpha: 0.1
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 255; 0; 0
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Billboards
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 30
+      Reference Frame: base_footprint
+      Value: true
+    - Alpha: 0.1
+      Cell Size: 0.1
+      Class: rviz/Grid
+      Color: 77; 77; 79
+      Enabled: true
+      Line Style:
+        Line Width: 0.01
+        Value: Billboards
+      Name: Fine Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 300
+      Reference Frame: base_footprint
+      Value: true
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 0
+            Min Value: 0
+            Value: true
+          Axis: Z
+          Channel Name: x
+          Class: rviz/LaserScan
+          Color: 0; 85; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 0; 0
+          Max Intensity: 2.61618
+          Min Color: 0; 0; 0
+          Min Intensity: 0.00218164
+          Name: Echo 0
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.1
+          Style: Points
+          Topic: /spencer/sensors/laser_front/echo0
+          Use Fixed Frame: true
+          Use rainbow: false
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 0; 255; 127
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 1
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: false
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_front/echo1
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 85; 170; 127
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 2
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: false
+          Size (Pixels): 4
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_front/echo2
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+      Enabled: true
+      Name: Front laser
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 255; 255; 255
+          Color Transformer: ""
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 0
+          Position Transformer: ""
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_rear/echo0
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 255; 255; 255
+          Color Transformer: ""
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Echo 1
+          Position Transformer: ""
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /spencer/sensors/laser_rear/echo1
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+      Enabled: true
+      Name: Rear laser
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /spencer_bagfile_tools/visualized_plane
+          Name: Ground Plane
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /spencer_bagfile_tools/visualized_frustums
+          Name: Frustums
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+      Enabled: true
+      Name: Sensor view frustums
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /track_annotation_tool/waypoint_markers
+          Name: Waypoint markers
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: spencer_tracking_rviz_plugin/TrackedPersons
+          Enabled: true
+          Name: Active track
+        - Class: spencer_tracking_rviz_plugin/TrackedPersons
+          Enabled: true
+          Name: TrackedPersons
+      Enabled: true
+      Name: Track annotation tool
+    - Class: rviz/Camera
+      Enabled: true
+      Image Rendering: background and overlay
+      Image Topic: /spencer/sensors/dslr/image
+      Name: DSLR camera
+      Overlay Alpha: 0
+      Queue Size: 2
+      Transport Hint: raw
+      Value: true
+      Visibility:
+        Fine Grid: true
+        Front laser:
+          Echo 0: true
+          Echo 1: true
+          Echo 2: true
+          Value: true
+        Grid: true
+        Rear laser:
+          Echo 0: true
+          Echo 1: true
+          Value: true
+        Sensor view frustums:
+          Frustums: true
+          Ground Plane: true
+          Value: true
+        TF and Axes:
+          Base Footprint: true
+          Odom Frame Axes: true
+          TF: true
+          Value: true
+        Track annotation tool:
+          Active track: true
+          TrackedPersons: true
+          Value: true
+          Waypoint markers: true
+        Value: true
+      Zoom Factor: 1
+  Enabled: true
+  Global Options:
+    Background Color: 40; 40; 40
+    Fixed Frame: base_footprint
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: track_annotation_tool/PlaceWaypoint
+    - Class: track_annotation_tool/DeleteWaypoint
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 8.72778
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 1.97256
+        Y: 0.237265
+        Z: 0.524073
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.189799
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 3.13672
+    Saved: ~
+Window Geometry:
+  DSLR camera:
+    collapsed: false
+  Displays:
+    collapsed: false
+  Height: 1003
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000017e0000038cfc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc000000410000038c000000dd00fffffffa000000040100000005fb0000002800460072006f006e0074002000640065007000740068002000700061006e006f00720061006d00610100000000ffffffff0000000000000000fb000000260052006500610072002000640065007000740068002000700061006e006f00720061006d006102000007840000002e00000266000003cbfb0000002400460072006f006e00740020005200470042002000700061006e006f00720061006d00610000000000ffffffff0000000000000000fb0000005e006b0069006e006400650072006300610072005f006f0064006f006d0065007400720079005f005f004f0064006f006d0065007400720079004700550049005f005f0031005f005f004f0064006f006d006500740072007900470055004903000001ef000001c90000057800000135fb000000100044006900730070006c00610079007301000000000000013c0000010f00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001a004b0069006e006500630074003100200043006f006c006f0072000000017d000000700000000000000000fb0000001a004b0069006e006500630074003100200044006500700074006800000001b9000000840000000000000000fb0000001a004b0069006e0065006300740030002000440065007000740068000000020d0000009d0000000000000000fb0000001c004b0069006e0065006300740020003000200043006f006c006f00720000000289000000c50000000000000000fb0000001400440053004c005200200069006d00610067006502000009f3000000100000050800000306fb0000002200520065006100720020005200470042002000700061006e006f00720061006d006102000007970000002d00000265000003cffb0000000a0049006d0061006700650100000303000000ca000000000000000000000001000005d40000038cfc0200000008fb0000005a007200710074005f0069006d006100670065005f0076006900650077005f005f0049006d0061006700650056006900650077005f005f0032005f005f0049006d006100670065005600690065007700570069006400670065007403000003100000011a0000018b00000148fb0000001a004b0069006e00650063007400310020004400650070007400680000000041000000ac0000000000000000fb0000001a004b0069006e00650063007400300020004400650070007400680000000041000001030000000000000000fb0000001a004b0069006e006500630074003100200043006f006c006f007200000000410000018a0000000000000000fb0000001c004b0069006e0065006300740020003000200043006f006c006f007200000000410000030d0000000000000000fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc000000410000038c0000001600fffffffa000000000100000003fb0000001600440053004c0052002000630061006d0065007200610100000000ffffffff0000008a00fffffffb0000000a0049006d0061006700650100000000ffffffff0000000000000000fb0000000a005600690065007700730000000510000001300000010f00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000003ce0000003bfc0100000004fb0000000800540069006d006503000007aa00000012000003ce00000043fb0000000800540069006d00650100000000000004500000000000000000fb0000004c007200710074005f0063006f006e0073006f006c0065005f005f0043006f006e0073006f006c0065005f005f0031005f005f0043006f006e0073006f006c006500570069006400670065007403000001f700000311000002890000039ffb0000005a007200710074005f0069006d006100670065005f0076006900650077005f005f0049006d0061006700650056006900650077005f005f0031005f005f0049006d006100670065005600690065007700570069006400670065007403000001e20000022e00000578000001f9000000200000038c00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1918
+  X: -7
+  Y: 24
