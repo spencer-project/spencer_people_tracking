@@ -286,7 +286,7 @@ void  Detector::EvaluateTemplate(const Matrix<double> &upper_body_template,
         int start_row = (int)max(0.0, close_range_BBoxes(i)(1));
         int end_row = (int)close_range_BBoxes(i)(1) + cropped_height;
 
-        Matrix<double> cropped(end_column-start_column+1, end_row-start_row+1);
+        Matrix<double> cropped(end_column-start_column, end_row-start_row);
 
         double min_distance_threshold = distances(i)(0)- (distances(i)(1)+0.2)/2.0;
         double max_distance_threshold = distances(i)(0)+ (distances(i)(1)+0.2)/2.0;
