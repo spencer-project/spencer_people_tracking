@@ -59,7 +59,7 @@ public:
 
 
     static void getGaussian1D(double sigma, double precision, Vector<double>& vecin);
-    static void conv1D(const Vector<double>& vec, const Vector<double>& kernel);
+    static void conv1D(Vector<double>& vec, const Vector<double>& kernel);
 
     static void MorphologyErode(Matrix<double> &img);
     static void MorphologyDilate(Matrix<double> &img);
