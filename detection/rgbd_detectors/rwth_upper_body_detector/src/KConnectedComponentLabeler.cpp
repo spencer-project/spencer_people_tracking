@@ -18,8 +18,8 @@ Tola, Engin. 2006 June 12. Homepage. <http://cvlab.epfl.ch/~tola/index.htm>
 
 4. An acknowledgement note should be included as: 
 
-     "The software used here was originally created by Tola, Engin. 2006 June 12. 
-	 Homepage. <http://cvlab.epfl.ch/~tola/index.htm>"
+     "The software used here was originally created by Tola, Engin. 2006 June 12.
+     Homepage. <http://cvlab.epfl.ch/~tola/index.htm>"
 
 **************************************************************************************/
 
@@ -70,266 +70,260 @@ int* KConnectedComponentLabeler::GetOutput()
 
 void KConnectedComponentLabeler::Process()
 {
-	if(m_MaskArray == NULL) return;
-	
-	KLinkedList eqTable;
+    if(m_MaskArray == NULL) return;
 
-	KNode * tmp = NULL;
-	KNode * p	= NULL;
-	KNode * p2	= NULL;
+    KLinkedList eqTable;
 
-	int i;
-	int	label = 2;
-	int	index = 1;
-	int	north = 0;
-	int	west  = 0;
-	int	nWest = 0;
-	int	nEast = 0;
-	
-	int		 * regionLabel = NULL;
-	int		 * lookUpTable = NULL;
-	long int * regionArea  = NULL;
-	
-	int	regionNumber;
+    KNode * tmp = NULL;
+    KNode * p	= NULL;
+    KNode * p2	= NULL;
 
-	int	maxArea;
-	int	maxIndex;
-	
-	int	data=0;
+    int i;
+    int label = 2;
+    int index = 1;
+    int north = 0;
+    int west  = 0;
+    int nWest = 0;
+    int nEast = 0;
 
-	for(i=0; i<m_height; i++)
-	{
-		for(int j=0; j<m_width; j++)
-		{			
-			index = i*m_width+j;
-			
-			if(m_MaskArray[index] == 1)
-			{
-				north = 0;
-				west  = 0;
-				nWest = 0;
-				nEast = 0;
+    int         *regionLabel = NULL;
+    int         *lookUpTable = NULL;
+    long int    *regionArea  = NULL;
 
-				if( i==0 && j != 0  )
-				{
+    int regionNumber;
+
+    int maxArea;
+    int maxIndex;
+
+    int data=0;
+
+    for(i=0; i<m_height; i++)
+    {
+        for(int j=0; j<m_width; j++)
+        {
+            index = i*m_width+j;
+
+            if(m_MaskArray[index] == 1)
+            {
+                north = 0;
+                west  = 0;
+                nWest = 0;
+                nEast = 0;
+
+                if( i==0 && j != 0  )
+                {
                     west = m_MaskArray[index-1];
-				}
-				else if( i!=0 && j == 0 )
-				{
-					north = m_MaskArray[index-m_width];
-					nEast = m_MaskArray[index-m_width+1];
-				}
-				else if( i!= 0 && j != 0 )
-				{
-					north = m_MaskArray[index-m_width];
-					west  = m_MaskArray[index-1];
-					nWest = m_MaskArray[index-m_width-1];
+                }
+                else if( i!=0 && j == 0 )
+                {
+                    north = m_MaskArray[index-m_width];
+                    nEast = m_MaskArray[index-m_width+1];
+                }
+                else if( i!= 0 && j != 0 )
+                {
+                    north = m_MaskArray[index-m_width];
+                    west  = m_MaskArray[index-1];
+                    nWest = m_MaskArray[index-m_width-1];
 
-					if( j != m_width-1 )
-						nEast= m_MaskArray[index-m_width+1];
-				}
+                    if( j != m_width-1 )
+                        nEast= m_MaskArray[index-m_width+1];
+                }
 
-				// after finding the neighbour labels
-				if ( west > 1 ) {
+                // after finding the neighbour labels
+                if ( west > 1 ) {
 
-					m_MaskArray[index] = west;
+                    m_MaskArray[index] = west;
 
-					if( nWest>1 )
-						eqTable.InsertData(west,nWest);
+                    if( nWest>1 )
+                        eqTable.InsertData(west,nWest);
 
-					if( north>1 && nWest<=1 )
-						eqTable.InsertData(west,north);
+                    if( north>1 && nWest<=1 )
+                        eqTable.InsertData(west,north);
 
-					if( nEast>1 && north<=1 )
-						eqTable.InsertData(west,nEast);
-				
-				}else if( nWest > 1) {
-					
-					m_MaskArray[index] = nWest;
+                    if( nEast>1 && north<=1 )
+                        eqTable.InsertData(west,nEast);
 
-					if ( north<=1 && nEast>1 )
-						eqTable.InsertData(nWest,nEast);
-				}else if( north > 1 ) {
-					m_MaskArray[index] = north;
-				}else if( nEast > 1 ) 
-					m_MaskArray[index] = nEast;
-				else {
-					m_MaskArray[index] = label;
-					eqTable.InsertData(label);
-					label++;
-				}
-			}
-		}
-	}
+                }else if( nWest > 1) {
 
-	regionNumber = eqTable.regionCount;
+                    m_MaskArray[index] = nWest;
 
-	if( regionNumber > 0 ) 
-	{
-		regionLabel  = new int[regionNumber];
-		regionArea   = new long int[label];
+                    if ( north<=1 && nEast>1 )
+                        eqTable.InsertData(nWest,nEast);
+                }else if( north > 1 ) {
+                    m_MaskArray[index] = north;
+                }else if( nEast > 1 )
+                    m_MaskArray[index] = nEast;
+                else {
+                    m_MaskArray[index] = label;
+                    eqTable.InsertData(label);
+                    label++;
+                }
+            }
+        }
+    }
 
-		for(i=0; i<label; i++ )
-			regionArea[i]=0;
+    regionNumber = eqTable.regionCount;
 
-		tmp = eqTable.header;
-		i=0;
-		do
-		{
-			regionLabel[i]=tmp->data;
-			tmp=tmp->ngNext;
-			i=i+1;
-		}
-		while(tmp!=NULL);
+    if( regionNumber > 0 )
+    {
+        regionLabel  = new int[regionNumber];
+        regionArea   = new long int[label];
 
-		lookUpTable = new int[label];
-	
-		p  = eqTable.header;
-		p2 = p;
-		
-		do
-		{   
-			data=p->data;
-			do
-			{   
-				lookUpTable[p2->data] = data;
-				p2 = p2->sgNext;
-			}
-			while(p2 != NULL);
-			p  = p->ngNext;
-			p2 = p;
-		}
-		while(p != NULL);		
+        for(i=0; i<label; i++ )
+            regionArea[i]=0;
 
-		for (i=0;i<m_height; i++  ) {
-			for (int j=0; j<m_width; j++ )
-			{
-				index=i*m_width+j;
+        tmp = eqTable.header;
+        i=0;
+        do
+        {
+            regionLabel[i]=tmp->data;
+            tmp=tmp->ngNext;
+            i=i+1;
+        }
+        while(tmp!=NULL);
 
-				if( m_MaskArray[index]>1 ) 
-				{
-					data=lookUpTable[ m_MaskArray[index] ];
-					m_MaskArray[index]=data;
+        lookUpTable = new int[label];
 
-					regionArea[ data ]++;
-				}
-				else
-					m_MaskArray[index]=0;
-			}
-		}
+        p  = eqTable.header;
+        p2 = p;
 
-		maxArea = regionArea[0];
-		maxIndex=0;
-		for(i=1; i<label; i++)
-		{
-			if(regionArea[i]>maxArea)
-			{
-				maxIndex = i;
-				maxArea = regionArea[i];
-			}
-		}
+        do
+        {
+            data=p->data;
+            do
+            {
+                lookUpTable[p2->data] = data;
+                p2 = p2->sgNext;
+            }
+            while(p2 != NULL);
+            p  = p->ngNext;
+            p2 = p;
+        }
+        while(p != NULL);
 
-		int* trueLabelArray = new int[label];
-		for(i=0; i<label; i++)
-		{
-			trueLabelArray[i] = 0;
+        for (i=0;i<m_height; i++  ) {
+            for (int j=0; j<m_width; j++ )
+            {
+                index=i*m_width+j;
 
-			KBox newComponent;
-			newComponent.ID = i+1;
-                        newComponent.bottomRight = CPoint(RAND_MAX, RAND_MAX);
-                        newComponent.topLeft     = CPoint(-RAND_MAX, -RAND_MAX);
-			m_Components.push_back(newComponent);
-		}
+                if( m_MaskArray[index]>1 )
+                {
+                    data=lookUpTable[ m_MaskArray[index] ];
+                    m_MaskArray[index]=data;
 
-		m_ObjectNumber = 0;
-		
-		int nImSize = m_height*m_width;
-		int x, y;
+                    regionArea[ data ]++;
+                }
+                else
+                    m_MaskArray[index]=0;
+            }
+        }
 
-		for(i=0; i<nImSize; i++)
-		{
-			x = i%m_width;
-			y = m_height-i/m_width-1;
+        maxArea = regionArea[0];
+        maxIndex=0;
+        for(i=1; i<label; i++)
+        {
+            if(regionArea[i]>maxArea)
+            {
+                maxIndex = i;
+                maxArea = regionArea[i];
+            }
+        }
 
-			if( regionArea[ m_MaskArray[i] ] < m_nAreaThreshold ) 
-				m_MaskArray[i] = 0;
-			else
-			{ 
-				if( trueLabelArray[ m_MaskArray[i] ] == 0 )
-				{
-					m_ObjectNumber++;
+        int* trueLabelArray = new int[label];
+        for(i=0; i<label; i++)
+        {
+            trueLabelArray[i] = 0;
 
-					m_Components[ m_ObjectNumber-1 ].topLeft.x     = x;
-					m_Components[ m_ObjectNumber-1 ].topLeft.y     = y;
-					m_Components[ m_ObjectNumber-1 ].bottomRight.x = x;
-					m_Components[ m_ObjectNumber-1 ].bottomRight.y = y;
+            KBox newComponent;
+            newComponent.ID = i+1;
+            newComponent.bottomRight = CPoint(RAND_MAX, RAND_MAX);
+            newComponent.topLeft     = CPoint(-RAND_MAX, -RAND_MAX);
+            m_Components.push_back(newComponent);
+        }
 
-					trueLabelArray[ m_MaskArray[i] ] = m_ObjectNumber;
-					m_MaskArray[i] = m_ObjectNumber;
-				}
-				else
-				{
-					m_MaskArray[i] = trueLabelArray[ m_MaskArray[i] ];
+        m_ObjectNumber = 0;
 
-					if( x > m_Components[ m_MaskArray[i]-1 ].bottomRight.x )
-						m_Components[ m_MaskArray[i]-1 ].bottomRight.x = x;
+        int nImSize = m_height*m_width;
+        int x, y;
 
-					if( x < m_Components[ m_MaskArray[i]-1 ].topLeft.x     )
-						m_Components[ m_MaskArray[i]-1 ].topLeft.x     = x;
+        for(i=0; i<nImSize; i++)
+        {
+            x = i%m_width;
+            y = m_height-i/m_width-1;
 
-					if( y > m_Components[ m_MaskArray[i]-1 ].bottomRight.y )
-						m_Components[ m_MaskArray[i]-1 ].bottomRight.y = y;
-					
-					if( y < m_Components[ m_MaskArray[i]-1 ].topLeft.y     )
-						m_Components[ m_MaskArray[i]-1 ].topLeft.y     = y;
-				}
-			}
-		}
+            if( regionArea[ m_MaskArray[i] ] < m_nAreaThreshold )
+                m_MaskArray[i] = 0;
+            else
+            {
+                if( trueLabelArray[ m_MaskArray[i] ] == 0 )
+                {
+                    m_ObjectNumber++;
+
+                    m_Components[ m_ObjectNumber-1 ].topLeft.x     = x;
+                    m_Components[ m_ObjectNumber-1 ].topLeft.y     = y;
+                    m_Components[ m_ObjectNumber-1 ].bottomRight.x = x;
+                    m_Components[ m_ObjectNumber-1 ].bottomRight.y = y;
+
+                    trueLabelArray[ m_MaskArray[i] ] = m_ObjectNumber;
+                    m_MaskArray[i] = m_ObjectNumber;
+                }
+                else
+                {
+                    m_MaskArray[i] = trueLabelArray[ m_MaskArray[i] ];
+
+                    if( x > m_Components[ m_MaskArray[i]-1 ].bottomRight.x )
+                        m_Components[ m_MaskArray[i]-1 ].bottomRight.x = x;
+
+                    if( x < m_Components[ m_MaskArray[i]-1 ].topLeft.x     )
+                        m_Components[ m_MaskArray[i]-1 ].topLeft.x     = x;
+
+                    if( y > m_Components[ m_MaskArray[i]-1 ].bottomRight.y )
+                        m_Components[ m_MaskArray[i]-1 ].bottomRight.y = y;
+
+                    if( y < m_Components[ m_MaskArray[i]-1 ].topLeft.y     )
+                        m_Components[ m_MaskArray[i]-1 ].topLeft.y     = y;
+                }
+            }
+        }
 
         while( m_Components.size() != m_ObjectNumber )
             m_Components.pop_back();
 
 
-		delete trueLabelArray; trueLabelArray = NULL;
-	}
-	
-	delete []lookUpTable;
-	lookUpTable = NULL;
+        delete trueLabelArray; trueLabelArray = NULL;
+    }
 
-	delete []regionArea;
-	regionArea = NULL;
+    delete []lookUpTable;
+    lookUpTable = NULL;
 
-	delete []regionLabel;
-	regionLabel = NULL;
+    delete []regionArea;
+    regionArea = NULL;
+
+    delete []regionLabel;
+    regionLabel = NULL;
 }
 
 //////// private KNode implementations ////////////////////
 
 KConnectedComponentLabeler::KNode::KNode()
 {
-	this->data=0;
-	this->sgNext=NULL;
-	this->ngNext=NULL;
+    this->data=0;
+    this->sgNext=NULL;
+    this->ngNext=NULL;
 }
 
 KConnectedComponentLabeler::KNode::~KNode()
 {
-    if(this->sgNext != NULL){
-        delete this->sgNext;
-        this->sgNext = NULL;
-    }
-    if(this->ngNext != NULL){
-        delete this->ngNext;
-        this->ngNext = NULL;
-    }
+    this->sgNext=NULL;
+    this->ngNext=NULL;
 }
 
 
 KBox::KBox()
 {
-	ID = 0;
-	bottomRight = 0;
-	topLeft = 0;
+    ID = 0;
+    bottomRight = 0;
+    topLeft = 0;
 }
 
 KBox::~KBox()
@@ -342,8 +336,8 @@ KBox::~KBox()
 
 KConnectedComponentLabeler::KLinkedList::KLinkedList()
 {
-	this->header = NULL;
-	this->regionCount = 0;
+    this->header = NULL;
+    this->regionCount = 0;
 }
 
 KConnectedComponentLabeler::KLinkedList::~KLinkedList()
@@ -365,7 +359,6 @@ KConnectedComponentLabeler::KLinkedList::~KLinkedList()
                         delete ptr2;
                         ptr2 = NULL;
                     }
-
                     if( ptr3 != NULL )
                         ptr3->sgNext=NULL;
                     ptr2 = ptr1;
@@ -388,43 +381,43 @@ KConnectedComponentLabeler::KLinkedList::~KLinkedList()
 
 void KConnectedComponentLabeler::KLinkedList::InsertData(int data)
 {
-	KNode *	ptrTemp = new KNode;
-	ptrTemp->data=data;
-	ptrTemp->ngNext=header;
-	header=ptrTemp;
-	regionCount++;
+    KNode *	ptrTemp = new KNode;
+    ptrTemp->data=data;
+    ptrTemp->ngNext=header;
+    header=ptrTemp;
+    regionCount++;
 }
 
 void KConnectedComponentLabeler::KLinkedList::InsertData(int addGroup, int searchGroup)
 {
-	if ( addGroup != searchGroup ) {
-		
-		KNode* tmp1 = header;
-		KNode* ptrAdd ;
-		KNode* ptrSearch ; 
+    if ( addGroup != searchGroup ) {
 
-		Search(addGroup,ptrAdd);
-		Search(searchGroup,ptrSearch);
+        KNode* tmp1 = header;
+        KNode* ptrAdd ;
+        KNode* ptrSearch ;
 
-		if ( (ptrSearch != NULL) && (ptrAdd != NULL) && (ptrSearch!=ptrAdd) ) {
-			
-			if ( ptrSearch != header ) {
-				
-				while( tmp1->ngNext != ptrSearch )
-					tmp1=tmp1->ngNext;
-				
-				tmp1->ngNext=ptrSearch->ngNext;
-			}
-			else{
-				header=ptrSearch->ngNext;
-			}
-			
-			while( ptrAdd->sgNext != NULL )
-				ptrAdd=ptrAdd->sgNext;
-			
-			ptrAdd->sgNext=ptrSearch;	
-		}
-	}
+        Search(addGroup,ptrAdd);
+        Search(searchGroup,ptrSearch);
+
+        if ( (ptrSearch != NULL) && (ptrAdd != NULL) && (ptrSearch!=ptrAdd) ) {
+
+            if ( ptrSearch != header ) {
+
+                while( tmp1->ngNext != ptrSearch )
+                    tmp1=tmp1->ngNext;
+
+                tmp1->ngNext=ptrSearch->ngNext;
+            }
+            else{
+                header=ptrSearch->ngNext;
+            }
+
+            while( ptrAdd->sgNext != NULL )
+                ptrAdd=ptrAdd->sgNext;
+
+            ptrAdd->sgNext=ptrSearch;
+        }
+    }
 
 }
 
@@ -432,27 +425,27 @@ void KConnectedComponentLabeler::KLinkedList::InsertData(int addGroup, int searc
 
 void KConnectedComponentLabeler:: KLinkedList::Search(int data, KConnectedComponentLabeler::KNode* &p )
 {
-	KNode* ptr1 = header;
-	KNode* ptr2 = header;
-	
-	do 
-	{
-		do 
-		{
-			if (ptr2->data==data){
-				p=ptr1;
-				return;
-			}
-			ptr2=ptr2->sgNext;
-		}
-		while(ptr2!=NULL);
-		
-		ptr1=ptr1->ngNext;
-		ptr2=ptr1;
-	}
-	while(ptr1!=NULL);
-	
-	p=ptr1;
+    KNode* ptr1 = header;
+    KNode* ptr2 = header;
+
+    do
+    {
+        do
+        {
+            if (ptr2->data==data){
+                p=ptr1;
+                return;
+            }
+            ptr2=ptr2->sgNext;
+        }
+        while(ptr2!=NULL);
+
+        ptr1=ptr1->ngNext;
+        ptr2=ptr1;
+    }
+    while(ptr1!=NULL);
+
+    p=ptr1;
 }
 
 

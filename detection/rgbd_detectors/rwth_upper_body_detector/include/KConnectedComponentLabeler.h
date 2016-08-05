@@ -18,8 +18,8 @@ Tola, Engin. 2006 June 12. Homepage. <http://cvlab.epfl.ch/~tola/index.htm>
 
 4. An acknowledgement note should be included as: 
 
-     "The software used here was originally created by Tola, Engin. 2006 June 12. 
-	 Homepage. <http://cvlab.epfl.ch/~tola/index.htm>"
+     "The software used here was originally created by Tola, Engin. 2006 June 12.
+     Homepage. <http://cvlab.epfl.ch/~tola/index.htm>"
 
 **************************************************************************************/
 
@@ -43,62 +43,62 @@ using namespace std;
 class KBox
 {
 public:
-        KBox();
-        virtual ~KBox();
-        CPoint topLeft;
-        CPoint bottomRight;
-        int	   ID;
+    KBox();
+    virtual ~KBox();
+    CPoint  topLeft;
+    CPoint  bottomRight;
+    int     ID;
 };
 
 class KConnectedComponentLabeler
 {
 
 private:
-	class KNode  
-	{
-	public:
-		KNode();
-		virtual ~KNode();
-		KNode*	ngNext;
-		KNode*	sgNext;
-		int data;
-	};
+    class KNode
+    {
+    public:
+        KNode();
+        virtual ~KNode();
+        KNode*  ngNext;
+        KNode*  sgNext;
+        int     data;
+    };
 
 
 private:
-	class KLinkedList
-	{
-	public:
-		void printTable();
+    class KLinkedList
+    {
+    public:
+        void printTable();
 
-		KNode * header;
-		int  regionCount;
+        KNode * header;
+        int  regionCount;
 
-		void Search(int data, KNode* &p);
+        void Search(int data, KNode* &p);
 
-		void InsertData(int data);
-		void InsertData(int addGroup,int searchGroup);
-		
-		KLinkedList();
-		~KLinkedList();
-	};
+        void InsertData(int data);
+        void InsertData(int addGroup,int searchGroup);
+
+        KLinkedList();
+        ~KLinkedList();
+    };
 
 public:
-	int*	GetOutput();
-	
-	int		m_ObjectNumber;
-    int*	m_MaskArray;
-		
-	int		m_nAreaThreshold;
-	int		m_height;
-	int		m_width;
+    int*    GetOutput();
 
-	vector<KBox> m_Components;
+    int     m_ObjectNumber;
+    int*    m_MaskArray;
 
-	void	Process();
-	
+    int     m_nAreaThreshold;
+    int     m_height;
+    int     m_width;
+
+    vector<KBox> m_Components;
+
+    void	Process();
+
     KConnectedComponentLabeler(int nAreaThreshold, int *mask, int width, int height);
-	virtual ~KConnectedComponentLabeler();
+    virtual ~KConnectedComponentLabeler();
 };
 
 #endif // !defined(AFX_CONNECTEDCOMPONENTLABELER_H__E4CEAEC2_ABC6_4A4E_AE25_68AC93377186__INCLUDED_)
