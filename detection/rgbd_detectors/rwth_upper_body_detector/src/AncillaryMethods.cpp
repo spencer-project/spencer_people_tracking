@@ -361,7 +361,7 @@ void AncillaryMethods::getGaussian1D(double sigma, double precision, Vector<doub
     }
 }
 
-void AncillaryMethods::conv1D(const Vector<double> &vec, const Vector<double> &kernel)
+void AncillaryMethods::conv1D(Vector<double> &vec, const Vector<double> &kernel)
 {
     int kernelSize = kernel.getSize();
     int kCenter = floor(kernelSize/2.0);
