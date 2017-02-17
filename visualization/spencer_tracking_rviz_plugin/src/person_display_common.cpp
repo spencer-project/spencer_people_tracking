@@ -28,11 +28,12 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef Q_MOC_RUN
 #include "person_display_common.h"
-
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#endif
 #define foreach BOOST_FOREACH
 
 

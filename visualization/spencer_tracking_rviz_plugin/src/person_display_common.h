@@ -31,31 +31,35 @@
 #ifndef PERSON_DISPLAY_COMMON_H
 #define PERSON_DISPLAY_COMMON_H
 
+#ifndef Q_MOC_RUN
 #include <map>
 #include <set>
 #include <boost/circular_buffer.hpp>
+#include <spencer_tracking_msgs/TrackedPersons.h>
+#include <geometry_msgs/Twist.h>
+#include <rviz/message_filter_display.h>
 
+#include <OGRE/OgreSceneNode.h>
+#include <OGRE/OgreSceneManager.h>
+#include "visuals/person_visual.h"
+#include "visuals/text_node.h"
+#include "visuals/covariance_visual.h"
+#include <rviz/ogre_helpers/shape.h>
 #include <rviz/properties/bool_property.h>
 #include <rviz/properties/enum_property.h>
 #include <rviz/properties/color_property.h>
 #include <rviz/properties/float_property.h>
 #include <rviz/properties/int_property.h>
 #include <rviz/properties/string_property.h>
-
-#include <rviz/ogre_helpers/shape.h>
-#include <rviz/ogre_helpers/movable_text.h>
 #include <rviz/ogre_helpers/arrow.h>
+#include <rviz/ogre_helpers/movable_text.h>
+#endif
 
-#include <OGRE/OgreSceneNode.h>
-#include <OGRE/OgreSceneManager.h>
 
-#include <spencer_tracking_msgs/TrackedPersons.h>
-#include <geometry_msgs/Twist.h>
-#include <rviz/message_filter_display.h>
 
-#include "visuals/person_visual.h"
-#include "visuals/text_node.h"
-#include "visuals/covariance_visual.h"
+
+
+
 
 using namespace std;
 using namespace boost;

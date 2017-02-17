@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 2 REQUIRED)
 message(STATUS "Using OpenCV version ${OpenCV_VERSION} installed at: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "OpenCV supported compute capabilities are: ${OpenCV_COMPUTE_CAPABILITIES}")
 

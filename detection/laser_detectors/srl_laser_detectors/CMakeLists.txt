@@ -29,7 +29,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(srl_laser_detectors)
 
-find_package(OpenCV)
+find_package(OpenCV 2)
 if(OpenCV_FOUND)
   message(STATUS "Using OpenCV version ${OpenCV_VERSION} installed at: ${OpenCV_INCLUDE_DIRS}")
   message(STATUS "OpenCV supported compute capabilities are: ${OpenCV_COMPUTE_CAPABILITIES}")
