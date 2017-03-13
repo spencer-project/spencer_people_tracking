@@ -2,12 +2,14 @@
     <!-- Launch file arguments -->
     <arg name="height_above_ground" default="1.6"/>  <!-- in meters, assumes a horizontally oriented RGB-D sensor; important for accurate detection -->
     <arg name="load_driver" default="true"/>  <!-- set to false if you are already running OpenNi from elsewhere -->
-    <arg name="visualization" default="true"/>
-    <arg name="dummy_transforms" default="true"/>
-    <arg name="use_openni1" default="false"/>
+    <arg name="visualization" default="true"/> <!-- start Rviz with predefined configuration? -->
+    <arg name="dummy_transforms" default="true"/> <!-- publish TF transform for sensor to groundplane -->
+    <arg name="use_openni1" default="false"/> <!-- compatibility for Kinect v1 -->
+    <arg name="use_upper_body_detector" default="true"/> <!-- use depth-template-based upper-body detector? -->
+    <arg name="use_hog_detector" default="false"/> <!-- use RGB groundHOG detector? Requires cudaHOG library-->
 
 
-    <!-- Run OpenNi2 driver -->
+    <!-- Run OpenNi driver if desired -->
     <group ns="spencer/sensors" if="$(arg load_driver)">
         <arg name="driver_launchfile" value="$(find openni2_launch)/launch/openni2.launch" unless="$(arg use_openni1)"/>  <!-- Asus Xtion Pro / Primesense-->
         <arg name="driver_launchfile" value="$(find openni_launch)/launch/openni.launch"   if="$(arg use_openni1)"/>      <!-- MS Kinect v1 -->
@@ -24,6 +26,7 @@
     <remap from="/spencer/sensors/rgbd_front_top/depth/camera_info" to="/spencer/sensors/rgbd_front_top/depth_registered/camera_info" if="$(arg use_openni1)"/>
     <remap from="/spencer/sensors/rgbd_front_top/rgb/image_raw" to="/spencer/sensors/rgbd_front_top/rgb/image_color" if="$(arg use_openni1)"/>
 
+
     <!-- Set ground plane distance -->
     <rosparam param="/spencer/perception_internal/people_detection/ground_plane/distance" subst_value="true">$(arg height_above_ground)</rosparam>
 
@@ -35,7 +38,10 @@
 
 
     <!-- Detectors -->        
-    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch"/>
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch">
+        <arg name="upper_body" default="$(arg use_upper_body_detector)"/>
+        <arg name="hog" default="$(arg use_hog_detector)"/>
+    </include>
 
     <!-- People tracking -->
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
