@@ -32,9 +32,10 @@
 #include <rviz/frame_manager.h>
 #include "rviz/selection/selection_manager.h"
 
+#ifndef Q_MOC_RUN
 #include "social_relations_display.h"
-
 #include <boost/foreach.hpp>
+#endif
 #define foreach BOOST_FOREACH
 
 namespace spencer_tracking_rviz_plugin

@@ -30,13 +30,12 @@
 
 #ifndef SOCIAL_ACTIVITIES_DISPLAY_H
 #define SOCIAL_ACTIVITIES_DISPLAY_H
-
+#ifndef Q_MOC_RUN
 #include <map>
 #include <vector>
 #include <boost/circular_buffer.hpp>
-
 #include <spencer_social_relation_msgs/SocialActivities.h>
-
+#endif
 #include "person_display_common.h"
 #include "tracked_persons_cache.h"
 

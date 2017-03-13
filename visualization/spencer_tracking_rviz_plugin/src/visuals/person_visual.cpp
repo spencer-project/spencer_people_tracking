@@ -28,14 +28,16 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
 #include <rviz/mesh_loader.h>
+#ifndef Q_MOC_RUN
 #include <ros/console.h>
 #include <ros/package.h>
 #include <resource_retriever/retriever.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
-
+#endif
 #include <OgreSceneManager.h>
 #include <OgreSubEntity.h>
 #include <OgreMaterialManager.h>

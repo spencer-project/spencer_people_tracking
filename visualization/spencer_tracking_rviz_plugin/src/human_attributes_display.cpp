@@ -31,13 +31,13 @@
 #include <rviz/frame_manager.h>
 #include <rviz/selection/selection_manager.h>
 
+#ifndef Q_MOC_RUN
 #include "human_attributes_display.h"
-
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/range/adaptor/map.hpp>
-
+#endif
 #define foreach BOOST_FOREACH
 
 namespace spencer_tracking_rviz_plugin
