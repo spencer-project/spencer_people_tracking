@@ -157,18 +157,29 @@ The following three tutorials help you to easily get started using our framework
 
 ##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
 
-This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live or Kinect v1 sensor horizontally on a flat surface, and connect it to your computer (or play the example bagfile linked in a section further below). Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
+This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live sensor horizontally on a flat surface, and connect it to your computer (or play the example bagfile linked in a section further below). Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
 
     roslaunch spencer_people_tracking_launch tracking_single_rgbd_sensor.launch height_above_ground:=1.6
     
 This will do the following:
-- Start the OpenNi2 drivers and publish RGB-D point clouds in the `/spencer/sensors/rgbd_front_top/` camera namespace
-- Run an upper-body RGB-D and groundHOG RGB detector, assuming a horizontal ground plane at 1.6 meters below the sensor. Other heights may work as well, but the detector has been trained at approximately this height.
+- Start the OpenNi2 drivers (for Asus Xtion Pro) and publish RGB-D point clouds in the `/spencer/sensors/rgbd_front_top/` camera namespace
+- Run an upper-body RGB-D detector, assuming a horizontal ground plane at 1.6 meters below the sensor. Other heights may work as well, but the detector has been trained at approximately this height.
 - Run a simple detection-to-detection fusion pipeline
 - Run the `srl_nearest_neighbor_tracker`, which will subscribe to `/spencer/perception/detected_persons` and publish tracks at `/spencer/perception/tracked_persons`
-- Run RViz with a predefined configuration, which shows the point cloud, detected and tracked persons (using our custom RViz plugins)
+- Run RViz with a predefined configuration, which shows the point cloud, the sensor's view frustum, and detected and tracked persons (using our custom RViz plugins).
 
-If this doesn't work, first check if the point cloud is displayed properly in RViz. If not, there is probably a problem with your RGB-D sensor (USB or OpenNi 2 issues).
+###### Using MS Kinect v1 ######
+
+The original MS Kinect v1 sensor does not support OpenNi2. In this case, append `use_openni1:=true` to the above command-line of the launch file to fall back to OpenNi1.
+
+###### Enabling the groundHOG detector ######
+
+If you have compiled the cudaHOG library (see description further above), you can optionally enable the groundHOG detector by passing `use_hog_detector:=true` to the launch file. The detection-to-detection fusion pipeline will then automatically fuse the detections from upper-body and HOG detector.
+
+###### Troubleshooting ######
+
+If you cannot see any detection bounding boxes, first check if the point cloud is displayed properly in RViz. If not, there is probably a problem with your RGB-D sensor (USB or OpenNi issues).
+
 
 ##### Tutorial 2: Tracking with front and rear laser + RGB-D sensors
 
