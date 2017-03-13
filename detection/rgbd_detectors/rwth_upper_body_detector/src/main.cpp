@@ -8,6 +8,7 @@
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 
@@ -183,6 +184,14 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
 
     if(!detect && !vis)
         return;
+
+    // Verify depth image is of correct format
+    if(depth->encoding != image_encodings::TYPE_32FC1) {
+        ROS_ERROR_THROTTLE(5.0, "Depth input image provided to upper-body detector has wrong encoding! 32FC1 is required (depth in meters), "
+            "usually offered by the registered/rectified depth image. Maybe you are remapping the input topic incorrectly to the unregistered, "
+            "raw image of type 16UC1 (depth in millimeters)?");
+        return;
+    }
 
     // Get depth image as matrix
     cv_depth_ptr = cv_bridge::toCvCopy(depth);
