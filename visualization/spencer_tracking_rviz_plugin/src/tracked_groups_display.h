@@ -31,9 +31,10 @@
 #ifndef TRACKED_GROUPS_DISPLAY_H
 #define TRACKED_GROUPS_DISPLAY_H
 
+#ifndef Q_MOC_RUN
 #include <map>
 #include <boost/circular_buffer.hpp>
-
+#endif
 #include <spencer_tracking_msgs/TrackedGroups.h>
 
 #include "person_display_common.h"

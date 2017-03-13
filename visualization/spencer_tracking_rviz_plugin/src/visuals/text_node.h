@@ -32,6 +32,7 @@
 #define TEXT_NODE_H
 
 #include <rviz/ogre_helpers/shape.h>
+#include <rviz/ogre_helpers/movable_text.h>
 
 namespace spencer_tracking_rviz_plugin {
     class TextNode {

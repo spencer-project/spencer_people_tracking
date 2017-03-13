@@ -32,6 +32,7 @@
 #include <rviz/frame_manager.h>
 #include "rviz/selection/selection_manager.h"
 
+#ifndef Q_MOC_RUN
 #include "social_activities_display.h"
 
 #include <boost/lexical_cast.hpp>
@@ -39,7 +40,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/foreach.hpp>
-
+#endif
 #define foreach BOOST_FOREACH
 
 // required to fix orientation of any Cylinder shapes
