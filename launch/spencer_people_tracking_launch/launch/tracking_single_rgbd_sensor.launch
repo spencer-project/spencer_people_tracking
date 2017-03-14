@@ -4,14 +4,21 @@
     <arg name="load_driver" default="true"/>  <!-- set to false if you are already running OpenNi from elsewhere -->
     <arg name="visualization" default="true"/>
     <arg name="dummy_transforms" default="true"/>
+    <arg name="use_openni1" default="false"/>
 
 
     <!-- Run OpenNi2 driver -->
     <group ns="spencer/sensors" if="$(arg load_driver)">
-        <include file="$(find openni2_launch)/launch/openni2.launch">
+        <include file="$(find openni2_launch)/launch/openni2.launch" unless="$(arg use_openni1)">
           <arg name="camera" value="rgbd_front_top"/>
           <arg name="device_id" value="#1"/>
           <arg name="depth_registration" default="true"/>
+        </include>
+
+        <include file="$(find openni_launch)/launch/openni.launch" if="$(arg use_openni1)">
+          <arg name="camera" value="rgbd_front_top"/>
+          <arg name="device_id" value="#1"/>
+          <arg name="depth_registration" default="false"/>
         </include>
     </group>
 
