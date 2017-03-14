@@ -73,7 +73,7 @@ void Detector::ProcessFrame(const Camera &camera_origin, const Matrix<double> &d
 
 
 
-    detected_bounding_boxes = EvaluateTemplate(upper_body_template, depth_map, close_range_BBoxes, distances);
+    EvaluateTemplate(upper_body_template, depth_map, close_range_BBoxes, distances, detected_bounding_boxes);
 }
 
 void Detector::ComputeFreespace(const Camera& camera,
@@ -126,10 +126,12 @@ void Detector::ComputeFreespace(const Camera& camera,
                 int pos_z = (int)round(z / step_z);
 
 //                occ_map(pos_x, pos_z) += z*(log(z) / log_2);
-                occ_map(pos_x, pos_z) += z;
+                if( 0 < pos_x && pos_x < x_bins && 0 < pos_z && pos_z < z_bins ){
+                    occ_map(pos_x, pos_z) += z;
 
-                mat_2D_pos_x.data()[j] = pos_x;
-                mat_2D_pos_y.data()[j] = pos_z;
+                    mat_2D_pos_x.data()[j] = pos_x;
+                    mat_2D_pos_y.data()[j] = pos_z;
+                }
             }
         }
     }
@@ -137,9 +139,10 @@ void Detector::ComputeFreespace(const Camera& camera,
 //    occ_map.WriteToTXT("before.txt");
     
     
-     Vector<double> kernel = AncillaryMethods::getGaussian1D(2,3);
-     occ_map = AncillaryMethods::conv1D(occ_map, kernel, false);
-     occ_map = AncillaryMethods::conv1D(occ_map, kernel, true);
+     Vector<double> kernel;
+     AncillaryMethods::getGaussian1D(2, 3, kernel);
+     AncillaryMethods::conv1D(occ_map, kernel, false);
+     AncillaryMethods::conv1D(occ_map, kernel, true);
 
 // occ_map.WriteToTXT("after.txt");
  
@@ -194,7 +197,7 @@ void Detector::ExtractPointsInROIs(/*Vector<Vector<Vector<double> > > &all_point
         if(mat_2D_pos_x.data()[i] >= 0)
         {
             roi_ind = labeled_ROIs(mat_2D_pos_x.data()[i], mat_2D_pos_y.data()[i])-1;
-            if(roi_ind > -1)
+            if(roi_ind > -1 && (roi_ind < all_ROIs.getSize()))
             {
 //                all_points_in_ROIs(pos_in_proj).pushBack(Vector<double>(point_cloud.X(i), point_cloud.Y(i), point_cloud.Z(i)));
                 all_ROIs(roi_ind).has_any_point = true;
@@ -235,10 +238,11 @@ void Detector::ExtractPointsInROIs(/*Vector<Vector<Vector<double> > > &all_point
     }
 }
 
-Vector<Vector<double> >  Detector::EvaluateTemplate(const Matrix<double> &upper_body_template,
+void  Detector::EvaluateTemplate(const Matrix<double> &upper_body_template,
                                                         const Matrix<double> &depth_map,
                                                         Vector<Vector<double> > &close_range_BBoxes,
-                                                        Vector<Vector<double> > distances)
+                                                        Vector<Vector<double> > distances,
+                                                        Vector<Vector<double> > &result_caller)
 {
     int stride = Globals::evaluation_stride;
     int nr_scales = Globals::evaluation_nr_scales;
@@ -248,7 +252,6 @@ Vector<Vector<double> >  Detector::EvaluateTemplate(const Matrix<double> &upper_
     int int_half_template_size = Globals::template_size / 2;
     double double_half_template_size = Globals::template_size / 2.0;
 
-    Vector<Vector<double> > final_result;
 
     // generate the scales
     Vector<double> all_scales(nr_scales, 1.0);
@@ -283,7 +286,7 @@ Vector<Vector<double> >  Detector::EvaluateTemplate(const Matrix<double> &upper_
         int start_row = (int)max(0.0, close_range_BBoxes(i)(1));
         int end_row = (int)close_range_BBoxes(i)(1) + cropped_height;
 
-        Matrix<double> cropped(end_column-start_column+1, end_row-start_row+1);
+        Matrix<double> cropped(end_column-start_column, end_row-start_row);
 
         double min_distance_threshold = distances(i)(0)- (distances(i)(1)+0.2)/2.0;
         double max_distance_threshold = distances(i)(0)+ (distances(i)(1)+0.2)/2.0;
@@ -490,8 +493,7 @@ Vector<Vector<double> >  Detector::EvaluateTemplate(const Matrix<double> &upper_
                 }
             }
         }
-        AncillaryMethods::GreedyNonMaxSuppression(result, Globals::evaluation_greedy_NMS_overlap_threshold, Globals::evaluation_greedy_NMS_threshold, upper_body_template, final_result);
+        AncillaryMethods::GreedyNonMaxSuppression(result, Globals::evaluation_greedy_NMS_overlap_threshold, Globals::evaluation_greedy_NMS_threshold, upper_body_template, result_caller);
     }
 //    roi_img.WriteToTXT("roi_img.txt");
-    return final_result;
 }

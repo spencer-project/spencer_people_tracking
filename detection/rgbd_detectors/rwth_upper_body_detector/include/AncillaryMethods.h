@@ -58,8 +58,11 @@ public:
 //    static void RenderBBox2DWithScore(const Vector<double> &bbox, QImage& image, int r, int g, int b, int lineWidth);
 
 
-    static Vector<double> getGaussian1D(double sigma, double precision);
-    static Vector<double> conv1D(const Vector<double>& vec, const Vector<double>& kernel);
+//    static Vector<double> getGaussian1D(double sigma, double precision);
+    static void getGaussian1D(double sigma, double precision, Vector<double>& vecin);
+
+//    static Vector<double> conv1D(const Vector<double>& vec, const Vector<double>& kernel);
+    static void conv1D(Vector<double>& vec, const Vector<double>& kernel);
 
     static void MorphologyErode(Matrix<double> &img);
     static void MorphologyDilate(Matrix<double> &img);
@@ -95,7 +98,8 @@ public:
 
 
     ///////////////// Segmentation part /////////////////////////////////////////
-    static Matrix<double> conv1D(Matrix<double> &im, Vector<double> &kernel, bool dirFlag);
+//    static Matrix<double> conv1D(Matrix<double> &im, Vector<double> &kernel, bool dirFlag);
+    static void conv1D(Matrix<double> &im, Vector<double> &kernel, bool dirFlag);
 
 
     ////////// LM & Curve Detectors ////////////////////////////////////////////
