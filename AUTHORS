@@ -1,0 +1,18 @@
+The spencer_people_tracking framework was developed in the context of the EU FP7 research project SPENCER.
+This work has been partly supported by the European Commission under contract number FP7-ICT-600877.
+
+The framework was initially created and is being maintained by:
+
+    Timm Linder
+    Stefan Breuers
+
+For the authors of the individual ROS packages, please check the respective README or package.xml files.
+We are also very thankful to the following additional contributors:
+
+    Lucas Beyer
+    Christian Dondrup
+    Fabian Girrbach
+    João Avelino
+    Kota Weaver
+
+...and anybody who we, by accident, forgot to mention here!
