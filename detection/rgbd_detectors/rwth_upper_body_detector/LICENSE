@@ -1,4 +1,8 @@
-Most of the ROS code in this package is licensed under the BSD license (see bottom of this file). However, the KConnectedComponentLabeller source code shipped with and used by this package is licensed under a more restrictive license which only permits use without restriction for academic or research purposes:
+Most of the ROS code in this package is licensed under the BSD license (see bottom of this file).
+
+However, the KConnectedComponentLabeller source code shipped with and used by this package is
+licensed under a more restrictive license which only permits use without restriction for
+academic or research purposes:
 
 
 License for component: KConnectedComponentLabeller
