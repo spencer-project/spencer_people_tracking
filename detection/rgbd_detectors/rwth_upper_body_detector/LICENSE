@@ -1,3 +1,28 @@
+Most of the ROS code in this package is licensed under the BSD license (see bottom of this file). However, the KConnectedComponentLabeller source code shipped with and used by this package is licensed under a more restrictive license which only permits use without restriction for academic or research purposes:
+
+
+License for component: KConnectedComponentLabeller
+==================================================
+This piece of program contained can be used, copied, modified, merged, published, and/or have copies distributed for academic or research purposes only without restriction under the following conditions:
+
+1. The above header and this permission notice shall be included in all copies or substantial portions of the program
+
+2. The software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and non-infringement. In no event shall the author(s) be liable for any claim, damages or liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with this program.
+
+3. If you use this piece of code for research purposes, refer to 
+
+Tola, Engin. 2006 June 12. Homepage. <http://cvlab.epfl.ch/~tola/index.htm>
+
+4. An acknowledgement note should be included as: 
+     "The software used here was originally created by Tola, Engin. 2006 June 12. 
+     Homepage. <http://cvlab.epfl.ch/~tola/index.htm>"
+
+--------------------------------------------------
+
+
+License for the remaining rwth_upper_body_detector package
+==========================================================
+
 Copyright (c) 2014, Christian Dondrup, Dennis Mitzel, Stefan Breuers
 All rights reserved.
 
