@@ -81,7 +81,7 @@ include_directories( include
 # )
 
 ## Declare a cpp executable
-add_executable(upper_body_detector src/main.cpp src/Camera.cpp src/ConfigFile.cpp src/Globals.cpp src/KConnectedComponentLabeler.cpp src/Math.cpp src/pointcloud.cpp src/ROI.cpp src/CPoint.cpp src/detector.cpp src/AncillaryMethods.cpp src/Hypo.cpp src/FrameInlier.cpp) 
+add_executable(upper_body_detector src/main.cpp src/Camera.cpp src/ConfigFile.cpp src/Globals.cpp src/KConnectedComponentLabeler.cpp src/Math.cpp src/pointcloud.cpp src/ROI.cpp src/detector.cpp src/AncillaryMethods.cpp src/Hypo.cpp src/FrameInlier.cpp) 
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
