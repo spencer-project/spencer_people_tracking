@@ -355,7 +355,7 @@ int main(int argc, char **argv)
     private_node_handle_.param("camera_namespace", cam_ns, string("/camera"));
     private_node_handle_.param("ground_plane", topic_gp, string("/ground_plane"));
 
-    topic_color_image = cam_ns + "/rgb/image_raw";
+    topic_color_image = cam_ns + "/rgb/image_rect_color";
     string topic_depth_image = cam_ns + "/depth/image_rect";
     string topic_camera_info = cam_ns + "/depth/camera_info";
 

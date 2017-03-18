@@ -21,11 +21,6 @@
         </include>
     </group>
 
-    <!-- Remapping required for detectors in case we are using OpenNi 1 (for MS Kinect) -->
-    <remap from="/spencer/sensors/rgbd_front_top/depth/image_rect" to="/spencer/sensors/rgbd_front_top/depth_registered/image_raw"  if="$(arg use_openni1)"/>
-    <remap from="/spencer/sensors/rgbd_front_top/depth/camera_info" to="/spencer/sensors/rgbd_front_top/depth_registered/camera_info" if="$(arg use_openni1)"/>
-    <remap from="/spencer/sensors/rgbd_front_top/rgb/image_raw" to="/spencer/sensors/rgbd_front_top/rgb/image_color" if="$(arg use_openni1)"/>
-
 
     <!-- Set ground plane distance -->
     <rosparam param="/spencer/perception_internal/people_detection/ground_plane/distance" subst_value="true">$(arg height_above_ground)</rosparam>
@@ -37,11 +32,19 @@
     </group>
 
 
-    <!-- Detectors -->        
-    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch">
-        <arg name="upper_body" default="$(arg use_upper_body_detector)"/>
-        <arg name="hog" default="$(arg use_hog_detector)"/>
-    </include>
+    <!-- Detectors -->
+    <group>
+        <!-- Remap input topics of detectors from "depth" to "depth_registered" in case we are using the OpenNi 1 driver (for MS Kinect).
+             Necessary because OpenNi 1 does not publish both the registered and unregistered depth images (as OpenNi 2 does), and we want to keep depth registration enabled. -->
+        <remap from="/spencer/sensors/rgbd_front_top/depth/image_rect" to="/spencer/sensors/rgbd_front_top/depth_registered/image_rect"  if="$(arg use_openni1)"/>
+        <remap from="/spencer/sensors/rgbd_front_top/depth/camera_info" to="/spencer/sensors/rgbd_front_top/depth_registered/camera_info" if="$(arg use_openni1)"/>
+
+        <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch">
+            <arg name="upper_body" default="$(arg use_upper_body_detector)"/>
+            <arg name="hog" default="$(arg use_hog_detector)"/>
+        </include>
+    </group>
+    
 
     <!-- People tracking -->
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
