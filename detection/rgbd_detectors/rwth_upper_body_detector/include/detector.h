@@ -50,8 +50,9 @@ private:
     //          close_range_BBoxes  -   Bounding boxes over ROIs
     //          distances           -
     ///////////////////////////////////////////////////////////////////////
-    Vector<Vector<double> > EvaluateTemplate(const Matrix<double> &upper_body_template, const Matrix<double> &depth_map,
-                                             Vector<Vector<double> > &close_range_BBoxes, Vector<Vector<double> > distances);
+    void EvaluateTemplate(const Matrix<double> &upper_body_template, const Matrix<double> &depth_map,
+                                             Vector<Vector<double> > &close_range_BBoxes, Vector<Vector<double> > distances, 
+                                             Vector<Vector<double> > &result);
 
     ///////////////////////////////////////////////////////////////////////
     // PreprocessROIs:

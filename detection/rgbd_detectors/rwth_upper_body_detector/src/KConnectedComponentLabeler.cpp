@@ -316,7 +316,14 @@ KConnectedComponentLabeler::KNode::KNode()
 
 KConnectedComponentLabeler::KNode::~KNode()
 {
-
+    if(this->sgNext != NULL){
+        delete this->sgNext;
+        this->sgNext = NULL;
+    }
+    if(this->ngNext != NULL){
+        delete this->ngNext;
+        this->ngNext = NULL;
+    }
 }
 
 
@@ -345,35 +352,42 @@ KConnectedComponentLabeler::KLinkedList::KLinkedList()
 
 KConnectedComponentLabeler::KLinkedList::~KLinkedList()
 {
-	KNode* ptr1 = header;
-	KNode* ptr2 = header;
-	KNode* ptr3 = header;
-	
-	if( header != NULL ) {
-		do 
-		{
-			do 
-			{
-				if (ptr2->sgNext != NULL){
-					ptr3 = ptr2;
-					ptr2 = ptr2->sgNext;
-				} else if( ptr1->sgNext != NULL ) {
-					delete ptr2;
-					if( ptr3 != NULL )
-						ptr3->sgNext=NULL;
-					ptr2 = ptr1;
-					ptr3 = ptr1;
-				}
-			}
-			while(ptr1->sgNext !=NULL);
-			
-			ptr1=ptr1->ngNext;
-			delete ptr2;
-			ptr2=ptr1;
-			ptr3=ptr1;
-		}
-		while(ptr1!=NULL);
-	}
+    KNode* ptr1 = header;
+    KNode* ptr2 = header;
+    KNode* ptr3 = header;
+
+    if( header != NULL ) {
+        do
+        {
+            do
+            {
+                if (ptr2->sgNext != NULL){
+                    ptr3 = ptr2;
+                    ptr2 = ptr2->sgNext;
+                } else if( ptr1->sgNext != NULL ) {
+                    if(ptr2 != NULL){
+                        delete ptr2;
+                        ptr2 = NULL;
+                    }
+
+                    if( ptr3 != NULL )
+                        ptr3->sgNext=NULL;
+                    ptr2 = ptr1;
+                    ptr3 = ptr1;
+                }
+            }
+            while(ptr1->sgNext !=NULL);
+
+            ptr1=ptr1->ngNext;
+            if(ptr2 != NULL){
+                delete ptr2;
+                ptr2 = NULL;
+            }
+            ptr2=ptr1;
+            ptr3=ptr1;
+        }
+        while(ptr1!=NULL);
+    }
 }
 
 void KConnectedComponentLabeler::KLinkedList::InsertData(int data)
