@@ -21,7 +21,7 @@
   <build_depend>pcl_conversions</build_depend> 
   <build_depend>eigen_conversions</build_depend> 
   <build_depend>tf_conversions</build_depend> 
-  <build_depend>cmake_module</build_depend>
+  <build_depend>cmake_modules</build_depend>
   <build_depend>spencer_tracking_msgs</build_depend> 
   <build_depend>spencer_vision_msgs</build_depend>
   
