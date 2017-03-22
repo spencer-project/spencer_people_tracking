@@ -54,12 +54,12 @@ for i in xrange(1, len(sys.argv)):
 folder     = rospy.get_param('~folder', None);
 files      = rospy.get_param('~files', None);
 
-if folder is None and files is None:
+if not folder and not files:
     rospy.logfatal("Must specify _folder argument (directory containing bagfiles to play) or _files!")
     sys.exit(1)
 
 filesToPlay = []
-if folder is not None:
+if folder:
     if not os.path.isdir(folder):
         rospy.logfatal("Specified folder %s does not exist! Aborting playback." % folder)
         sys.exit(2)
@@ -119,7 +119,7 @@ if folder is not None:
     filesMatchingPattern = ['"%s"' % f for f in filesMatchingPattern]
     filesToPlay += filesMatchingPattern
 
-if files is not None:
+if files:
     filesToPlay += shlex.split(files)
 
 rospy.loginfo("Bagfiles to play: " + str(filesToPlay))
