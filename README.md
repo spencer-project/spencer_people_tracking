@@ -170,7 +170,7 @@ Then, you can launch
 
     roslaunch spencer_people_tracking_launch tracking_on_bagfile.launch
     
-which will start playing back a bagfile (as soon as you unpause by pressing `Space`) and run Rviz for visualization.
+which will start playing back a bagfile (as soon as you unpause by pressing `SPACE`) and run Rviz for visualization.
 
 ##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
 
