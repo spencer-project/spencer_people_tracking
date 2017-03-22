@@ -143,6 +143,11 @@ We recommend installation of ROS and the required depencencies of our components
     sudo apt-get install ros-indigo-desktop-full
     sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-indigo-openni-launch ros-indigo-openni2-launch ros-indigo-cmake-modules ros-indigo-eigen-conversions
     
+###### Using ROS Kinetic on Ubuntu 16.04 (Xenial)
+
+    sudo apt-get install ros-kinetic-desktop-full
+    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-kinetic-openni-launch ros-kinetic-openni2-launch ros-kinetic-cmake-modules ros-kinetic-eigen-conversions libopencv-dev
+    
 ##### Building our ROS packages
 
 As we currently do not yet provide any pre-built Debian packages, we suggest to [create a new catkin workspace](http://wiki.ros.org/catkin/workspaces) for our framework, and then clone the content of this repository into the `src` folder of this new workspace. Then, build the workspace using the normal methods (catkin_make / catkin build).
@@ -153,7 +158,19 @@ The cudaHOG library used by the groundHOG detector requires an nVidia graphics c
 
 #### Quick start tutorial
 
-The following three tutorials help you to easily get started using our framework.
+The following demo and three tutorials help you to easily get started using our framework.
+
+##### Demo: Multimodal tracking in RGB-D and 2D laser from a bagfile
+
+A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework can be downloaded by running
+
+    rosrun spencer_people_tracking_launch download_example_bagfiles.sh
+
+Then, you can launch
+
+    roslaunch spencer_people_tracking_launch tracking_on_bagfile.launch
+    
+which will start playing back a bagfile (as soon as you unpause by pressing `Space`) and run Rviz for visualization.
 
 ##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
 
@@ -210,11 +227,6 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 3. Start your copy of `freiburg_people_tracking.launch`.
 4. If needed, start group tracking via `roslaunch spencer_people_tracking_launch group_tracking.launch`.
 
-#### Example dataset (bagfile)
-
-A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework will be linked here in the future.
-
-In case you just want to test one of the detectors, we will also provide a launch file that remaps the bagfile topics to the ones expected by the detector launch files (e.g. `laser` instead of `/spencer/sensors/laser_front/echo0`). 
 
 #### Credits, license & how to cite
 
