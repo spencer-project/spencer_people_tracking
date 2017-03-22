@@ -10,6 +10,7 @@
   <arg name="front_rgbd" default="true"/>
   <arg name="rear_rgbd" default="true"/>
   <arg name="uncompress_rgbd" default="true"/>
+  <arg name="tracked_persons" default="true"/>
 
   <!-- Playback options -->
   <arg name="rqt" default="false"/>
@@ -38,6 +39,9 @@
   <group>
     <remap from="/tf" to="/spencer/sensors/tf_in_bagfile"/>
     <remap from="/spencer/sensors/clock" to="/clock"/>
+
+    <remap from="/spencer/perception/tracked_persons" to="/spencer/perception/tracked_persons_in_bagfile" unless="$(arg tracked_persons)"/>
+    <remap from="/spencer/perception/detected_persons" to="/spencer/perception/detected_persons_in_bagfile" unless="$(arg tracked_persons)"/>
 
     <!-- Uncompress RGB-D images -->
     <remap if="$(arg uncompress_rgbd)" from="/spencer/sensors/rgbd_front_top/depth/image_raw/compressedDepth" to="/spencer/sensors/rgbd_front_top/depth_recorded/image_raw/compressedDepth"/>
