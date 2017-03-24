@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <build_depend>message_generation</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>camera_calibration_parsers</build_depend>
-  
+
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
@@ -67,7 +67,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <run_depend>message_runtime</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>camera_calibration_parsers</run_depend>
-  
+  <run_depend>compressed_image_transport</run_depend>
+  <run_depend>compressed_depth_image_transport</run_depend>
   <run_depend>rospy</run_depend>
 
 </package>
