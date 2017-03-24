@@ -130,31 +130,42 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 #### Installation
 
-The people and group detection and tracking framework has been tested Ubuntu 14.04 using ROS Indigo. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
+The people and group detection and tracking framework has been tested on Ubuntu 14.04 / ROS Indigo and Ubuntu 16.04 / ROS Kinetic. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
 
 *NOTE: The entire framework only works on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
 
-##### Required dependencies
+##### 1. Cloning the source code repository
 
-We recommend installation of ROS and the required depencencies of our components via:
+As we currently do not yet provide any pre-built Debian packages, you have to build our framework from source code. As a first step, create a folder for a new catkin workspace and clone the GitHub repository into the `src` subfolder:
 
-###### Using ROS Indigo on Ubuntu 14.04 (Trusty)
-
-    sudo apt-get install ros-indigo-desktop-full
-    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-indigo-openni-launch ros-indigo-openni2-launch ros-indigo-cmake-modules ros-indigo-eigen-conversions
+    cd ~/Code
+    mkdir -p spencer-people-tracking-ws/src
+    cd spencer-people-tracking-ws/src
+    git clone https://github.com/spencer-project/spencer_people_tracking.git
     
-###### Using ROS Kinetic on Ubuntu 16.04 (Xenial)
+##### 2. Installing required dependencies
 
-    sudo apt-get install ros-kinetic-desktop-full
-    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-kinetic-openni-launch ros-kinetic-openni2-launch ros-kinetic-cmake-modules ros-kinetic-eigen-conversions libopencv-dev
+Assuming you have ROS Indigo or ROS Kinetic already installed, we recommend installing the required depencencies of our framework via:
+
+    rosdep update
+    rosdep install -r --from-paths . --ignore-src
     
-##### Building our ROS packages
+##### 3. Initializing the catkin workspace
+ 
+Next, we suggest to use `catkin` (available via `sudo apt-get install python-catkin-tools`) to setup the workspace:
 
-As we currently do not yet provide any pre-built Debian packages, we suggest to [create a new catkin workspace](http://wiki.ros.org/catkin/workspaces) for our framework, and then clone the content of this repository into the `src` folder of this new workspace. Then, build the workspace using the normal methods (catkin_make / catkin build).
+    cd ..
+    catkin config --init --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    
+##### 4. Building the ROS packages
 
-##### Note on CUDA SDK for the groundHOG detector
+Finally, build all packages via:
 
-The cudaHOG library used by the groundHOG detector requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
+    catkin build -c -s
+
+##### Special note on CUDA SDK for the groundHOG detector
+
+The cudaHOG library used by `rwth_ground_hog` requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
 
 #### Quick start tutorial
 
