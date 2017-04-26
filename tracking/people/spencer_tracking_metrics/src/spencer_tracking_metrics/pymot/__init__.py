@@ -6,7 +6,7 @@
 #
 # Contributors:
 # Markus Roth (roth@videmo.de)
-# Martin Bäuml (baeuml@kit.edu)
+# Martin Baeuml (baeuml@kit.edu)
 # Mika Fischer (fischer@videmo.de)
 # Keni Bernardin (bernardin@videmo.de)
 #
