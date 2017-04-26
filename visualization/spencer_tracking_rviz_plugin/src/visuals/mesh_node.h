@@ -32,8 +32,9 @@
 #define MESH_NODE_H
 
 #include <rviz/mesh_loader.h>
+#ifndef Q_MOC_RUN
 #include <resource_retriever/retriever.h>
-
+#endif
 #include <rviz/visualization_manager.h>
 #include <rviz/render_panel.h> // hack to get camera position 
 

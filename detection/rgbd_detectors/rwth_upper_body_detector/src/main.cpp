@@ -8,6 +8,7 @@
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 
@@ -184,6 +185,14 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
     if(!detect && !vis)
         return;
 
+    // Verify depth image is of correct format
+    if(depth->encoding != image_encodings::TYPE_32FC1) {
+        ROS_ERROR_THROTTLE(5.0, "Depth input image provided to upper-body detector has wrong encoding! 32FC1 is required (depth in meters), "
+            "usually offered by the registered/rectified depth image. Maybe you are remapping the input topic incorrectly to the unregistered, "
+            "raw image of type 16UC1 (depth in millimeters)?");
+        return;
+    }
+
     // Get depth image as matrix
     cv_depth_ptr = cv_bridge::toCvCopy(depth);
     img_depth_ = cv_depth_ptr->image;
@@ -261,7 +270,7 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
     }
 
     // Creating a ros image with the detection results an publishing it
-    if(vis && abs((depth->header.stamp - color_image->header.stamp).toSec()) < 0.2) {  // only if color image is not outdated (not using a synchronizer!)
+    if(vis && color_image && abs((depth->header.stamp - color_image->header.stamp).toSec()) < 0.2) {  // only if color image is not outdated (not using a synchronizer!)
         // Check for suppported image format
         if(color_image->encoding == "rgb8" || color_image->encoding == "bgr8") {
             ROS_DEBUG("Publishing result image for upper-body detector");
@@ -346,7 +355,7 @@ int main(int argc, char **argv)
     private_node_handle_.param("camera_namespace", cam_ns, string("/camera"));
     private_node_handle_.param("ground_plane", topic_gp, string("/ground_plane"));
 
-    topic_color_image = cam_ns + "/rgb/image_raw";
+    topic_color_image = cam_ns + "/rgb/image_rect_color";
     string topic_depth_image = cam_ns + "/depth/image_rect";
     string topic_camera_info = cam_ns + "/depth/camera_info";
 

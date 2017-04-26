@@ -31,11 +31,12 @@
 #ifndef TRACKED_PERSONS_CACHE_H
 #define TRACKED_PERSONS_CACHE_H
 
+#ifndef Q_MOC_RUN
 #include <map>
 #include <geometry_msgs/PoseWithCovariance.h>
 #include <geometry_msgs/TwistWithCovariance.h>
 #include <spencer_tracking_msgs/TrackedPersons.h>
-
+#endif
 #include "additional_topic_subscriber.h"
 
 namespace spencer_tracking_rviz_plugin

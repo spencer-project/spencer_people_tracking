@@ -61,6 +61,6 @@
     </group>
 
     <!-- Filter tracks that are output by people tracker (e.g. visually confirmed tracks, moving tracks etc. on separate topics) -->
-    <include file="$(find spencer_people_tracking_launch)/launch/filter_tracks.launch"/>
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/filter_tracks.launch"/>
 
 </launch>

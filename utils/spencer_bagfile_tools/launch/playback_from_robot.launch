@@ -1,46 +1,21 @@
-<!--
-Software License Agreement (BSD License)
-
-Copyright (c) 2013-2015, Timm Linder, Social Robotics Lab, University of Freiburg
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-* Neither the name of the copyright holder nor the names of its contributors
-  may be used to endorse or promote products derived from this software
-  without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--->
-
 <!-- Launch file for playing bagfiles recorded with the SPENCER robot platform -->
 <launch>
   <!-- CONFIGURABLE ARGUMENTS -->
-  <arg name="files"/>
-  <arg name="localization" default="false"/>
+  <arg name="files" default=""/>
+  <arg name="folder" default=""/>
+  
+  <arg name="urdf" default="false"/>
+  <arg name="remap_tf" default="true" if="$(arg urdf)"/>
+  <arg name="remap_tf" default="false" unless="$(arg urdf)"/>
   
   <arg name="depth" default="true"/>
   <arg name="no_point_clouds" default="false" />
   <arg name="front_rgbd" default="true"/>
   <arg name="rear_rgbd" default="true"/>
+  <arg name="laser" default="true"/>
   <arg name="uncompress_rgbd" default="true"/>
+  <arg name="tracked_persons" default="true"/>
+  <arg name="velodyne" default="false"/>
 
   <!-- Playback options -->
   <arg name="rqt" default="false"/>
@@ -57,18 +32,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <arg name="visualization" default="true" /> <!-- whether to run RViz with provided config, or not -->
   <arg name="panoramas" default="false"/>
   <arg name="relay_rgbd_for_visualization" default="true"/>
-  <arg name="rviz_config_file" default="$(find spencer_visualization)/config/visualization_spencer_robot_1.rviz"/> <!-- configuration file for RViz to use, if visualization is enabled -->
-  
+  <arg name="rviz_config_file" default="$(find spencer_bagfile_tools)/launch/components/visualization_robot.rviz"/> <!-- configuration file for RViz to use, if visualization is enabled -->
+
   <arg name="rosbag_play_args" default="--clock --queue=5 --delay=0 --start=$(arg start) --duration=$(arg duration) --rate=$(arg rate)" /> <!-- extra arguments used to play back the bagfile -->
- 
+
   <!-- Important: Use simulated time published on /clock topic, otherwise TF will be broken -->
   <param name="/use_sim_time" value="true"/>
 
 
   <!-- BAG FILE PLAYBACK -->
   <group>
-    <remap from="/tf" to="/spencer/sensors/tf_in_bagfile"/>
+    <remap from="/tf" to="/spencer/sensors/tf_in_bagfile" if="$(arg remap_tf)"/>
     <remap from="/spencer/sensors/clock" to="/clock"/>
+
+    <remap from="/spencer/perception/tracked_persons" to="/spencer/perception/tracked_persons_in_bagfile" unless="$(arg tracked_persons)"/>
+    <remap from="/spencer/perception/detected_persons" to="/spencer/perception/detected_persons_in_bagfile" unless="$(arg tracked_persons)"/>
 
     <!-- Uncompress RGB-D images -->
     <remap if="$(arg uncompress_rgbd)" from="/spencer/sensors/rgbd_front_top/depth/image_raw/compressedDepth" to="/spencer/sensors/rgbd_front_top/depth_recorded/image_raw/compressedDepth"/>
@@ -94,7 +72,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <!-- This script launches either rosbag play or rqt_bag, and searches for all relevant bag files for the active sensor modalities in the given folder -->
     <node name="playback_wrapper" pkg="spencer_bagfile_tools" type="play.py" output="screen" required="$(arg required)" ns="/spencer/sensors" clear_params="true"> <!-- sub-namespace only applied for relative topic names in bagfile -->
+      <!-- Either give a list of files... -->
       <param name="files" value="$(arg files)"/>
+
+      <!-- Or an entire folder containing bagfiles prefixed with laser_, front_rgbd_, etc. -->
+      <param name="folder" value="$(arg folder)"/>
+      <param name="laser" value="$(arg laser)"/>
+      <param name="front_rgbd" value="$(arg front_rgbd)"/>
+      <param name="rear_rgbd" value="$(arg rear_rgbd)"/>
+
       <param name="rqt" value="$(arg rqt)"/>
       <param name="pause" value="$(arg pause)"/>
       <param name="loop" value="$(arg loop)"/>
@@ -105,7 +91,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
   <!-- TF EXCLUSIONS -->
-  <group>
+  <group if="$(arg remap_tf)">
     <remap from="tf_old" to="/spencer/sensors/tf_in_bagfile"/>
     <node name="tf_filter" pkg="spencer_bagfile_tools" type="tf_filter.py" args="_exclude:='[]'"/>
   </group>
@@ -190,10 +176,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </group>
 
 
-  <!-- ROBOT URDF -->
-  <include file="$(find spencer_description)/launch/publish.launch"/>
+  <!-- VELODYNE POINT CLOUD GENERATION -->
+  <group if="$(arg velodyne)">
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+  </group>
 
-  
+
+  <!-- ROBOT URDF -->
+  <group if="$(arg urdf)">
+    <include file="$(find spencer_description)/launch/publish.launch"/>
+  </group>
+
   <!-- VISUALIZATION -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config_file)" required="false" if="$(arg visualization)"/>
 

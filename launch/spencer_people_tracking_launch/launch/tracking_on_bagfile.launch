@@ -1,0 +1,67 @@
+<launch>
+    <arg name="bagfile_folder" default="$(find spencer_people_tracking_launch)/data/rgbd_2dlaser_example"/>
+
+    <arg name="front_laser" default="true"/>
+    <arg name="front_rgbd" default="true"/>
+    
+    <arg name="rear_rgbd" default="false"/>
+    <arg name="rear_laser" default="false"/>
+    
+    <arg name="static_map" default="true"/>
+    
+    <arg name="loop" default="true"/>
+    <arg name="rate" default="0.2"/>
+
+    <arg name="visualization" default="true"/>
+    <arg name="rviz_config_file" default="$(find spencer_people_tracking_launch)/rviz/tracking-rgbd-laser.rviz"/>
+
+
+    <!-- Bagfile playback -->
+    <include file="$(find spencer_bagfile_tools)/launch/playback_from_robot.launch">
+        <!-- Load bagfiles from this folder, assuming they are prefixed correctly -->
+        <arg name="folder" value="$(arg bagfile_folder)"/>
+            <arg name="laser" value="$(arg front_laser)"/>
+            <arg name="front_rgbd" value="$(arg front_rgbd)"/>
+            <arg name="rear_rgbd" value="$(arg rear_rgbd)"/>
+            <arg name="remap_tf" value="true"/>
+
+        <!-- We could also supply individual filenames instead. In that case, it is easiest if all topics were recorded into the same bagfile. -->
+        <!-- <arg name="files" value="$(find bagfile_folder)/mybagfile.bag"/> -->
+
+        <arg name="loop" value="$(arg loop)"/>
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="required" value="false"/>
+        
+        <arg name="visualization" value="$(arg visualization)"/>
+        <arg name="rviz_config_file" value="$(arg rviz_config_file)"/>
+    </include>
+
+    <!-- Optionally load a map to suppress false positives -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg bagfile_folder)/map.yaml" if="$(arg static_map)"/>
+
+    <!-- Detectors -->
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch" if="$(arg front_rgbd)"/>
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/rear_rgbd_detectors.launch" if="$(arg rear_rgbd)"/>
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/laser_detectors.launch" if="$(arg front_laser)">
+        <arg name="rear" value="$(arg rear_laser)"/>
+    </include> 
+
+    <!-- People tracking -->
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
+        <arg name="rgbd" value="$(arg front_rgbd)"/>
+        <arg name="laser_low_confidence_detections" value="$(arg front_laser)"/>
+    </include>
+
+    <!-- Only needed if no laser available -->
+    <group unless="$(arg front_laser)">
+        <!-- As there is not yet any high-recall/low-confidence detector for RGB-D, and we are not using laser, tracks may get deleted too quickly in case of missed detections.
+         To deal with this, for the moment, we increase the maximum number of occluded frames to be  a bit more tolerant towards missed detections.
+         This works fine in uncrowded environments which are not very dynamic. -->
+        <rosparam param="/spencer/perception_internal/people_tracking/srl_nearest_neighbor_tracker/max_occlusions_before_deletion">50</rosparam>
+        <rosparam param="/spencer/perception_internal/people_tracking/srl_nearest_neighbor_tracker/max_occlusions_before_deletion_of_mature_track">200</rosparam>
+    </group>
+
+    <!-- Group tracking -->
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/group_tracking.launch"/> 
+
+</launch>

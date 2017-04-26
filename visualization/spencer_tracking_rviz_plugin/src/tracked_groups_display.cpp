@@ -33,10 +33,11 @@
 #include "rviz/selection/selection_manager.h"
 
 #include "tracked_groups_display.h"
-
+#ifndef Q_MOC_RUN
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#endif
 #define foreach BOOST_FOREACH
 
 namespace spencer_tracking_rviz_plugin

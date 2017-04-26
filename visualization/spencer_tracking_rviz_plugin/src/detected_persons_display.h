@@ -31,12 +31,12 @@
 #ifndef DETECTED_PERSONS_DISPLAY_H
 #define DETECTED_PERSONS_DISPLAY_H
 
+#ifndef Q_MOC_RUN
 #include <map>
 #include <boost/circular_buffer.hpp>
-
 #include <spencer_tracking_msgs/DetectedPersons.h>
-
 #include "person_display_common.h"
+#endif
 
 namespace spencer_tracking_rviz_plugin
 {

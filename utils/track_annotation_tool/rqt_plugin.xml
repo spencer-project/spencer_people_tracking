@@ -1,0 +1,22 @@
+<library path="src">
+  <class name="Track Annotation Plugin" type="track_annotation_tool.gui.TrackAnnotationPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Plugin for annotating person tracks (using the track_annotation_tool package). Works in combination with the
+      associated RViz plugin.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Track annotation plugin</label>
+      <icon type="file">icons/classes/TrackAnnotationPlugin.png</icon>
+      <statustip>Plugin for annotating person tracks (using the track_annotation_tool package). Works in combination with the
+      associated RViz plugin.</statustip>
+    </qtgui>
+  </class>
+</library>

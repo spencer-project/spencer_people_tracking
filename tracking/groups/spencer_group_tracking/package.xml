@@ -16,14 +16,16 @@
   <build_depend>roscpp</build_depend>
   <build_depend>python-numpy</build_depend>
   <build_depend>python-scipy</build_depend>
-  <build_depend>spencer_tracking_msgs</build_depend> 
-  <build_depend>spencer_social_relation_msgs</build_depend> 
-  
+  <build_depend>spencer_tracking_msgs</build_depend>
+  <build_depend>spencer_social_relation_msgs</build_depend>
+
   <run_depend>rospy</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>python-numpy</run_depend>
   <run_depend>python-scipy</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>
   <run_depend>spencer_social_relation_msgs</run_depend>
-  
+  <run_depend>atlas</run_depend>
+
+
 </package>

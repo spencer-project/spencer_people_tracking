@@ -36,7 +36,6 @@ Tola, Engin. 2006 June 12. Homepage. <http://cvlab.epfl.ch/~tola/index.htm>
 
 #include <string>
 #include <vector>
-#include "CPoint.h"
 
 
 using namespace std;
@@ -45,8 +44,10 @@ class KBox
 public:
         KBox();
         virtual ~KBox();
-        CPoint topLeft;
-        CPoint bottomRight;
+        int topLeft_x;
+        int topLeft_y;
+        int bottomRight_x;
+        int bottomRight_y;
         int	   ID;
 };
 

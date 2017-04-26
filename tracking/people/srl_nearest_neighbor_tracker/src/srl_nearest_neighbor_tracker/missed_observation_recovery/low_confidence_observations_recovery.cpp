@@ -78,6 +78,8 @@ void LowConfidenceObservationsRecovery::recoverObservations(const double current
 {
     // Check if normal and low-confidence detections are sufficiently synchronized
     m_numCyclesTotal++;
+    
+    if (!m_currentLowConfidenceDetections) return;
     double timestampDelta = currentTime - m_currentLowConfidenceDetections->header.stamp.toSec();
     if(std::abs(timestampDelta) > m_maxTimestampDifference)
     {

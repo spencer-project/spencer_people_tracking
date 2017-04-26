@@ -20,7 +20,9 @@
   <build_depend>tf_conversions</build_depend>
   <build_depend>spencer_diagnostics</build_depend>
   <build_depend>cmake_modules</build_depend>
+  <build_depend>srl_laser_segmentation</build_depend>
 
+  <run_depend>srl_laser_segmentation</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>
   <run_depend>eigen_conversions</run_depend>

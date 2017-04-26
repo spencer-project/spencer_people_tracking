@@ -130,50 +130,91 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 #### Installation
 
-The people and group detection and tracking framework has been tested on Ubuntu 12.04 using ROS Hydro, as well as Ubuntu 14.04 using ROS Indigo. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
+The people and group detection and tracking framework has been tested on Ubuntu 14.04 / ROS Indigo and Ubuntu 16.04 / ROS Kinetic. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
 
-*NOTE: The entire framework has only been tested on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
+*NOTE: The entire framework only works on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
 
-##### Required dependencies
+##### 1. Cloning the source code repository
 
-We recommend installation of ROS and the required depencencies of our components via:
+As we currently do not yet provide any pre-built Debian packages, you have to build our framework from source code. As a first step, create a folder for a new catkin workspace and clone the GitHub repository into the `src` subfolder:
 
-###### Using ROS Hydro on Ubuntu 12.04 (Precise)
-
-    sudo apt-get install ros-hydro-desktop-full
-    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-hydro-openni-launch ros-hydro-openni2-launch ros-hydro-cmake-modules ros-hydro-eigen-conversions
-
-###### Using ROS Indigo on Ubuntu 14.04 (Trusty)
-
-    sudo apt-get install ros-indigo-desktop-full
-    sudo apt-get install libeigen3-dev libsvm-dev python-numpy python-scipy ros-indigo-openni-launch ros-indigo-openni2-launch ros-indigo-cmake-modules ros-indigo-eigen-conversions
+    cd ~/Code
+    mkdir -p spencer-people-tracking-ws/src
+    cd spencer-people-tracking-ws/src
+    git clone https://github.com/spencer-project/spencer_people_tracking.git
     
-##### Building our ROS packages
+##### 2. Installing required dependencies
 
-As we currently do not yet provide any pre-built Debian packages, we suggest to [create a new catkin workspace](http://wiki.ros.org/catkin/workspaces) for our framework, and then clone the content of this repository into the `src` folder of this new workspace. Then, build the workspace using the normal methods (catkin_make / catkin build).
+Assuming you have ROS Indigo or ROS Kinetic already installed, we recommend installing the required depencencies of our framework via:
 
-##### Note on CUDA SDK for the groundHOG detector
+    rosdep update
+    rosdep install -r --from-paths . --ignore-src
+    
+##### 3. Initializing the catkin workspace
+ 
+Next, we suggest to use `catkin` (available via `sudo apt-get install python-catkin-tools`) to setup the workspace:
 
-The cudaHOG library used by the groundHOG detector requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
+    cd ..
+    catkin config --init --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    
+##### 4. Building the ROS packages
+
+Finally, build all packages via:
+
+    catkin build -c -s
+
+##### 5. Sourcing the ROS workspace
+
+After building the workspace, source it via:
+
+    source devel/setup.bash
+
+
+##### Special note on CUDA SDK for the groundHOG detector
+
+The cudaHOG library used by `rwth_ground_hog` requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
 
 #### Quick start tutorial
 
-The following three tutorials help you to easily get started using our framework.
+The following demo and three tutorials help you to easily get started using our framework.
+
+##### Demo: Multimodal tracking in RGB-D and 2D laser from a bagfile
+
+A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework can be downloaded by running
+
+    rosrun spencer_people_tracking_launch download_example_bagfiles.sh
+
+Then, you can launch
+
+    roslaunch spencer_people_tracking_launch tracking_on_bagfile.launch
+    
+which will start playing back a bagfile (as soon as you unpause by pressing `SPACE`) and run Rviz for visualization.
 
 ##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
 
-This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live or Kinect v1 sensor horizontally on a flat surface, and connect it to your computer (or play the example bagfile linked in a section further below). Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
+This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live sensor horizontally on a flat surface, and connect it to your computer (or play the example bagfile linked in a section further below). Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
 
     roslaunch spencer_people_tracking_launch tracking_single_rgbd_sensor.launch height_above_ground:=1.6
     
 This will do the following:
-- Start the OpenNi2 drivers and publish RGB-D point clouds in the `/spencer/sensors/rgbd_front_top/` camera namespace
-- Run an upper-body RGB-D and groundHOG RGB detector, assuming a horizontal ground plane at 1.6 meters below the sensor. Other heights may work as well, but the detector has been trained at approximately this height.
+- Start the OpenNi2 drivers (for Asus Xtion Pro) and publish RGB-D point clouds in the `/spencer/sensors/rgbd_front_top/` camera namespace
+- Run an upper-body RGB-D detector, assuming a horizontal ground plane at 1.6 meters below the sensor. Other heights may work as well, but the detector has been trained at approximately this height.
 - Run a simple detection-to-detection fusion pipeline
 - Run the `srl_nearest_neighbor_tracker`, which will subscribe to `/spencer/perception/detected_persons` and publish tracks at `/spencer/perception/tracked_persons`
-- Run RViz with a predefined configuration, which shows the point cloud, detected and tracked persons (using our custom RViz plugins)
+- Run RViz with a predefined configuration, which shows the point cloud, the sensor's view frustum, and detected and tracked persons (using our custom RViz plugins).
 
-If this doesn't work, first check if the point cloud is displayed properly in RViz. If not, there is probably a problem with your RGB-D sensor (USB or OpenNi 2 issues).
+###### Using MS Kinect v1 ######
+
+The original MS Kinect v1 sensor does not support OpenNi2. In this case, append `use_openni1:=true` to the above command-line of the launch file to fall back to OpenNi1.
+
+###### Enabling the groundHOG detector ######
+
+If you have compiled the cudaHOG library (see description further above), you can optionally enable the groundHOG detector by passing `use_hog_detector:=true` to the launch file. The detection-to-detection fusion pipeline will then automatically fuse the detections from upper-body and HOG detector.
+
+###### Troubleshooting ######
+
+If you cannot see any detection bounding boxes, first check if the point cloud is displayed properly in RViz. If not, there is probably a problem with your RGB-D sensor (USB or OpenNi issues).
+
 
 ##### Tutorial 2: Tracking with front and rear laser + RGB-D sensors
 
@@ -204,11 +245,6 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 3. Start your copy of `freiburg_people_tracking.launch`.
 4. If needed, start group tracking via `roslaunch spencer_people_tracking_launch group_tracking.launch`.
 
-#### Example dataset (bagfile)
-
-A short exemplary bagfile with 2D laser and RGB-D sensor data to test our framework will be linked here in the future.
-
-In case you just want to test one of the detectors, we will also provide a launch file that remaps the bagfile topics to the ones expected by the detector launch files (e.g. `laser` instead of `/spencer/sensors/laser_front/echo0`). 
 
 #### Credits, license & how to cite
 

@@ -31,15 +31,15 @@
 #ifndef HUMAN_ATTRIBUTES_DISPLAY_H
 #define HUMAN_ATTRIBUTES_DISPLAY_H
 
+#ifndef Q_MOC_RUN
 #include <map>
 #include <boost/circular_buffer.hpp>
-
 #include <spencer_human_attribute_msgs/HumanAttributes.h>
 
 #include "person_display_common.h"
 #include "tracked_persons_cache.h"
 #include "visuals/mesh_node.h"
-
+#endif
 
 namespace spencer_tracking_rviz_plugin
 {

@@ -50,6 +50,7 @@ generate_dynamic_reconfigure_options(
 
 catkin_package()
 
+include_directories(${catkin_INCLUDE_DIRS})
 
 
 # # #  panorama_builder executable (receives from and publishes to ROS) # # # 

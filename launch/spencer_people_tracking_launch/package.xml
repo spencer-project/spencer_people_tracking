@@ -14,5 +14,10 @@
   <author>Stefan Breuers</author>
   
   <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>spencer_tracking_rviz_plugin</run_depend>
+  <run_depend>srl_nearest_neighbor_tracker</run_depend>
+  <run_depend>spencer_detected_person_association</run_depend>
+  <run_depend>jsk_rviz_plugins</run_depend>
   
 </package>
