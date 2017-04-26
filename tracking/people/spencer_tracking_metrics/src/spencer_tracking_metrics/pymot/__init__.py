@@ -27,7 +27,6 @@ from formatchecker import FormatChecker
 from utilities import write_stderr_red
 import logging
 import time
-import glob, os, re
 LOG = logging.getLogger(__name__)
 
 
@@ -81,9 +80,6 @@ class MOTEvaluation:
         # List of dicts, containing ground truths and hypotheses for visual debugging
         self.visualDebugFrames_ = []
 
-        self.evalMisses = []
-        self.evalFalsePositives = []
-        self.evalMismatches = []
 
     def get_hypotheses_frame(self, timestamp):
         """Get list of hypotheses occuring chronologically close to ground truth timestamp, but at most with time difference self.sync_delta"""
@@ -114,25 +110,6 @@ class MOTEvaluation:
         for frame in frames:
             self.evaluateFrame(frame)
 
-        misses_filename = rospy.get_param("~misses_filename", "misses.txt")
-        falsepositives_filename = rospy.get_param("~falsepositives_filename", "falsepositives.txt")
-        mismatches_filename = rospy.get_param("~mismatches_filename", "mismatches.txt")
-
-        with open(misses_filename, 'w') as file:
-            for item in self.evalMisses:
-                file.write("%s " % str(item[0]) + " " + str(item[1]) + "\n")
-            file.close
-            #print "Wrote misses to "
-
-        with open(falsepositives_filename, 'w') as file:
-            for item in self.evalFalsePositives:
-                file.write("%s " % str(item[0]) + " " + str(item[1]) + " " + str(item[2]) + " " + str(item[3]) + " " + str(item[4]) + " " + str(item[5]) + "\n")
-            file.close
-
-        with open(mismatches_filename, 'w') as file:
-            for item in self.evalMismatches:
-                file.write("%s " % str(item[0]) + " " + str(item[1]) + " " + str(item[2]) + " " + str(item[3]) + " " + str(item[4]) + " " + str(item[5]) + "\n")
-            file.close
 
     def evaluateFrame(self, frame):
         """Update statistics by evaluating a new frame."""
@@ -225,7 +202,6 @@ class MOTEvaluation:
                 self.misses_ += 1 
                 correspondences[gt_id] = hypothesis[0]["id"]
                 self.total_distance_ += distance
-                self.evalMisses.append([frame["num"], correspondences[gt_id]])
 
         munk_hypotheses = filter(lambda h: h['id'] not in correspondences.values(), hypotheses)         
         munk_gts = filter(lambda g: g['id'] not in correspondences.keys(), groundtruths) 
@@ -375,8 +351,6 @@ class MOTEvaluation:
                         g = g[0]
                         h = h[0]
 
-                        self.evalMismatches.append([frame["num"], h["id"], h["x"], h["y"], h["w"], h["h"]])
-
                         g["class"] = "mismatch"
                         h["class"] = "mismatch"
 
@@ -431,7 +405,6 @@ class MOTEvaluation:
                 groundtruth["class"] = "miss"
                 visualDebugAnnotations.append(groundtruth)
                 self.misses_ += 1
-                self.evalMisses.append([frame["num"], groundtruth["id"]])
 
         # Count false positives
         for hypothesis in hypotheses:
@@ -441,7 +414,6 @@ class MOTEvaluation:
                 self.false_positives_ += 1
                 visualDebugAnnotations.append(hypothesis)
                 hypothesis["class"] = "false positive"
-                self.evalFalsePositives.append([frame["num"], hypothesis["id"], hypothesis["x"], hypothesis["y"], hypothesis["w"], hypothesis["h"]])
         
         self.total_correspondences_ += len(correspondences)
 
