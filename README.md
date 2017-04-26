@@ -163,6 +163,13 @@ Finally, build all packages via:
 
     catkin build -c -s
 
+##### 5. Sourcing the ROS workspace
+
+After building the workspace, source it via:
+
+    source devel/setup.bash
+
+
 ##### Special note on CUDA SDK for the groundHOG detector
 
 The cudaHOG library used by `rwth_ground_hog` requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
