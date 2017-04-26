@@ -61,10 +61,12 @@ Launches the nearest-neighbor tracker with a set of parameters that worked well 
         <rosparam file="$(find srl_nearest_neighbor_tracker)/launch/params/$(arg ekf_param_file)" command="load"/>
         
         <!-- Override measurement noise values from detectors -->
-        <param name="overwrite_measurement_noise" value="false"/>
+        <param name="overwrite_measurement_noise" value="false"/> <!-- see note below -->
         <param name="measurement_noise" value="0.05"/>
 
-        <!-- Settings to reproduce results of ICRA16 paper (disable features that were added afterwards) -->
+        <!-- IMPORTANT! -->
+        <!-- These values override above settings to reproduce results of ICRA16 paper (disable features that were added afterwards) -->
+        <param name="overwrite_measurement_noise" value="true"/>
         <param name="logic_initiator_high_confidence_modalities" value=""/>
         <param name="published_track_forward_predict_time" value="0.0"/>
 
