@@ -57,7 +57,6 @@ def calculatePyMot(clearMotInput):
                 entity["id"] = gtPerson.track_id
                 entity["x"] = gtPerson.pose.pose.position.x
                 entity["y"] = gtPerson.pose.pose.position.y
-                entity["w"] = entity["h"] = None
                 entity["dco"] = gtPerson.is_occluded
                 frame["annotations"].append(entity)
         
@@ -75,7 +74,6 @@ def calculatePyMot(clearMotInput):
             entity["id"] = trackedPerson.track_id
             entity["x"] = trackedPerson.pose.pose.position.x
             entity["y"] = trackedPerson.pose.pose.position.y
-            entity["w"] = entity["h"] = None
             entity["dco"] = trackedPerson.is_occluded;
             frame["hypotheses"].append(entity)
         
