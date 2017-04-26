@@ -270,7 +270,7 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
     }
 
     // Creating a ros image with the detection results an publishing it
-    if(vis && abs((depth->header.stamp - color_image->header.stamp).toSec()) < 0.2) {  // only if color image is not outdated (not using a synchronizer!)
+    if(vis && color_image && abs((depth->header.stamp - color_image->header.stamp).toSec()) < 0.2) {  // only if color image is not outdated (not using a synchronizer!)
         // Check for suppported image format
         if(color_image->encoding == "rgb8" || color_image->encoding == "bgr8") {
             ROS_DEBUG("Publishing result image for upper-body detector");
