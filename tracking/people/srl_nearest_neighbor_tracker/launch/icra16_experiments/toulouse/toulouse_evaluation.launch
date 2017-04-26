@@ -59,12 +59,12 @@
 
     <!-- Detectors -->
 
-    <include file="$(find spencer_people_tracking_launch)/launch/laser_detectors.launch" if="$(arg laser)">
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/laser_detectors.launch" if="$(arg laser)">
         <arg name="rear" value="false"/>  <!-- people in rear of robot are not wearing mocap markers!!! -->
         <arg name="low_confidence_detections" value="true"/>
     </include>
 
-    <include file="$(find spencer_people_tracking_launch)/launch/front_rgbd_detectors.launch" if="$(arg rgbd)">
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch" if="$(arg rgbd)">
         <arg name="hog" value="$(arg hog)"/>
     </include>
 

@@ -16,7 +16,7 @@
     <remap from="/spencer/perception/detected_persons" to="/unused/detected_persons"/>
     <remap from="/spencer/perception/detected_persons_composite" to="/unused/detected_persons_composite"/>
 
-    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
         <arg name="rgbd" value="false"/>
         <arg name="static_map_filter" value="false"/>
         <arg name="fuse_detections" value="true"/> <!-- special case, to fuse low-confidence observations -->

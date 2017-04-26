@@ -11,7 +11,7 @@
 
     <!-- Tracker -->
 
-    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
         <arg name="rgbd" value="true"/>
         <arg name="static_map_filter" value="false"/>
         <arg name="subscriber_queue_size" value="3"/>

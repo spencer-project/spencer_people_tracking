@@ -60,7 +60,7 @@
 
     <!-- Fuse detections -->
 
-    <include file="$(find spencer_people_tracking_launch)/launch/freiburg_people_tracking.launch">
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
         <arg name="rgbd" value="$(arg front_rgbd)"/>
         <arg name="laser_low_confidence_detections" value="true"/>
         <arg name="static_map_filter" value="$(arg static_map_filter)"/>
