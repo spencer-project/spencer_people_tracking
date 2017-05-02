@@ -132,6 +132,7 @@ void ROSInterface::publishTracks(ros::Time currentRosTime, const Tracks& tracks)
 
         trackedPerson.track_id = track->id;
         trackedPerson.age = ros::Duration(currentRosTime.toSec() - track->createdAt);
+        std::vector< long unsigned int > detection_ids;
 
         switch(track->trackStatus){
             case Track::MATCHED:
@@ -139,6 +140,10 @@ void ROSInterface::publishTracks(ros::Time currentRosTime, const Tracks& tracks)
                 trackedPerson.is_matched = true;
                 trackedPerson.is_occluded = false;
                 trackedPerson.detection_id = track->observation->id;
+                foreach(Observation::Ptr observation, track->observations){
+                    detection_ids.push_back(observation->id);
+                }
+                trackedPerson.detection_ids = detection_ids;
                 break;
             case Track::MISSED:
                 trackedPerson.is_matched = false;

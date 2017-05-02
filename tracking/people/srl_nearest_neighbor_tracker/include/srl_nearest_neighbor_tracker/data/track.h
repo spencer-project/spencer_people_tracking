@@ -69,6 +69,9 @@ struct Track
     /// Initializing or matching Observation. NULL for OCCLUDED or DELETED tracks.
     Observation::Ptr observation;
 
+    /// Initializing or matching Observation. NULL for OCCLUDED or DELETED tracks.
+    Observations observations;
+
     /// Creation time of the track in seconds.
     double createdAt;
 

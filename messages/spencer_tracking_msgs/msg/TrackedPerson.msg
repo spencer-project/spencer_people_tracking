@@ -5,6 +5,7 @@ uint64      track_id        # unique identifier of the target, consistent over t
 bool        is_occluded     # if the track is currently not observable in a physical way
 bool        is_matched      # if the track is currently matched by a detection
 uint64      detection_id    # id of the corresponding detection in the current cycle (undefined if occluded)
+uint64[]    detection_ids   # ids of the corresponding detection in the current cycle (undefined if occluded)
 duration    age             # age of the track
 
 # The following fields are extracted from the Kalman state x and its covariance C
