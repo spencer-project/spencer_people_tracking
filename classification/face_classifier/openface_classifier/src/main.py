@@ -15,21 +15,27 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 from rwth_perception_people_msgs.msg import UpperBodyDetector
-from spencer_tracking_msgs.msg import DetectedPersons, DetectedPerson
+from spencer_tracking_msgs.msg import (
+    CompositeDetectedPersons,
+    DetectedPerson,
+    DetectedPersons,
+    TrackedPerson,
+    TrackedPersons,
+    )
 
 import message_filters
+
+import spencer_detected_person_association
 
 faceCascade = cv2.CascadeClassifier('/opt/ros/kinetic/share/OpenCV-3.2.0-dev/haarcascades/haarcascade_frontalface_default.xml')
 
 class image_converter:
 
     def __init__(self):
-        self.image_pub = rospy.Publisher('image_topic_2', Image)
+        self.image_pub = rospy.Publisher('image_tracked', Image, queue_size=10)
+        self.track_pub = rospy.Publisher('persons_tracked', Image, queue_size=10)
 
         self.bridge = CvBridge()
-
-    # self.image_sub = rospy.Subscriber("/spencer/perception_internal/people_detection/rgbd_front_top/upper_body_detector/image",Image,self.callback)
-    # self.roi_sub = rospy.Subscriber("/spencer/perception_internal/people_detection/rgbd_front_top/upper_body_detector/detections",UpperBodyDetector,self.callback)
 
         image_sub = \
             message_filters.Subscriber('/spencer/sensors/rgbd_front_top/rgb/image_rect_color'
@@ -41,11 +47,15 @@ class image_converter:
             message_filters.Subscriber('/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body'
                 , DetectedPersons)
 
-        self.ts = message_filters.ApproximateTimeSynchronizer(
+        self.time_sync = message_filters.ApproximateTimeSynchronizer(
             [image_sub, detections_sub, persons_sub], 30, 1)
-        self.ts.registerCallback(self.callback)
+        self.time_sync.registerCallback(self.time_sync_callback)
 
-    def callback(
+        track_sync_sub = message_filters.Subscriber('/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body', DetectedPersons)
+        self.track_sync = spencer_detected_person_association.TrackSynchronizer(track_sync_sub, 100)
+        self.track_sync.registerCallback(self.track_sync_callback)
+
+    def time_sync_callback(
         self,
         image,
         detections,
@@ -98,6 +108,15 @@ class image_converter:
                 print(e)
         except:
             pass
+
+    def track_sync_callback(
+        self,
+        trackAssociation,
+        persons):
+        person = persons.detections[0]
+        person_id = person.detection_id
+        tracking_id = trackAssociation.lookupTrackId(person_id)
+        print('person_id: {} tracking_id: {}'.format(person_id, tracking_id))
 
 def main(args):
     ic = image_converter()
