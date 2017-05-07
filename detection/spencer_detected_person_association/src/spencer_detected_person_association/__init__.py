@@ -33,8 +33,7 @@ You can use the TrackSynchronizer class to buffer incoming ROS messages until pe
 """
 
 import collections, rospy, threading, message_filters
-from spencer_tracking_msgs.msg import TrackedPersons
-from spencer_detected_person_association.msg import CompositeDetectedPersons
+from spencer_tracking_msgs.msg import CompositeDetectedPersons, TrackedPersons
 
 
 """ Subscribes to /spencer/perception/tracked_persons and invokes the registered callback(s). """
@@ -127,7 +126,7 @@ class FusedDetectionIdMemory(object):
         self.fusedDetectionLookup = dict()
         self.oldDetections = collections.deque() # used to efficiently remove old detections from the dictionary if max length is exceeded
 
-        self.fusedDetectionsTopic = "/spencer/perception_internal/fused_person_detections"
+        self.fusedDetectionsTopic = "/spencer/perception/detected_persons_composite"
         self.fusedDetectionSubscriber = rospy.Subscriber(self.fusedDetectionsTopic, CompositeDetectedPersons, self.newFusedDetectionsAvailable)
         self.maxOriginalDetectionsToRemember = maxOriginalDetectionsToRemember
 
@@ -149,8 +148,9 @@ class FusedDetectionIdMemory(object):
     def newFusedDetectionsAvailable(self, fusedDetections):
         with self.lock:
             for fusedDetection in fusedDetections.elements:
-                fusedId = fusedDetection.fused_detection_id
-                for originalDetectionId in fusedDetection.original_detection_ids:
+                fusedId = fusedDetection.composite_detection_id
+                for originalDetection in fusedDetection.original_detections:
+                    originalDetectionId = originalDetection.detection_id
                     self.fusedDetectionLookup[originalDetectionId] = fusedId
                     self.oldDetections.append(originalDetectionId)
 
