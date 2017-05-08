@@ -51,11 +51,11 @@ class image_converter:
                 , TrackedPersons)
 
         self.time_sync = message_filters.ApproximateTimeSynchronizer(
-            [image_sub, detections_sub, detected_persons_sub, tracked_persons_sub], 30, 1)
+            [image_sub, detections_sub, detected_persons_sub, tracked_persons_sub], 300, 0.02)
         self.time_sync.registerCallback(self.time_sync_callback)
 
         track_sync_sub = message_filters.Subscriber('/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body', DetectedPersons)
-        self.track_sync = spencer_detected_person_association.TrackSynchronizer(track_sync_sub, 100)
+        self.track_sync = spencer_detected_person_association.TrackSynchronizer(track_sync_sub, 300)
         self.track_sync.registerCallback(self.track_sync_callback)
 
     def time_sync_callback(
@@ -136,18 +136,27 @@ class image_converter:
         self,
         trackAssociation,
         detected_persons):
-        tracked_persons = TrackedPersons()
-        tracked_persons.header = detected_persons.header
-        for detected_person in detected_persons.detections:
-            detection_id = detected_person.detection_id
-            track_id = trackAssociation.lookupTrackId(detection_id)
-            if track_id is not None:
-                # print('detection_id: {} track_id: {}'.format(detection_id, track_id))
-                tracked_person = TrackedPerson()
-                tracked_person.track_id = track_id
-                tracked_person.detection_id = detection_id
-                tracked_persons.tracks.append(tracked_person)
-        self.track_pub.publish(tracked_persons)
+        age = rospy.Time.now() - detected_persons.header.stamp
+        output = "New detections with track association available (age of detections = %.2f sec)! Detection to track association: " % age.to_sec()
+
+        if detected_persons.detections:
+            tracked_persons = TrackedPersons()
+            tracked_persons.header = detected_persons.header
+            for detected_person in detected_persons.detections:
+                detection_id = detected_person.detection_id
+                track_id = trackAssociation.lookupTrackId(detection_id)
+                if track_id is not None:
+                    # print('detection_id: {} track_id: {}'.format(detection_id, track_id))
+                    tracked_person = TrackedPerson()
+                    tracked_person.track_id = track_id
+                    tracked_person.detection_id = detection_id
+                    tracked_persons.tracks.append(tracked_person)
+                    output += "\n[det %d --> track %s]" % (detection_id, str(track_id))
+            self.track_pub.publish(tracked_persons)
+        else:
+            output += "Empty set of detections!"
+
+        # rospy.loginfo(output)
 
 def main(args):
     ic = image_converter()
