@@ -242,7 +242,7 @@ pcl::people::GroundBasedPeopleDetectionApp<PointT>::rotateRgbImage(Eigen::Rotati
     actualUpVectorInCameraFrame3d /= actualUpVectorInCameraFrame3d(2);
 
     actualUpVectorInCameraFrame = actualUpVectorInCameraFrame3d.head(2).normalized();
-    desiredUpVectorInCameraFrame << 0, -1;
+    desiredUpVectorInCameraFrame << 0, 1;
 
     float rotationAngle = std::atan2(actualUpVectorInCameraFrame.y(), actualUpVectorInCameraFrame.x()) - atan2(desiredUpVectorInCameraFrame.y(), desiredUpVectorInCameraFrame.x());
     rotationAngle *= 180.0f / M_PI;
