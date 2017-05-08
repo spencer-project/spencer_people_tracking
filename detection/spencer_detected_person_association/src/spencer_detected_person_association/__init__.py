@@ -112,7 +112,10 @@ class TrackAssociation(object):
                     self.oldDetections.append(detectionId)
 
                 while(len(self.oldDetections) > self.maxFusedDetectionsToRemember):
-                    del self.trackLookup[ self.oldDetections.popleft() ]
+                    try:
+                        del self.trackLookup[ self.oldDetections.popleft() ]
+                    except:
+                        pass
 
 
 """
