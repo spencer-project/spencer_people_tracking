@@ -6,6 +6,7 @@
     <arg name="dummy_transforms" default="true"/> <!-- publish TF transform for sensor to groundplane -->
     <arg name="use_openni1" default="false"/> <!-- compatibility for Kinect v1 -->
     <arg name="use_upper_body_detector" default="true"/> <!-- use depth-template-based upper-body detector? -->
+    <arg name="use_pcl_detector" default="false"/> <!-- use ROI-HOG detector from PCL? Cannot be combined with upper-body detector! -->
     <arg name="use_hog_detector" default="false"/> <!-- use RGB groundHOG detector? Requires cudaHOG library-->
 
 
@@ -41,6 +42,7 @@
 
         <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch">
             <arg name="upper_body" default="$(arg use_upper_body_detector)"/>
+            <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
             <arg name="hog" default="$(arg use_hog_detector)"/>
         </include>
     </group>

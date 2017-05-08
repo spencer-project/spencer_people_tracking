@@ -1,5 +1,6 @@
 <launch>
     <arg name="upper_body" default="true"/>
+    <arg name="pcl_detector" default="false"/> <!-- do not use at the same time with upper-body detector! -->
     <arg name="hog" default="false"/>
 
     <arg name="ground_plane" value="/spencer/sensors/rgbd_front_top/ground_plane"/>
@@ -16,12 +17,6 @@
             <param name="rate" value="30.0"/>
         </node>
 
-        <!-- RWTH really fixed groundplane
-        <node pkg="rwth_ground_plane" type="ground_plane_really_fixed" name="ground_plane_front_top" output="screen">
-            <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
-            <param name="rate" value="30.0"/>
-        </node>-->
-
         <!-- Front RGB-D upper body -->
         <include file="$(find rwth_upper_body_detector)/launch/upper_body_detector.launch" ns="rgbd_front_top" if="$(arg upper_body)">
             <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/>
@@ -33,6 +28,20 @@
             <arg name="detection_id_offset" value="3"/>
             <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
         </include>
+
+        <!-- Front PCL detector (publishes on same topic as upper-body detector) -->
+        <group if="$(arg pcl_detector)">
+            <remap from="/spencer/perception/detected_persons" to="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/> <!-- replaces upper-body detections -->
+            <include file="$(find pcl_people_detector)/launch/start.launch" ns="rgbd_front_top">
+                <arg name="input_topic" value="/spencer/sensors/rgbd_front_top/depth_registered/points"/>
+                <arg name="camera_info_topic" value="/spencer/sensors/rgbd_front_top/rgb/camera_info"/>
+                <arg name="base_link_frame" value="base_footprint"/>
+                <arg name="detection_frame" value="pcl_people_detector_front_link"/>
+                <arg name="ground_coeffs" value="0 0 -1 0"/>
+                <arg name="detection_id_offset" value="11"/>
+                <arg name="detection_id_increment" value="$(arg detection_id_increment"/>
+            </include>
+        </group>
 
         <!-- Front RGB-D HOG -->
         <include file="$(find rwth_ground_hog)/launch/ground_hog_with_GP.launch" ns="rgbd_front_top" if="$(arg hog)">

@@ -13,6 +13,9 @@
     <arg name="detection_id_increment" default="1"/>
     <arg name="node_name" default="pcl_people_detector"/>
 
+    <arg name="rgb_visualization" default="false"/>
+
+
     <node name="$(arg node_name)" type="detect_people" pkg="pcl_people_detector" output="screen">
         <param name="input_topic" value="$(arg input_topic)"/>
         <param name="camera_info_topic" value="$(arg camera_info_topic)"/>
@@ -26,6 +29,8 @@
         
         <param name="detection_id_offset" value="$(arg detection_id_offset)"/>
         <param name="detection_id_increment" value="$(arg detection_id_increment)"/>
+
+        <param name="rgb_visualization" value="$(arg rgb_visualization)"/>
     </node>
 
 </launch>

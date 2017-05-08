@@ -1,8 +1,25 @@
 <launch>
-    <!-- Detectors -->
-    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch"/>
-    <include file="$(find spencer_people_tracking_launch)/launch/detectors/rear_rgbd_detectors.launch"/>
+    <arg name="use_upper_body_detector" default="true"/> <!-- use depth-template-based upper-body detector? -->
+    <arg name="use_pcl_detector" default="false"/> <!-- use ROI-HOG detector from PCL library? cannot be used with upper-body detector at the same time! -->
+    <arg name="use_hog_detector" default="false"/> <!-- use RGB groundHOG detector? Requires cudaHOG library-->
+
+
+    <!-- RGB-D detectors -->
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch">
+        <arg name="upper_body" value="$(arg use_upper_body_detector)"/>
+        <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
+        <arg name="hog" value="$(arg use_hog_detector)"/>
+    </include>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/rear_rgbd_detectors.launch">
+        <arg name="upper_body" value="$(arg use_upper_body_detector)"/>
+        <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
+        <arg name="hog" value="$(arg use_hog_detector)"/>
+    </include>
+
+    <!-- Laser detectors -->
     <include file="$(find spencer_people_tracking_launch)/launch/detectors/laser_detectors.launch"/> 
+
 
     <!-- People tracking -->
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">

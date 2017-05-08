@@ -7,6 +7,12 @@
     <arg name="rear_rgbd" default="false"/>
     <arg name="rear_laser" default="false"/>
     
+    <!-- Which RGB-D detector to use? Default setting (only upper-body) gives best results. Note that PCL+upper-body detector cannot be combined -->
+    <arg name="use_pcl_detector" default="false"/>
+    <arg name="use_hog_detector" default="false"/>
+    <arg name="use_upper_body_detector" default="true" unless="$(arg use_pcl_detector)"/>
+    <arg name="use_upper_body_detector" default="false"    if="$(arg use_pcl_detector)"/>
+
     <arg name="static_map" default="true"/>
     
     <arg name="loop" default="true"/>
@@ -39,12 +45,24 @@
     <!-- Optionally load a map to suppress false positives -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg bagfile_folder)/map.yaml" if="$(arg static_map)"/>
 
+
     <!-- Detectors -->
-    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch" if="$(arg front_rgbd)"/>
-    <include file="$(find spencer_people_tracking_launch)/launch/detectors/rear_rgbd_detectors.launch" if="$(arg rear_rgbd)"/>
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch" if="$(arg front_rgbd)">
+        <arg name="upper_body" value="$(arg use_upper_body_detector)"/>
+        <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
+        <arg name="hog" value="$(arg use_hog_detector)"/>
+    </include>
+
+    <include file="$(find spencer_people_tracking_launch)/launch/detectors/rear_rgbd_detectors.launch" if="$(arg rear_rgbd)">
+        <arg name="upper_body" value="$(arg use_upper_body_detector)"/>
+        <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
+        <arg name="hog" value="$(arg use_hog_detector)"/>
+    </include>
+
     <include file="$(find spencer_people_tracking_launch)/launch/detectors/laser_detectors.launch" if="$(arg front_laser)">
         <arg name="rear" value="$(arg rear_laser)"/>
     </include> 
+
 
     <!-- People tracking -->
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">

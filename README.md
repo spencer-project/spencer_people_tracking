@@ -190,6 +190,15 @@ Then, you can launch
     
 which will start playing back a bagfile (as soon as you unpause by pressing `SPACE`) and run Rviz for visualization.
 
+###### Using the PCL people detector instead of the upper-body detector ######
+
+As an alternative to the depth template-based upper-body detector, you can choose to use our slightly modified version of the person detector from the Point Cloud Library. This detector first performs a Euclidean clustering and head subcluster extraction, before validating the candidate ROIs using a HOG SVM. To do so, pass `use_pcl_detector:=true` to the launch file.
+
+###### Enabling the groundHOG detector ######
+
+If you have compiled the cudaHOG library (see description further above), you can optionally enable the groundHOG detector by passing `use_hog_detector:=true` to the launch file. The detection-to-detection fusion pipeline will then automatically fuse the detections from both detectors.
+
+
 ##### Tutorial 1: People / group tracking and visualization with a single RGB-D sensor
 
 This is the easiest way to get started using just a single RGB-D sensor connected locally to your computer. Place your Asus Xtion Pro Live sensor horizontally on a flat surface, and connect it to your computer (or play the example bagfile linked in a section further below). Then run the following launch file from your people tracking workspace (make sure that you have sourced it, e.g. `source devel/setup.bash`):
@@ -207,9 +216,6 @@ This will do the following:
 
 The original MS Kinect v1 sensor does not support OpenNi2. In this case, append `use_openni1:=true` to the above command-line of the launch file to fall back to OpenNi1.
 
-###### Enabling the groundHOG detector ######
-
-If you have compiled the cudaHOG library (see description further above), you can optionally enable the groundHOG detector by passing `use_hog_detector:=true` to the launch file. The detection-to-detection fusion pipeline will then automatically fuse the detections from upper-body and HOG detector.
 
 ###### Troubleshooting ######
 
@@ -244,6 +250,11 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 3. Create a copy of the `freiburg_people_tracking.launch` file in `spencer_people_tracking_launch`. Adjust it to refer to your own fusion launch file created in step 2.
 3. Start your copy of `freiburg_people_tracking.launch`.
 4. If needed, start group tracking via `roslaunch spencer_people_tracking_launch group_tracking.launch`.
+
+
+#### Multi-modal datasets for evaluation
+
+The multi-modal "Motion Capture" sequence from our ICRA 2016 paper is available upon request to let you evaluate your own detection / tracking algorithms on our dataset. For a fair comparison, please use the CLEAR-MOT metrics implementation contained in this repository, if possible. The raw data from the airport sequence cannot be shared for privacy reasons, though we might provide the extracted detections at a later point.
 
 
 #### Credits, license & how to cite

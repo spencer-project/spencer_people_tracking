@@ -1,5 +1,6 @@
 <launch>
     <arg name="upper_body" default="true"/>
+    <arg name="pcl_detector" default="false"/> <!-- do not use at the same time with upper-body detector! -->
     <arg name="hog" default="false"/>
 
     <arg name="ground_plane" value="/spencer/sensors/rgbd_rear_top/ground_plane"/>
@@ -27,6 +28,20 @@
             <arg name="detection_id_offset" value="5"/>
             <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
         </include>
+
+        <!-- Rear PCL detector (publishes on same topic as upper-body detector) -->
+        <group if="$(arg pcl_detector)">
+            <remap from="/spencer/perception/detected_persons" to="/spencer/perception_internal/detected_persons/rgbd_rear_top/upper_body"/> <!-- replaces upper-body detections -->
+            <include file="$(find pcl_people_detector)/launch/start.launch" ns="rgbd_rear_top">
+                <arg name="input_topic" value="/spencer/sensors/rgbd_rear_top/depth_registered/points"/>
+                <arg name="camera_info_topic" value="/spencer/sensors/rgbd_rear_top/rgb/camera_info"/>
+                <arg name="base_link_frame" value="base_footprint"/>
+                <arg name="detection_frame" value="pcl_people_detector_rear_link"/>
+                <arg name="ground_coeffs" value="0 0 -1 0"/>
+                <arg name="detection_id_offset" value="12"/>
+                <arg name="detection_id_increment" value="$(arg detection_id_increment"/>
+            </include>
+        </group>
 
         <!-- Rear RGB-D HOG -->
         <include file="$(find rwth_ground_hog)/launch/ground_hog_with_GP.launch" ns="rgbd_rear_top" if="$(arg hog)">
