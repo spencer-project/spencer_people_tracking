@@ -56,7 +56,7 @@ if __name__ == '__main__':
     arguments = rospy.myargv()
     rospy.init_node("track_synchronizer_test")
 
-    detectionsTopic = "/spencer/perception_internal/detected_persons/rgbd_front_top"
+    detectionsTopic = "/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"
     detected_person_sub = message_filters.Subscriber(detectionsTopic, DetectedPersons)
 
     track_sync = TrackSynchronizer(detected_person_sub, 100)
