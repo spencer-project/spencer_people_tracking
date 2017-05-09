@@ -71,3 +71,18 @@ target_link_libraries(pose_to_odometry ${catkin_LIBRARIES})
 # # #  publish_camera_info executable (loads calibration YAML file from disk and publishes it at given rate) # # # 
 add_executable(publish_camera_info src/spencer_bagfile_tools/publish_camera_info.cpp)
 target_link_libraries(publish_camera_info ${catkin_LIBRARIES})
+
+
+install(TARGETS panorama_builder laser_scan_inverter pose_to_odometry publish_camera_info
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE
+)
+
+
+

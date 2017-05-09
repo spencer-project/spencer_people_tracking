@@ -32,7 +32,8 @@ install(TARGETS detect_people
 
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-  PATTERN ".svn" EXCLUDE)
+  PATTERN ".svn" EXCLUDE
+)
 
 install(DIRECTORY parameters/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/parameters
