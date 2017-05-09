@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_people_tracking_launch</name>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <description>
     Launch files for multi-modal people tracking on the SPENCER robot platform
   </description>

@@ -2,8 +2,8 @@
 Changelog for package spencer_social_relation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2017-05-09)
+------------------
 * added missing roslib deps
 * Contributors: Marc Hanheide
 

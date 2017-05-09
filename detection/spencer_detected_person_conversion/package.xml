@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_detected_person_conversion</name>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <description>
     Converter scripts for converting geometry_msgs/PoseArray or people_msgs/PositionMeasurementArray
     to spencer_tracking_msgs/DetectedPersons, and vice versa. 

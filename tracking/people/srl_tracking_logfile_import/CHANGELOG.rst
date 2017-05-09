@@ -2,8 +2,8 @@
 Changelog for package srl_tracking_logfile_import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2017-05-09)
+------------------
 * added missing roslib deps
 * Contributors: Marc Hanheide
 
