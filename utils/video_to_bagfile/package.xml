@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>video_to_bagfile</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <description>
     Converts video files (e.g. *.mov, *.avi) into ROS bagfiles.
   </description>

@@ -2,7 +2,7 @@
 <package>
 
   <name>pcl_people_detector</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>ROS wrapper for the ground-based people detector from the PCL library, based upon the implementation provided by M. Munaro, F. Basso and E. Menegatti. "Tracking people within groups with RGB-D data". In Proceedings of the International Conference on Intelligent Robots and Systems (IROS) 2012, Vilamoura (Portugal), 2012.</description>
 
   <url type="website">http://view.pointclouds.org/documentation/tutorials/ground_based_rgbd_people_detection.php#ground-based-rgbd-people-detection</url>
