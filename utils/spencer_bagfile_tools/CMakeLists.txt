@@ -89,6 +89,7 @@ install(PROGRAMS
 	scripts/speedup_bagfile.py
 	scripts/visualize_frustum.py
 	scripts/visualize_plane.py
+	scripts/tf_filter.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
