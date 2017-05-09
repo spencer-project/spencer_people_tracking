@@ -2,8 +2,8 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * various install targets added that were missing
 * Fix crash on startup of upper_body_detector

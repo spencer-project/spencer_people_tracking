@@ -2,8 +2,8 @@
 Changelog for package srl_laser_detectors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * various install targets added that were missing
 * added install targets
 * Add missing OpenCV 2 dependencies

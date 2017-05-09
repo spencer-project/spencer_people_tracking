@@ -2,8 +2,8 @@
 Changelog for package spencer_human_attribute_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * Updated licenses
 * Adding message definitions, RViz plugins and mock scripts

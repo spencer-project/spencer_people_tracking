@@ -2,8 +2,8 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * made it catkin package
 * various install targets added that were missing
 * Enable selection of PCL people detector in example launch files.

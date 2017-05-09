@@ -2,8 +2,8 @@
 Changelog for package spencer_tracking_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * Fixed segfault. You shouldnt mix QT4 and QT5
 * Compiling on kinetic. Rviz crashes with views (QT bug?)

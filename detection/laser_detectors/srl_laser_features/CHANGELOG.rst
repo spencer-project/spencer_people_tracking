@@ -2,8 +2,8 @@
 Changelog for package srl_laser_features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * added install targets
 * Updating licenses for laser detector, features and segmentation
 * Updating laser detectors, segmentation and features from SRL SVN.

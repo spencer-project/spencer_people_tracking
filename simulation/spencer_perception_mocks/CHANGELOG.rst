@@ -2,8 +2,8 @@
 Changelog for package spencer_perception_mocks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * various install targets added that were missing
 * Fix spencer_perception_mocks

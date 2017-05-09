@@ -2,8 +2,8 @@
 Changelog for package rwth_ground_hog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * various install targets added that were missing
 * Updated README and license for groundHOG

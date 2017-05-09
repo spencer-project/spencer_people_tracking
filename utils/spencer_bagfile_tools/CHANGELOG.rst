@@ -2,8 +2,8 @@
 Changelog for package spencer_bagfile_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * various install targets added that were missing
 * Update to spencer_bagfile_tools, track annotation tool added

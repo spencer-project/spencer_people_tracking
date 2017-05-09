@@ -2,8 +2,8 @@
 Changelog for package srl_tracking_logfile_import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2017-05-09)
+------------------
 * homogenised all version strings to 1.0.0
 * various install targets added that were missing
 * Updating lots of utility packages to latest version from SPENCER repo. Licenses updated.

@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_diagnostics</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>
     Easy-to-use diagnostic tools (e.g. MonitoredPublisher) that publish diagnostic_msgs/DiagnosticArray messages which can be processed
     by diagnostic_aggregator and displayed by rqt_runtime_monitor or rqt_robot_monitor.
