@@ -1,0 +1,16 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package spencer_detected_person_association
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* various install targets added that were missing
+* Updating TrackSynchronizer with current message types and topics namespaces
+* Compiling on kinetic. Rviz crashes with views (QT bug?)
+* Updated licenses for spencer_detected_person_association
+* Updating spencer_detected_person_association from SPENCER repo
+* Fix for `#2 <https://github.com/LCAS/spencer_people_tracking/issues/2>`_, correctly include message headers in spencer_detected_person_association
+* Adding script for detecting suspicious poses and covariance matrices of CompositeDetectedPersons, useful for debugging (will output to console)
+* Fix compilation issue
+* Adding detection-to-detection fusion modules
+* Contributors: Joao Avelino, Marc Hanheide, Timm Linder, ruffsl

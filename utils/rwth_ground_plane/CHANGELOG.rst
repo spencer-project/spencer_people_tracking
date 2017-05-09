@@ -1,0 +1,16 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package rwth_ground_plane
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* homogenised all version strings to 1.0.0
+* various install targets added that were missing
+* moved headers according to ROS std
+* added spencer_diagnostics
+* added missing dep
+* Updating lots of utility packages to latest version from SPENCER repo. Licenses updated.
+* Rename ground_plane_really_fixed to ground_plane_fixed
+  Old ground_plane_fixed.launch deleted (was there for historic reasons)
+* Moving rwth_ground_plane into new 'utils' folder
+* Contributors: Marc Hanheide, Timm Linder

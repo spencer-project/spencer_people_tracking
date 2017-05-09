@@ -1,0 +1,16 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package spencer_bagfile_tools
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* homogenised all version strings to 1.0.0
+* various install targets added that were missing
+* Update to spencer_bagfile_tools, track annotation tool added
+* Add some missing dependencies for rosdep, add missing srl_laser_segmentation dependency in srl_nearest_neighbor_tracker
+* Make playback scripts and launch file more configurable
+* In playback_from_robot.launch, optionally do not publish recorded tracked persons
+* Compiling on kinetic. Rviz crashes with views (QT bug?)
+* Fixes to spencer_bagfile_tools
+* Adding package spencer_bagfile_tools
+* Contributors: Joao Avelino, Marc Hanheide, Timm Linder
