@@ -68,6 +68,18 @@ add_executable(blob_detector
 add_dependencies(blob_detector ${catkin_EXPORTED_TARGETS})
 target_link_libraries(blob_detector ${catkin_LIBRARIES})
 
+install(TARGETS blob_detector
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
+
 
 ### Learned detectors ###
 if(OpenCV_FOUND)
@@ -103,6 +115,13 @@ if(OpenCV_FOUND)
   )
   add_dependencies(${TRAINING_NODE} ${catkin_EXPORTED_TARGETS})
   target_link_libraries(${TRAINING_NODE} ${DETECTOR_LIBRARIES})  # laser feature lib is linked here
+
+  install(TARGETS ${TRAINING_NODE} ${DETECTOR_NODE}
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+
 
 else()
   message(WARNING "OpenCV not found, will not build learned detectors! ${DETECTOR_NODE} and ${TRAINING_NODE} executables will not be available.")
