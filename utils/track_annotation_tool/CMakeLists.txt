@@ -68,7 +68,7 @@ install(TARGETS
 )
 
 install(FILES
-  plugin_description.xml
+  rqt_plugin.xml rviz_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 install(DIRECTORY media/
@@ -77,5 +77,7 @@ install(DIRECTORY media/
 install(DIRECTORY icons/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/icons)
 
-#install(PROGRAMS scripts/send_test_msgs.py
-#  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(PROGRAMS 
+  scripts/rqt_gui
+  scripts/simulator.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
