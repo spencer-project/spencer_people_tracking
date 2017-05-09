@@ -15,4 +15,4 @@
  
   <buildtool_depend>catkin</buildtool_depend>
   
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

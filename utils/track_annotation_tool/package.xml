@@ -69,4 +69,4 @@ and http://p.yusukekamiyamane.com/ for details on the icons.
       <rviz plugin="${prefix}/rviz_plugin.xml"/>
       <rqt_gui plugin="${prefix}/rqt_plugin.xml"/>
   </export>
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

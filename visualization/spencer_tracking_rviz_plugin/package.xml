@@ -27,4 +27,4 @@
   <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

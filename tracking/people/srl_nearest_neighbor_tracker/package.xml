@@ -29,4 +29,4 @@
   <run_depend>tf_conversions</run_depend>
   <run_depend>spencer_diagnostics</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

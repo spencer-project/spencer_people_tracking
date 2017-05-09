@@ -23,4 +23,4 @@
   <run_depend>geometry_msgs</run_depend>
 
   <export/>
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

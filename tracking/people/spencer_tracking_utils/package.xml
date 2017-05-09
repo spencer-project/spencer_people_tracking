@@ -22,4 +22,4 @@
   <run_depend>tf</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

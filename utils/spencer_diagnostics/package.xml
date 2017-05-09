@@ -26,4 +26,4 @@
   <run_depend>spencer_control_msgs</run_depend>
   <run_depend>tf</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>
