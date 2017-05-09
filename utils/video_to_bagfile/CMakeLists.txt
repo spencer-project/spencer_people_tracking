@@ -14,6 +14,8 @@ add_executable(video_to_bagfile src/video_to_bagfile/video_to_bagfile.cpp)
 target_link_libraries(video_to_bagfile ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 
-install(PROGRAMS video_to_bagfile
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+install(TARGETS video_to_bagfile
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
