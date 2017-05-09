@@ -2,6 +2,9 @@
 Changelog for package video_to_bagfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.1 (2017-05-09)
 ------------------
 * homogenised all version strings to 1.0.0

@@ -2,6 +2,11 @@
 Changelog for package srl_laser_features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added missing roslib deps
+* Contributors: Marc Hanheide
+
 1.0.1 (2017-05-09)
 ------------------
 * added install targets

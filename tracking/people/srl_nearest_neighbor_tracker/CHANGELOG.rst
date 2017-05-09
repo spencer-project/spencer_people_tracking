@@ -2,6 +2,11 @@
 Changelog for package srl_nearest_neighbor_tracker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added missing roslib deps
+* Contributors: Marc Hanheide
+
 1.0.1 (2017-05-09)
 ------------------
 * Add some missing dependencies for rosdep, add missing srl_laser_segmentation dependency in srl_nearest_neighbor_tracker

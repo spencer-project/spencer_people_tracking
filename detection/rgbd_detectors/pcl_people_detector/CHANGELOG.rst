@@ -2,6 +2,9 @@
 Changelog for package pcl_people_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.1 (2017-05-09)
 ------------------
 * homogenised all version strings to 1.0.0
