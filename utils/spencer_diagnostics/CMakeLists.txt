@@ -24,3 +24,15 @@ target_link_libraries(spencer_diagnostics ${catkin_LIBRARIES})
 add_executable(tf_lookup_monitor src/spencer_diagnostics/tf_lookup_monitor.cpp)
 add_dependencies(tf_lookup_monitor ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tf_lookup_monitor ${catkin_LIBRARIES})
+
+install(TARGETS spencer_diagnostics tf_lookup_monitor
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
