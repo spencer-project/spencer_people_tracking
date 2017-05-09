@@ -1,3 +1,56 @@
+## spencer_people_tracking (kinetic) - 1.0.1-0
+
+The packages in the `spencer_people_tracking` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release -n -t kinetic -r kinetic spencer_people_tracking` on `Tue, 09 May 2017 17:20:30 -0000`
+
+These packages were released:
+- `pcl_people_detector`
+- `rwth_ground_hog`
+- `rwth_ground_plane`
+- `rwth_perception_people_msgs`
+- `rwth_upper_body_detector`
+- `spencer_bagfile_tools`
+- `spencer_control_msgs`
+- `spencer_detected_person_association`
+- `spencer_detected_person_conversion`
+- `spencer_diagnostics`
+- `spencer_group_tracking`
+- `spencer_human_attribute_msgs`
+- `spencer_leg_detector_wrapper`
+- `spencer_people_tracking_launch`
+- `spencer_perception_mocks`
+- `spencer_social_relation_msgs`
+- `spencer_social_relations`
+- `spencer_tracking_metrics`
+- `spencer_tracking_msgs`
+- `spencer_tracking_rviz_plugin`
+- `spencer_tracking_utils`
+- `spencer_vision_msgs`
+- `srl_laser_detectors`
+- `srl_laser_features`
+- `srl_laser_segmentation`
+- `srl_nearest_neighbor_tracker`
+- `srl_tracking_exporter`
+- `srl_tracking_logfile_import`
+- `track_annotation_tool`
+- `video_to_bagfile`
+
+Version of package(s) in repository `spencer_people_tracking`:
+
+- upstream repository: https://github.com/lcas/spencer_people_tracking.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `1.0.1-0`
+
+Versions of tools used:
+
+- bloom version: `0.5.26`
+- catkin_pkg version: `0.3.1`
+- rosdep version: `0.11.5`
+- rosdistro version: `0.6.2`
+- vcstools version: `0.1.39`
+
+
 ### SPENCER Multi-Modal People Detection & Tracking Framework
 ###### Multi-modal ROS-based people and group detection & tracking framework for mobile robots developed within the context of the EU FP7 project [SPENCER](http://www.spencer.eu).
 
