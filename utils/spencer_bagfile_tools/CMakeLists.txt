@@ -31,7 +31,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(spencer_bagfile_tools)
 
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs image_transport image_geometry cv_bridge tf message_generation dynamic_reconfigure camera_calibration_parsers)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs nav_msgs image_transport image_geometry cv_bridge tf message_generation dynamic_reconfigure camera_calibration_parsers)
 
 add_message_files(
    FILES
@@ -71,6 +71,26 @@ target_link_libraries(pose_to_odometry ${catkin_LIBRARIES})
 # # #  publish_camera_info executable (loads calibration YAML file from disk and publishes it at given rate) # # # 
 add_executable(publish_camera_info src/spencer_bagfile_tools/publish_camera_info.cpp)
 target_link_libraries(publish_camera_info ${catkin_LIBRARIES})
+
+
+install(PROGRAMS
+	scripts/create_thumbnails.py
+	scripts/dump_encoder_values.py
+	scripts/dump_tf_frames.py
+	scripts/dump_timestamps.py
+	scripts/interpolate_odometry.py
+	scripts/odom_to_tf.py
+	scripts/play.py
+	scripts/plot_tf.py
+	scripts/postprocess_bagfile.py
+	scripts/reconstruct_odometry.py
+	scripts/replace_frames.py
+	scripts/shift_timestamps.py
+	scripts/speedup_bagfile.py
+	scripts/visualize_frustum.py
+	scripts/visualize_plane.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 
 install(TARGETS panorama_builder laser_scan_inverter pose_to_odometry publish_camera_info
