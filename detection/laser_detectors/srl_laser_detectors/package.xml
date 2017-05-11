@@ -2,7 +2,7 @@
 <package>
 
   <name>srl_laser_detectors</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <description>Person detectors for laser range data</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>

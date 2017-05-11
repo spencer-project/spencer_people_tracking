@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_vision_msgs</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <description>Messages used for Vision-related tasks in SPENCER</description>
 
   <maintainer email="beyer@vision.rwth-aachen.de">Lucas Beyer</maintainer>

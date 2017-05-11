@@ -2,8 +2,8 @@
 Changelog for package spencer_bagfile_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2017-05-11)
+------------------
 * moved tf_filter
 * added nav_msgs and install targets
 * Contributors: Marc Hanheide

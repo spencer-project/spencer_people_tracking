@@ -2,8 +2,8 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2017-05-11)
+------------------
 * added missing rqt deps
 * Contributors: Marc Hanheide
 

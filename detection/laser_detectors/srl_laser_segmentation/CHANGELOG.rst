@@ -2,8 +2,8 @@
 Changelog for package srl_laser_segmentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2017-05-11)
+------------------
 * added missing dep
 * Contributors: Marc Hanheide
 

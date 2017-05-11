@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_leg_detector_wrapper</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <description>
     Wrapper that integrates the leg_detector from wg-perception into the SPENCER people tracking framework.
     The leg_detector needs to be installed separately from https://github.com/wg-perception/people.

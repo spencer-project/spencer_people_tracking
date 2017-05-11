@@ -2,8 +2,8 @@
 Changelog for package spencer_group_tracking
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2017-05-11)
+------------------
 * added tf dep
 * Contributors: Marc Hanheide
 

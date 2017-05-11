@@ -2,8 +2,8 @@
 Changelog for package video_to_bagfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2017-05-11)
+------------------
 * added image_transport dep
 * Contributors: Marc Hanheide
 
