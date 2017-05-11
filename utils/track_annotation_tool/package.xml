@@ -56,6 +56,8 @@ and http://p.yusukekamiyamane.com/ for details on the icons.
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rviz</build_depend>
+  <build_depend>rqt_gui</build_depend>
+  <build_depend>rqt_gui_py</build_depend>
   <build_depend>spencer_tracking_msgs</build_depend>
   <build_depend>spencer_human_attribute_msgs</build_depend>
 
