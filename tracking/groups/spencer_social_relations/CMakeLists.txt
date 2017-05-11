@@ -57,3 +57,21 @@ add_executable(spatial_relations
 )
 add_dependencies(spatial_relations ${catkin_EXPORTED_TARGETS})
 target_link_libraries(spatial_relations ${catkin_LIBRARIES} ${LIBSVM_LIBRARIES})
+
+
+install(TARGETS spatial_relations
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+install(PROGRAMS
+  scripts/long_term_relations.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY models/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
+  PATTERN ".svn" EXCLUDE
+)
