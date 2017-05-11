@@ -2,6 +2,9 @@
 Changelog for package spencer_detected_person_conversion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.2 (2017-05-09)
 ------------------
 * added missing roslib deps

@@ -2,6 +2,9 @@
 Changelog for package rwth_ground_hog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.2 (2017-05-09)
 ------------------
 * added missing roslib deps

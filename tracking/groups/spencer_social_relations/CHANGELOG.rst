@@ -2,6 +2,12 @@
 Changelog for package spencer_social_relations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added install targets
+* added eigen dep
+* Contributors: Marc Hanheide
+
 1.0.2 (2017-05-09)
 ------------------
 

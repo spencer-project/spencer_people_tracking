@@ -2,6 +2,12 @@
 Changelog for package spencer_bagfile_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* moved tf_filter
+* added nav_msgs and install targets
+* Contributors: Marc Hanheide
+
 1.0.2 (2017-05-09)
 ------------------
 * added missing roslib deps

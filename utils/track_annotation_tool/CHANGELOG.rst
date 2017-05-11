@@ -2,6 +2,11 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added missing rqt deps
+* Contributors: Marc Hanheide
+
 1.0.2 (2017-05-09)
 ------------------
 * added missing roslib deps
