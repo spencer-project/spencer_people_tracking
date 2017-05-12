@@ -2,6 +2,9 @@
 Changelog for package video_to_bagfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.4 (2017-05-12)
 ------------------
 

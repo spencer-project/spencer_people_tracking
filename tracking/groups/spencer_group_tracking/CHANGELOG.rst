@@ -2,6 +2,9 @@
 Changelog for package spencer_group_tracking
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.4 (2017-05-12)
 ------------------
 

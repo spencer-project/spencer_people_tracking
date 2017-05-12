@@ -2,6 +2,12 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/lcas/spencer_people_tracking
+* added qt4-dev dep
+* Contributors: Marc Hanheide
+
 1.0.4 (2017-05-12)
 ------------------
 * added QT deps
