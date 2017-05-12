@@ -29,7 +29,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(spencer_tracking_utils)
 
-find_package(catkin REQUIRED COMPONENTS rospy roscpp tf spencer_tracking_msgs cmake_modules)
+find_package(catkin REQUIRED COMPONENTS rospy roscpp tf spencer_tracking_msgs nav_msgs cmake_modules)
 
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
