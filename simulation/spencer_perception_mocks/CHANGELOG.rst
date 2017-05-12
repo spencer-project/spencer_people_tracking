@@ -2,6 +2,9 @@
 Changelog for package spencer_perception_mocks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.3 (2017-05-11)
 ------------------
 

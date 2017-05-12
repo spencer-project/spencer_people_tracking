@@ -2,6 +2,11 @@
 Changelog for package srl_nearest_neighbor_tracker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added angles dep
+* Contributors: Marc Hanheide
+
 1.0.3 (2017-05-11)
 ------------------
 

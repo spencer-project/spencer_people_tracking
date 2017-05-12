@@ -2,6 +2,9 @@
 Changelog for package spencer_tracking_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.3 (2017-05-11)
 ------------------
 
