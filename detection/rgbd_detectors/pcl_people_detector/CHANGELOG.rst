@@ -2,6 +2,9 @@
 Changelog for package pcl_people_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.4 (2017-05-12)
+------------------
+
 1.0.3 (2017-05-11)
 ------------------
 * added visualisation_msgs dep

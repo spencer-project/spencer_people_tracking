@@ -2,7 +2,7 @@
 <package>
 
   <name>srl_laser_features</name>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <description>Features that can be calculated on segments of laser range data, based upon the features described in Matthias Luber's PhD thesis</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>

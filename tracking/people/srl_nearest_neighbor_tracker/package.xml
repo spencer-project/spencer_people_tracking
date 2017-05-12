@@ -1,6 +1,6 @@
 <package>
   <name>srl_nearest_neighbor_tracker</name>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <description>
     Nearest-neighbor person tracker
   </description>
