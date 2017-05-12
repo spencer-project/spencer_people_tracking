@@ -2,8 +2,8 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.4 (2017-05-12)
+------------------
 * added QT deps
 * Contributors: Marc Hanheide
 

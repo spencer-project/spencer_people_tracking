@@ -1,6 +1,6 @@
 <package>
   <name>srl_tracking_logfile_import</name>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <description>
      Imports old CARMEN logfiles containing laser scans and annotations, and allows
      to publish them as ROS topics
