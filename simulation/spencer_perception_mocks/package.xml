@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_perception_mocks</name>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <description>
     Perception Mock components for SPENCER
   </description>
