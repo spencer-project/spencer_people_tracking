@@ -75,8 +75,7 @@ private:
     bool checkForClosebyExistingTrack(const Observation::Ptr& observation);
 
     /// Creates a new track from the given observation.
-    Track::Ptr createTrack(const Observation::Ptr &observation);
-    Track::Ptr createTrack(const Observations& observations);
+    Track::Ptr createTrack(const Observation::Ptr& observation);
 
     /// Create new tracks from unmatched observations.
     void initNewTracksFromObservations(const Observations& newObservations);

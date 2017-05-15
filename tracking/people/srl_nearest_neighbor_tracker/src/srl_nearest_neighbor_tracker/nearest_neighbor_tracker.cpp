@@ -196,15 +196,6 @@ const Tracks& NearestNeighborTracker::processCycle(double currentTime, const Obs
     mergedPairings.insert( mergedPairings.end(), pairings.begin(), pairings.end() );
     mergedPairings.insert( mergedPairings.end(), reappearedParings.begin(), reappearedParings.end() );
 
-    foreach(Track::Ptr track, m_tracks){
-        track->observations.clear();
-    }
-
-    foreach(Pairing::Ptr pairing, mergedPairings){
-        pairing->track->observations.push_back(pairing->observation);
-    }
-
-
 
     updateKalmanFilter(mergedPairings);
 
@@ -325,27 +316,13 @@ bool NearestNeighborTracker::checkForClosebyExistingTrack(const Observation::Ptr
     return closebyExistingTrack;
 }
 
+
 Track::Ptr NearestNeighborTracker::createTrack(const Observation::Ptr& observation)
 {
     Track::Ptr newTrack( new Track );
     newTrack->id = m_trackIdCounter++;
     newTrack->trackStatus = Track::NEW;
     newTrack->observation = observation;
-    newTrack->createdAt = m_cycleTime;
-    newTrack->numberOfTotalMatches = newTrack->numberOfConsecutiveOcclusions = newTrack->numberOfConsecutiveMisses = newTrack->numberOfConsecutiveWeakMatches = 0;
-    newTrack->model_idx = 0;
-    newTrack->detectionProbability = 1.0;
-    newTrack->stateHistory.set_capacity(Params::get<int>("state_history_length", 30)); // for DEBUGging & elimination of duplicate tracks
-    return newTrack;
-}
-
-Track::Ptr NearestNeighborTracker::createTrack(const Observations& observations)
-{
-    Track::Ptr newTrack( new Track );
-    newTrack->id = m_trackIdCounter++;
-    newTrack->trackStatus = Track::NEW;
-    newTrack->observation = observations.back();
-    newTrack->observations = observations;
     newTrack->createdAt = m_cycleTime;
     newTrack->numberOfTotalMatches = newTrack->numberOfConsecutiveOcclusions = newTrack->numberOfConsecutiveMisses = newTrack->numberOfConsecutiveWeakMatches = 0;
     newTrack->model_idx = 0;
@@ -389,7 +366,7 @@ void NearestNeighborTracker::initNewTracksFromCandidates(const InitiatorCandidat
         // Make sure no track exists closeby, in case we have duplicate detections for some reason
         if(checkForClosebyExistingTrack(observations.back())) continue;
 
-        Track::Ptr newTrack = createTrack(observations);
+        Track::Ptr newTrack = createTrack(observations.back());
         newTrack->state = m_filter->initializeTrackStateFromLogicInitiator(candidate);
         newTracks.push_back(newTrack);
     }
