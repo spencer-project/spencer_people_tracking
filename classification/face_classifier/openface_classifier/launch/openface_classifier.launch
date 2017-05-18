@@ -1,0 +1,26 @@
+<launch>
+    <arg name="input" default="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/>
+    <arg name="output" default="/spencer/perception_internal/detected_persons_syncronized/rgbd_front_top/upper_body"/>
+
+    <!-- Re-publish detections as syncronized track, for processing by the classifier-->
+    <group ns="/spencer/perception_internal/detected_person_association">
+        <node name="track_synchronizer" type="track_synchronizer.py" pkg="spencer_detected_person_association">
+            <remap from="input" to="$(arg input)"/>
+            <remap from="output" to="$(arg output)"/>
+        </node>
+    </group>
+
+    <arg name="image_topic" default="/spencer/sensors/rgbd_front_top/rgb/image_rect_color"/>
+    <arg name="annotations_topics" default="/spencer/perception_internal/people_detection/rgbd_front_top/upper_body_detector/annotations"/>
+    <arg name="tracks_topics" default="/spencer/perception_internal/detected_persons_syncronized/rgbd_front_top/upper_body"/>
+
+    <!-- Re-publish detections as syncronized track, for processing by the classifier-->
+    <group ns="/spencer/classification_internal/classified_tracks">
+        <node name="annotation_classifier" type="annotation_classifier.py" pkg="openface_classifier" output="screen">
+            <remap from="image" to="$(arg image_topic)"/>
+            <remap from="annotations" to="$(arg annotations_topics)"/>
+            <remap from="tracks" to="$(arg tracks_topics)"/>
+        </node>
+    </group>
+
+</launch>
