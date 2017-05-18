@@ -1,9 +1,9 @@
 Header header
 
 # frame id (backref)
-int64 frame
+uint64 frame
 # box id
-int64 id
+uint64 id
 # top left x
 float64 tlx
 # top left y

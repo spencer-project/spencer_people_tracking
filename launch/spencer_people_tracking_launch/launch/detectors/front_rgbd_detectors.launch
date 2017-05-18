@@ -27,6 +27,7 @@
             <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/>
             <arg name="camera_namespace" value="/spencer/sensors/rgbd_front_top"/>
             <arg name="upper_body_detections" value="upper_body_detector/detections" />
+            <arg name="upper_body_annotations" value="upper_body_detector/annotations" />
             <arg name="upper_body_bb_centres" value="upper_body_detector/bounding_box_centres" />
             <arg name="upper_body_image" value="image" />
             <arg name="ground_plane" value="$(arg ground_plane)" />
@@ -46,7 +47,7 @@
             <arg name="detection_id_offset" value="4"/>
             <arg name="detection_id_increment" value="$(arg detection_id_increment)"/>
         </include>
-       
+
     </group>
 
 </launch>
