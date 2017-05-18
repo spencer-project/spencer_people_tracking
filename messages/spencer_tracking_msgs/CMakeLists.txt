@@ -29,6 +29,8 @@ add_message_files(
    ImmDebugInfo.msg
    ImmDebugInfos.msg
    TrackingTimingMetrics.msg
+   TrackIdentityAssociation.msg
+   TrackIdentityAssociations.msg
 )
 
 # Generate services in the 'srv' folder
