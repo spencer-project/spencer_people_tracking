@@ -16,7 +16,7 @@
 
     <!-- Re-publish detections as syncronized track, for processing by the classifier-->
     <group ns="/spencer/classification_internal/classified_tracks">
-        <node name="annotation_classifier" type="annotation_classifier.py" pkg="openface_classifier" output="screen">
+        <node name="annotation_classifier" type="annotation_classifier_node.py" pkg="openface_classifier" output="screen">
             <remap from="image" to="$(arg image_topic)"/>
             <remap from="annotations" to="$(arg annotations_topics)"/>
             <remap from="tracks" to="$(arg tracks_topics)"/>

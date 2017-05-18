@@ -38,6 +38,8 @@ import roslib
 import rospy
 import message_filters
 
+import openface_classifier
+
 # roslib.load_manifest('my_package')
 
 import sys
