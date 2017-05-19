@@ -34,11 +34,12 @@
 from __future__ import print_function
 
 import roslib
+import threading
 # import rospkg
 import rospy
 import message_filters
 
-import openface_classifier
+from openface_classifier import OpenFaceAnotater
 
 # roslib.load_manifest('my_package')
 
@@ -55,15 +56,22 @@ from rwth_perception_people_msgs.msg import (
 from spencer_tracking_msgs.msg import (
     TrackedPerson,
     TrackedPersons,
+    TrackIdentityAssociation,
+    TrackIdentityAssociations
 )
+from dynamic_reconfigure.server import Server as DynamicReconfigureServer
+from openface_classifier.cfg import classifierConfig as ConfigType
 
 faceCascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml')
 
 
 class annotation_classifier:
 
-    def __init__(self):
+    def __init__(self,args):
         self.image_pub = rospy.Publisher('annotations_vizulized', Image, queue_size=10)
+        self.track_person_assoc_pub = rospy.Publisher('track_person_assoc', TrackIdentityAssociations, queue_size=10)
+        self.server = DynamicReconfigureServer(ConfigType, self.reconfigure_classifier_callback)
+        self.lock = threading.lock()
         self.bridge = CvBridge()
 
         image_sub = message_filters.Subscriber('image', Image)
@@ -73,7 +81,14 @@ class annotation_classifier:
         self.time_sync = message_filters.ApproximateTimeSynchronizer(
             [image_sub, annotation_sub, tracked_persons_sub], 100, 0.033)
         self.time_sync.registerCallback(self.time_sync_callback)
+        self.classifier = OpenFaceAnotater(args)
 
+    def reconfigure_classifier_callback(self, config, level):
+        with self.lock:
+            self.classifier.load_model(config['classifier_path'])
+            self.classifier.load_features(config['feature_path'])
+        return config
+    
     def time_sync_callback(self, image, annotatedFrame, trackedPersons):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(image, 'bgr8')
@@ -96,54 +111,72 @@ class annotation_classifier:
                 continue
 
         if trackAnnotations:
-            for track_id in trackAnnotations:
-                annotation = trackAnnotations[track_id]
+            with self.lock:
+                track_assocs = TrackIdentityAssociations()
+                track_assocs.header = trackedPersons.header
+                for track_id in trackAnnotations:
+                    annotation = trackAnnotations[track_id]
 
-                print('track_id: {} annotation_id: {}'.format(track_id, annotation.id))
-                x = int(annotation.tlx)
-                y = int(annotation.tly)
-                w = int(annotation.width)
-                h = int(annotation.height)
+                    print('track_id: {} annotation_id: {}'.format(track_id, annotation.id))
+                    x = int(annotation.tlx)
+                    y = int(annotation.tly)
+                    w = int(annotation.width)
+                    h = int(annotation.height)
 
-                cv_image_crop = cv_image[y:y + h, x:x + w]
-                gray = cv2.cvtColor(cv_image_crop, cv2.COLOR_BGR2GRAY)
-                try:
-                    faces = faceCascade.detectMultiScale(
-                        gray,
-                        scaleFactor=1.1,
-                        minNeighbors=3,
-                        minSize=(50, 50),
-                        flags = cv2.CASCADE_SCALE_IMAGE
-                    )
+                    cv_image_crop = cv_image[y:y + h, x:x + w]
+                    # gray = cv2.cvtColor(cv_image_crop, cv2.COLOR_BGR2GRAY)
 
-                    # Draw a rectangle around the faces
-                    for (x, y, w, h) in faces:
-                        cv2.rectangle(cv_image_crop, (int(x-w*0.1), int(y-h*0.1)), (x+int(w*1.1), y+int(h*1.1)), (0, 255, 0), 2)
-                except Exception:
-                    continue
+                    if cv_image_crop.shape[0]>0 and cv_image_crop.shape[1]>0:
+                        cv_image_crop = cv2.cvtColor(cv_image_crop,cv2.COLOR_BGR2RGB)
+                        cv_image_crop,identities = self.openface_annotater.predictWithLabel(cv_image_crop,[], multiple=False, scale=None)
+                        #identities has a single element
+                        person = identities[0]
+                        track_assoc.person_name = person
+                        cv_image_crop = cv2.cvtColor(cv_image_crop,cv2.COLOR_RGB2BGR)
+                        track_assocs.tracks.append(track_assoc)
+                        try:
+                            self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image_crop,
+                                                   'bgr8'))
+                        except CvBridgeError, e:
+                            print(e)
+                self.track_person_assoc_pub.publish(track_assocs)
+                    # try:
+                    #     faces = faceCascade.detectMultiScale(
+                    #         gray,
+                    #         scaleFactor=1.1,
+                    #         minNeighbors=3,
+                    #         minSize=(50, 50),
+                    #         flags = cv2.CASCADE_SCALE_IMAGE
+                    #     )
 
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.putText(
-                    cv_image_crop,
-                    str(track_id%10000000),
-                    (0, h),
-                    font,
-                    1*w/160.0,
-                    (255, 255, 255),
-                    2,
-                    )
+                    #     # Draw a rectangle around the faces
+                    #     for (x, y, w, h) in faces:
+                    #         cv2.rectangle(cv_image_crop, (int(x-w*0.1), int(y-h*0.1)), (x+int(w*1.1), y+int(h*1.1)), (0, 255, 0), 2)
+                    # except Exception:
+                    #     continue
 
-                try:
-                    self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image_crop, 'bgr8'))
-                except CvBridgeError, e:
-                    print(e)
+                    # font = cv2.FONT_HERSHEY_SIMPLEX
+                    # cv2.putText(
+                    #     cv_image_crop,
+                    #     str(track_id%10000000),
+                    #     (0, h),
+                    #     font,
+                    #     1*w/160.0,
+                    #     (255, 255, 255),
+                    #     2,
+                    #     )
 
-                break
+                    # try:
+                    #     self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image_crop, 'bgr8'))
+                    # except CvBridgeError, e:
+                    #     print(e)
+
+                    # break
         else:
             print('No track.detection_id annotation.id found in common')
 
 def main(args):
-    ac = annotation_classifier()
+    ac = annotation_classifier(args)
     rospy.init_node('annotation_classifier')
     try:
         rospy.spin()
