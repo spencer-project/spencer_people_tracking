@@ -10,7 +10,7 @@
         </node>
     </group>
 
-    <arg name="image_topic" default="/spencer/sensors/rgbd_front_top/rgb/image_rect_color"/>
+    <arg name="image_topic" default="/head_camera/rgb/image_rect_color"/>
     <arg name="annotations_topics" default="/spencer/perception_internal/people_detection/rgbd_front_top/upper_body_detector/annotations"/>
     <arg name="tracks_topics" default="/spencer/perception_internal/detected_persons_syncronized/rgbd_front_top/upper_body"/>
 
