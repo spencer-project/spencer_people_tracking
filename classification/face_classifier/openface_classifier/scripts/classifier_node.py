@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import rospy
+import numpy as np
 import openface_classifier.msg
 import threading
 from sklearn.neighbors import KNeighborsClassifier
@@ -38,6 +39,17 @@ class Classifier:
             self.load_features(config['feature_path'])
         return config
 
+    def classify(self,feature):
+        '''Classification logic for unknown class included based on thresholded dot product'''
+        dot_prod_threshold_unknown = 0.6
+        dist,ind = self.clf.kneighbors(feature)
+        nn_product = np.vdot(feature,self.features[ind[0]])
+        if nn_product>dot_prod_threshold_unknown:
+            person = self.clf.predict(feature)[0]
+        else:
+            person = 'Unknown'
+        return person
+
     def track_feature_msg_callback(self,data):
         #subscriber callback
         #Case when only single track and feature is there
@@ -54,7 +66,7 @@ class Classifier:
         with self.lock:
             for (track,feature) in zip(track_list,features):
                 track_assoc = TrackIdentityAssociation()
-                label = self.clf.predict(feature)[0]
+                label = self.classify(feature)
                 track_assoc.track_id = track
                 track_assoc.detection_id = track.detection_id
                 track_assoc.person_name = label
