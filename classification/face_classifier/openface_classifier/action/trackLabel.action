@@ -1,0 +1,9 @@
+#goal
+uint64 track_id
+string person_name
+---
+#result
+bool training_success
+---
+#feedback
+float32 percent_complete
