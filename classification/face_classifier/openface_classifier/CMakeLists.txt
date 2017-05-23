@@ -68,7 +68,6 @@ catkin_python_setup()
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-	DEPENDENCIES 
 	actionlib_msgs
 )
 
@@ -113,7 +112,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+# include_directories(include)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
