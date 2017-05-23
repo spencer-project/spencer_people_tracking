@@ -1,6 +1,8 @@
 <launch>
     <arg name="input" default="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/>
     <arg name="output" default="/spencer/perception_internal/detected_persons_syncronized/rgbd_front_top/upper_body"/>
+    <arg name="dlib_model_path" default="$(find openface_classifier)/config/models/dlib/shape_predictor_68_face_landmarks.dat" />
+    <arg name="openface_model_path" default="$(find openface_classifier)/config/models/openface/nn4.small2.v1.t7" />
 
     <!-- Re-publish detections as syncronized track, for processing by the classifier-->
     <group ns="/spencer/perception_internal/detected_person_association">
@@ -14,9 +16,21 @@
     <arg name="annotations_topics" default="/spencer/perception_internal/people_detection/rgbd_front_top/upper_body_detector/annotations"/>
     <arg name="tracks_topics" default="/spencer/perception_internal/detected_persons_syncronized/rgbd_front_top/upper_body"/>
 
+        <!-- Re-publish detections as syncronized track, for processing by the classifier-->
+    <!-- <group ns="/spencer/classification_internal/classified_tracks">
+        <node name="annotation_classifier" type="annotation_classifier_node.py" pkg="openface_classifier" output="screen">
+            <remap from="image" to="$(arg image_topic)"/>
+            <remap from="annotations" to="$(arg annotations_topics)"/>
+            <remap from="tracks" to="$(arg tracks_topics)"/>
+        </node>
+    </group> -->
+
     <!-- Re-publish detections as syncronized track, for processing by the classifier-->
     <group ns="/spencer/classification_internal/classified_tracks">
-        <node name="annotation_classifier" type="annotation_classifier_node.py" pkg="openface_classifier" output="screen">
+        <node name="face_embedder" type="face_embedder_node.py" pkg="openface_classifier" output="screen">
+            <param name="dlib_model_path" value="$(arg dlib_model_path)" type="string"/>
+            <param name="openface_model_path" value="$(arg openface_model_path)" type="string"/>
+
             <remap from="image" to="$(arg image_topic)"/>
             <remap from="annotations" to="$(arg annotations_topics)"/>
             <remap from="tracks" to="$(arg tracks_topics)"/>
