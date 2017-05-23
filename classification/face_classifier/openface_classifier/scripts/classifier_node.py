@@ -39,9 +39,7 @@ class Classifier:
 
     def load_model(self, classifier_path):
         with open(classifier_path, 'r') as f:
-            (le, clf) = pickle.load(f)
-        self.clf = clf
-        self.le = le
+            self.clf = pickle.load(f)
 
     def load_features(self, feature_path):
         self.features = np.load(feature_path)
@@ -60,8 +58,7 @@ class Classifier:
         dist,ind = self.clf.kneighbors(feature)
         nn_product = np.vdot(feature,self.features[ind[0]])
         if nn_product>dot_prod_threshold_unknown:
-            person = self.clf.predict(feature)
-            label = self.le.inverse_transform(person)[0]
+            label = self.clf.predict(feature)
         else:
             label = 'Unknown'
         return label

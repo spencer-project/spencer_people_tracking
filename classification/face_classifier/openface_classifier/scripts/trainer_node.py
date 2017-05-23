@@ -38,7 +38,7 @@ class Trainer:
 		rospy.Subscriber("input", PersonEmbeddings, self.track_feature_msg_callback) #subscribes to (track,feature) message
 		self.action_server = actionlib.SimpleActionServer('trackLabel', trackLabelAction, self.track_label_actionlib_callback, False)
 		self.action_server.start()
-		self.client = Client('classifier_node',timeout=30) #dynamic_reconfig for client
+		self.client = Client('/spencer/classification_internal/classified_tracks/classifier',timeout=30) #dynamic_reconfig for client
 
 	def get_data(self):
 		try:
@@ -46,7 +46,7 @@ class Trainer:
 			labels = np.load(self.labels_path) #load labels file. (n_samples,)
 		except IOError:
 			features = np.empty((0,128),float)
-			labels = np.empty((0,1),str)
+			labels = np.empty((0),str)
 			print('Files cant be read')
 
 		return features, labels
@@ -64,14 +64,17 @@ class Trainer:
 		if query_track in self.track_feature_map:
 			query_track_feature_list = self.track_feature_map[query_track]
 
-			features,labels = self.get_data()
+			features, labels = self.get_data()
 
 			for i,feat in enumerate(query_track_feature_list):
-				features = np.append(features,np.array(feat),axis=0)
-				labels = np.append(labels,query_label,axis=0)
+				features = np.vstack([features,feat])
+				labels = np.hstack([labels,[query_label]])
 				progress = (i+1.0)/len(query_track_feature_list)*100
 				self._feedback.percent_complete = progress
 				self.action_server.publish_feedback(self._feedback)
+
+			print('features: ', features.shape)
+			print('labels: ', labels.shape)
 
 			#Training classifier
 			clf = KNeighborsClassifier(n_neighbors=1)
@@ -85,7 +88,7 @@ class Trainer:
 
 			self._result.training_success = True
 			#update configuration on classifier_node
-			client.update_configuration(
+			self.client.update_configuration(
 				{"classifier_path":self.classifier_path,
 				 "feature_path":self.feature_path}
 			)
