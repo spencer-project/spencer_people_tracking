@@ -5,8 +5,9 @@
     <arg name="dlib_model_path" default="$(find openface_classifier)/config/models/dlib/shape_predictor_68_face_landmarks.dat" />
     <arg name="openface_model_path" default="$(find openface_classifier)/config/models/openface/nn4.small2.v1.t7" />
 
-    <arg name="classifier_path" default="$(find openface_classifier)/config/models/classifier.pkl" />
-    <arg name="feature_path" default="$(find openface_classifier)/config/models/features.npy" />
+    <arg name="classifier_path" default="$(find openface_classifier)/config/models/classifier1.pkl" />
+    <arg name="feature_path" default="$(find openface_classifier)/config/models/features1.npy" />
+    <arg name="labels_path" default="$(find openface_classifier)/config/models/labels1.npy" />
 
     <!-- Re-publish detections as syncronized track, for processing by the classifier-->
     <group ns="/spencer/perception_internal/detected_person_association">
@@ -44,6 +45,13 @@
         <node name="classifier" type="classifier_node.py" pkg="openface_classifier" output="screen">
             <param name="classifier_path" value="$(arg classifier_path)" type="string"/>
             <param name="feature_path" value="$(arg feature_path)" type="string"/>
+
+            <remap from="input" to="embeddings"/>
+        </node>
+        <node name="trainer" type="trainer_node.py" pkg="openface_classifier" output="screen">
+            <param name="classifier_path" value="$(arg classifier_path)" type="string"/>
+            <param name="feature_path" value="$(arg feature_path)" type="string"/>
+            <param name="labels_path" value="$(arg labels_path)" type="string"/>
 
             <remap from="input" to="embeddings"/>
         </node>
