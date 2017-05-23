@@ -4,4 +4,4 @@
 uint64          detection_id
 uint64          track_id
 
-float32[] embedding
+float64[] embedding
