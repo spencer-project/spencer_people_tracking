@@ -68,6 +68,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
+	DEPENDENCIES
 	actionlib_msgs
 )
 
@@ -87,7 +88,7 @@ generate_messages(
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
  generate_dynamic_reconfigure_options(
-   cfg/classifierConfig.cfg
+   cfg/Classifier.cfg
  )
 
 ###################################

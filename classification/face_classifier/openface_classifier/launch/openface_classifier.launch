@@ -1,8 +1,12 @@
 <launch>
     <arg name="input" default="/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"/>
     <arg name="output" default="/spencer/perception_internal/detected_persons_syncronized/rgbd_front_top/upper_body"/>
+
     <arg name="dlib_model_path" default="$(find openface_classifier)/config/models/dlib/shape_predictor_68_face_landmarks.dat" />
     <arg name="openface_model_path" default="$(find openface_classifier)/config/models/openface/nn4.small2.v1.t7" />
+
+    <arg name="classifier_path" default="$(find openface_classifier)/config/models/classifier.pkl" />
+    <arg name="feature_path" default="$(find openface_classifier)/config/models/features.npy" />
 
     <!-- Re-publish detections as syncronized track, for processing by the classifier-->
     <group ns="/spencer/perception_internal/detected_person_association">
@@ -34,6 +38,14 @@
             <remap from="image" to="$(arg image_topic)"/>
             <remap from="annotations" to="$(arg annotations_topics)"/>
             <remap from="tracks" to="$(arg tracks_topics)"/>
+        </node>
+
+
+        <node name="classifier" type="classifier_node.py" pkg="openface_classifier" output="screen">
+            <param name="classifier_path" value="$(arg classifier_path)" type="string"/>
+            <param name="feature_path" value="$(arg feature_path)" type="string"/>
+
+            <remap from="input" to="embeddings"/>
         </node>
     </group>
 
