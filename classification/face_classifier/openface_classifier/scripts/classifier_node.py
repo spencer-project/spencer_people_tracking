@@ -55,10 +55,11 @@ class Classifier:
     def classify(self,feature):
         '''Classification logic for unknown class included based on thresholded dot product'''
         dot_prod_threshold_unknown = 0.6
-        dist,ind = self.clf.kneighbors(feature)
+        dist,ind = self.clf.kneighbors([feature])
         nn_product = np.vdot(feature,self.features[ind[0]])
         if nn_product>dot_prod_threshold_unknown:
-            label = self.clf.predict(feature)
+            feature = np.array([feature])
+            label = str(self.clf.predict(feature))
         else:
             label = 'Unknown'
         return label

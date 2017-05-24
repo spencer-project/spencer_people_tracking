@@ -88,10 +88,10 @@ class Trainer:
 
 			self._result.training_success = True
 			#update configuration on classifier_node
-			self.client.update_configuration(
-				{"classifier_path":self.classifier_path,
-				 "feature_path":self.feature_path}
-			)
+			# self.client.update_configuration(
+			# 	{"classifier_path":self.classifier_path,
+			# 	 "feature_path":self.feature_path}
+			# )
 
 		self.action_server.set_succeeded(self._result)
 
