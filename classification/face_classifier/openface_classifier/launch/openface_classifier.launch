@@ -45,16 +45,18 @@
         <node name="classifier" type="classifier_node.py" pkg="openface_classifier" output="screen">
             <param name="classifier_path" value="$(arg classifier_path)" type="string"/>
             <param name="feature_path" value="$(arg feature_path)" type="string"/>
-
             <remap from="input" to="embeddings"/>
         </node>
-        <!-- <node name="trainer" type="trainer_node.py" pkg="openface_classifier" output="screen">
+        
+        <node name="trainer" type="trainer_node.py" pkg="openface_classifier" output="screen">
             <param name="classifier_path" value="$(arg classifier_path)" type="string"/>
             <param name="feature_path" value="$(arg feature_path)" type="string"/>
             <param name="labels_path" value="$(arg labels_path)" type="string"/>
+        </node>
 
-            <remap from="input" to="embeddings"/>
-        </node> -->
+        <node name="data_associator" type="data_associator_node.py" pkg="openface_classifier" output="screen">
+            <remap from="track_feature_input" to="embeddings"/>
+        </node>
     </group>
 
 </launch>

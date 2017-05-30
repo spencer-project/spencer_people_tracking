@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 	actionlib_msgs
 	actionlib
 	spencer_vision_msgs
+	message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -55,11 +56,10 @@ find_package(catkin REQUIRED COMPONENTS
  )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ add_service_files(
+   FILES
+   TrackLabelAssociationService.srv
+ )
 
 ## Generate actions in the 'action' folder
  add_action_files(
