@@ -1,4 +1,6 @@
 uint64 track_id
+uint64 num_features
 string person_name
+time end_time
 ---
 bool success
