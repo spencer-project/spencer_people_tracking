@@ -36,7 +36,7 @@ class DataAssociator:
 		self.lock = threading.Lock()
 
 	def update_and_correct_track_feature_map(self):
-		bool shouldSendGoal = False
+		shouldSendGoal = False
 		goal = labels2FeaturesGoal()
 
 		for label in self.label_track_feature_map:
