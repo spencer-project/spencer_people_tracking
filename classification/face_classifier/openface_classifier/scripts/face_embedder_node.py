@@ -170,7 +170,8 @@ class face_embedder:
                         personEmbedding.detection_id = annotation.id
                         personEmbedding.embedding = rep
                         personEmbeddings.elements.append(personEmbedding)
-            self.embedding_pub.publish(personEmbeddings)
+            if len(personEmbeddings.elements) > 0:
+                self.embedding_pub.publish(personEmbeddings)
         else:
             print('No track.detection_id annotation.id found in common')
 
