@@ -21,24 +21,26 @@ from spencer_vision_msgs.msg import (
 import pickle
 import os
 
-# dir = os.path.dirname(__file__)
+dir = os.path.dirname(__file__)
 
 class Classifier:
     def __init__(self):
         self.lock = threading.Lock()
-        self.classifier_path = rospy.get_param('~classifier_path')
-        self.feature_path = rospy.get_param('~feature_path')
-        rospy.Subscriber("input",PersonEmbeddings, self.track_feature_msg_callback) #subscribes to (track,feature) message
-        self.track_person_assoc_pub = rospy.Publisher('output', TrackIdentityAssociations, queue_size=10)
+        # self.classifier_path = rospy.get_param('~classifier_path')
+        # self.feature_path = rospy.get_param('~feature_path')
+        self.embeddings_topic = rospy.get_param('~embeddings_topic')
+        self.labeled_tracks_topic = rospy.get_param('~labeled_tracks_topic')
+        rospy.Subscriber(self.embeddings_topic, PersonEmbeddings, self.track_feature_msg_callback) #subscribes to (track,feature) message
+        self.track_person_assoc_pub = rospy.Publisher(self.labeled_tracks_topic, TrackIdentityAssociations, queue_size=10)
         self.server = Server(ClassifierConfig, self.reconfigure_classifier_callback)
-        # self.classifier_path = os.path.join(dir, '../config/models/classifier.pkl') #TODO: pick from rosparam
-        # self.feature_path =  os.path.join(dir, '../config/models/features.npy')      #TODO: pick from rosparam
+        self.classifier_path = os.path.join(dir, '../config/models/classifier.pkl') #TODO: pick from rosparam
+        self.feature_path =  os.path.join(dir, '../config/models/features.npy')      #TODO: pick from rosparam
         self.load_model(self.classifier_path)
         self.load_features(self.feature_path)
 
 
     def load_model(self, classifier_path):
-        print 'load from ',classifier_path
+        # print 'load from ',classifier_path
         try:
             with open(classifier_path, 'r') as f:
                 self.clf = pickle.load(f)
@@ -46,14 +48,14 @@ class Classifier:
             print 'File path for classifier not exist'
 
     def load_features(self, feature_path):
-        print 'load from ',feature_path
+        # print 'load from ',feature_path
         try:
             self.features = np.load(feature_path)
         except IOError:
             print 'File path for features not exist'
 
     def reconfigure_classifier_callback(self, config, level):
-        print 'dynreconfig classifier callback'
+        # print 'dynreconfig classifier callback'
         with self.lock:
             print 'lock acquired'
             self.classifier_path = config['classifier_path']

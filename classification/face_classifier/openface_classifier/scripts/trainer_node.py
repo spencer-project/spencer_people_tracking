@@ -20,26 +20,26 @@ import pickle
 import numpy as np
 import os
 
-# dir = os.path.dirname(__file__)
+dir = os.path.dirname(__file__)
 
 class Trainer:
 	# create messages that are used to publish feedback/result
-	
+
 	def __init__(self):
-		self.classifier_path = rospy.get_param('~classifier_path')
-		self.feature_path = rospy.get_param('~feature_path')
-		self.labels_path = rospy.get_param('~labels_path')
-		# self.classifier_path =  os.path.join(dir, '../config/models/classifier.pkl') #TODO: pick from rosparam
-		# self.feature_path =  os.path.join(dir, '../config/models/features.npy')		 #TODO: pick from rosparam
-		# self.labels_path =  os.path.join(dir, '../config/models/labels.npy')		 #TODO: pick from rosparam
+		# self.classifier_path = rospy.get_param('~classifier_path')
+		# self.feature_path = rospy.get_param('~feature_path')
+		# self.labels_path = rospy.get_param('~labels_path')
+		self.classifier_path =  os.path.join(dir, '../config/models/classifier.pkl') #TODO: pick from rosparam
+		self.feature_path =  os.path.join(dir, '../config/models/features.npy')		 #TODO: pick from rosparam
+		self.labels_path =  os.path.join(dir, '../config/models/labels.npy')		 #TODO: pick from rosparam
 
 		self.action_server = actionlib.SimpleActionServer('labels2Features', labels2FeaturesAction, self.labels2Features_actionlib_callback, False)
 		self.action_server.start()
 		print 'ActionLib server started'
-		self.client = Client('classifier_node',timeout=30) #dynamic_reconfig for client
+		self.client = Client('classifier',timeout=30) #dynamic_reconfig for client
 
 	def get_data(self):
-		print 'get_data called'
+		# print 'get_data called'
 		self.label_feature_map = defaultdict(list) #label->feature list. Needed for the reset feature.
 		try:
 			features = np.load(self.feature_path) #load feature file. features matrix is n_samples X num_features(128 for openface)
@@ -51,7 +51,7 @@ class Trainer:
 
 	def labels2Features_actionlib_callback(self, goal):
 		print 'labels2Features_actionlib_callback'
-		
+
 		self.get_data()
 
 		for datum in goal.elements:
@@ -73,7 +73,7 @@ class Trainer:
 			for f in feature_list:
 				features = np.vstack((features,f))
 				labels = np.hstack((labels,label))
-		
+
 		# print('features: ', features.shape)
 		print 'Features'
 		print features

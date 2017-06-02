@@ -78,18 +78,23 @@ class face_embedder:
         self.imgDim = 96
         self.cuda = False
 
+        self.image_topic = rospy.get_param('~image_topic')
+        self.annotations_topic = rospy.get_param('~annotations_topic')
+        self.tracks_topic = rospy.get_param('~tracks_topic')
+        self.embeddings_topic = rospy.get_param('~embeddings_topic')
+
         self.align = openface.AlignDlib(self.dlib_model_path)
         self.net = openface.TorchNeuralNet(
             self.openface_model_path,
             imgDim=self.imgDim,
             cuda=self.cuda)
 
-        self.embedding_pub = rospy.Publisher('output', PersonEmbeddings, queue_size=10)
+        self.embedding_pub = rospy.Publisher(self.embeddings_topic, PersonEmbeddings, queue_size=10)
         self.bridge = CvBridge()
 
-        image_sub = message_filters.Subscriber('image', Image)
-        annotation_sub = message_filters.Subscriber('annotations', AnnotatedFrame)
-        tracked_persons_sub = message_filters.Subscriber('tracks', TrackedPersons)
+        image_sub = message_filters.Subscriber(self.image_topic, Image)
+        annotation_sub = message_filters.Subscriber(self.annotations_topic, AnnotatedFrame)
+        tracked_persons_sub = message_filters.Subscriber(self.tracks_topic, TrackedPersons)
 
         self.time_sync = message_filters.ApproximateTimeSynchronizer(
             [image_sub, annotation_sub, tracked_persons_sub], 100, 0.033)
