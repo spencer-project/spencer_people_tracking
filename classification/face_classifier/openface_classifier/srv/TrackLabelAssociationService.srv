@@ -1,6 +1,7 @@
 uint64 track_id
-uint64 num_features
-string person_name
-time end_time
+string track_label
+uint32 min_embeddings
+time expiration
+bool reset_label
 ---
 bool success

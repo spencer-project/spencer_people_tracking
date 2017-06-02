@@ -19,84 +19,93 @@ from spencer_vision_msgs.msg import (
 	PersonEmbedding,
 	PersonEmbeddings,
 )
-from openface_classifier.srv import trackLabelAssociation
+from openface_classifier.srv import *
 from collections import defaultdict
 
 class DataAssociator:
-	TRACK_ID_KEY = 'track_id'
-	FEATURE_LIST_KEY = 'feature_list'
-	FEATURE_SIZE_KEY =  'feature_size'
-	
+
 	def __init__(self):
-		rospy.Subscriber("track_feature_input", PersonEmbeddings, self.track_feature_msg_callback) 		#subscribes to (track,feature) message
-		rospy.Service('track_label', trackLabelAssociation, self.track_label_service_callback)
-		self.actionlibClient = actionlib.SimpleActionClient('labels2Features', labels2FeaturesAction)
-		self.actionlibClient.wait_for_server()
-		self.label_track_feature_map = {}
+		self.requests_map = {}
 		self.lock = threading.Lock()
 
-	def update_and_correct_track_feature_map(self):
+		self.embeddings_topic = rospy.get_param('~embeddings_topic')
+		rospy.Subscriber(self.embeddings_topic, PersonEmbeddings, self.track_feature_msg_callback) 		#subscribes to (track,feature) message
+		rospy.Service('track_label', TrackLabelAssociationService, self.track_label_service_callback)
+		self.actionlibClient = actionlib.SimpleActionClient('labels2Features', labels2FeaturesAction)
+		self.actionlibClient.wait_for_server()
+
+	def check_requests(self):
 		shouldSendGoal = False
 		goal = labels2FeaturesGoal()
+		keys_removed = []
+		for track_id in self.requests_map:
+			request = self.requests_map[track_id]['request']
+			embeddings = self.requests_map[track_id]['embeddings']
 
-		for label in self.label_track_feature_map:
-			feature_list_length = len(self.label_track_feature_map[label][FEATURE_LIST_KEY])
-			allowed_length = self.label_track_feature_map[label][FEATURE_SIZE_KEY]
-			
-			if feature_list_length >= allowed_length:
+			embeddings_length = len(embeddings)
+			diff = embeddings_length - request.min_embeddings
+
+			if diff >= 0:
 				shouldSendGoal = True
-				diff = feature_list_length - allowed_length
 				label2Features_msg = LabelToFeatures()
-				label2Features_msg.person_name = label
-				label2Features_msg.reset_label = False
+				label2Features_msg.person_name = request.track_label
+				label2Features_msg.reset_label = request.reset_label
 				label2Features_msg.person_embeddings = PersonEmbeddings()
-
-				for embedding in self.label_track_feature_map[label][FEATURE_LIST_KEY][diff:]:
-					person_embedding = PersonEmbedding()
-					person_embedding.embedding = embedding
-					person_embedding.track_id = self.label_track_feature_map[label][TRACK_ID_KEY]
-					label2Features_msg.person_embeddings.elements.append(person_embedding)	
+				label2Features_msg.person_embeddings.elements = embeddings[diff:]
 
 				goal.elements.append(label2Features_msg)
+				keys_removed.append(track_id)
 
 		if shouldSendGoal:
 			self.actionlibClient.send_goal(goal)
-			self.actionlibClient.wait_for_result(rospy.Duration.from_sec(5.0))
-
+			print(goal)
+			# self.actionlibClient.wait_for_result(rospy.Duration.from_sec(5.0))
+			for key in keys_removed:
+				del self.requests_map[key]
 
 	def track_feature_msg_callback(self, personEmbeddings):
+		print 'track_feature subscriber callback'
 		with self.lock:
-			elements = personEmbeddings.elements
-			features = []
-			
-			for element in elements:
-				elem_track_id = element.track_id
-				elem_embedding = element.embedding
-				if elem_track_id == self.track_id:
-					features.append(elem_embedding)
+			# Loop over each track embedding
+			for personEmbedding in personEmbeddings.elements:
+				track_id = personEmbedding.track_id
+				embedding = personEmbedding.embedding
+				# Check if track is being monitored
+				if track_id in self.requests_map:
+					# Add the embedding if so
+					self.requests_map[track_id]['embeddings'].append(personEmbedding)
+			# Check for completed requests
+			self.check_requests()
 
-			if self.track_label in self.label_track_feature_map:
-				
-				#logic for adding features to list
-				if self.label_track_feature_map[self.track_label][TRACK_ID_KEY] == self.track_id: #append features ti
-					self.label_track_feature_map[self.track_label][FEATURE_LIST_KEY].extend(features)
-				else: #the list is newly created with current features
-					self.label_track_feature_map[self.track_label][FEATURE_LIST_KEY] = features
+	def track_label_service_callback(self, new_request):
+		print("track_label_service_callback")
+		print("trackIdentityAssociationServiceRequest: ", new_request)
 
-				#update feature size key
-				self.label_track_feature_map[self.track_label][FEATURE_SIZE_KEY] = self.num_features_to_collect
+		track_id = new_request.track_id
+		# track_label = trackIdentityAssociationServiceRequest.person_name
+		# request_timeout_time = trackIdentityAssociationServiceRequest.end_time
+		# num_features_to_collect = trackIdentityAssociationServiceRequest.num_features
+
+		with self.lock:
+			# Check if the track is not already being monitored
+			if track_id not in self.requests_map:
+				# If not present, then add it
+				self.requests_map[track_id] = {
+					'request':new_request,
+					'embeddings':[],
+				}
 			else:
-				self.label_track_feature_map[self.track_label] = {TRACK_ID_KEY:self.track_id,FEATURE_LIST_KEY:features,FEATURE_SIZE_KEY:self.num_features_to_collect}
-			
-			self.update_and_correct_track_feature_map()
-		
-	def track_label_service_callback(self, trackIdentityAssociationServiceRequest):
-		with self.lock:
-			self.track_id = trackIdentityAssociationServiceRequest.track_id
-			self.track_label = trackIdentityAssociationServiceRequest.person_name
-			self.request_timeout_time = trackIdentityAssociationServiceRequest.end_time
-			self.num_features_to_collect = trackIdentityAssociationServiceRequest.num_features
-		return trackLabelAssociationResponse(True)
+				# Otherwise check of the label is still the same
+				old_request = self.requests_map[track_id]['request']
+				if old_request.track_id != track_id:
+					# If not the same, then clear the old embeddings
+					self.requests_map[track_id]['embeddings'] = []
+				# Update the request
+				self.requests_map[track_id]['request'] = new_request
+			# Check for completed requests
+			self.check_requests()
+
+		return TrackLabelAssociationServiceResponse(True)
 
 
 '''This node collects Track->Label and Track->Feature mappings, gets Label->Feature mappings from them and sends it to the trainer_node'''
