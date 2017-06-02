@@ -76,7 +76,7 @@ class face_embedder:
         self.dlib_model_path = rospy.get_param('~dlib_model_path')
         self.openface_model_path = rospy.get_param('~openface_model_path')
         self.imgDim = 96
-        self.cuda = True
+        self.cuda = False
 
         self.align = openface.AlignDlib(self.dlib_model_path)
         self.net = openface.TorchNeuralNet(
@@ -84,7 +84,7 @@ class face_embedder:
             imgDim=self.imgDim,
             cuda=self.cuda)
 
-        self.embedding_pub = rospy.Publisher('embeddings', PersonEmbeddings, queue_size=10)
+        self.embedding_pub = rospy.Publisher('output', PersonEmbeddings, queue_size=10)
         self.bridge = CvBridge()
 
         image_sub = message_filters.Subscriber('image', Image)
@@ -135,6 +135,8 @@ class face_embedder:
                 y2 = np.clip(y + h, 1, cv_image.shape[1]-1)
 
                 cv_image_crop = cv_image[y1:y2, x1:x2]
+                cv_image_crop = cv2.cvtColor(cv_image_crop,cv2.COLOR_BGR2RGB)
+                cv_image_crop = cv2.cvtColor(cv_image_crop,cv2.COLOR_RGB2BGR)
                 bb = self.align.getLargestFaceBoundingBox(cv_image_crop)
 
                 scale = None
