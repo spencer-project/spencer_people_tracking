@@ -9,7 +9,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
 
 from dynamic_reconfigure.client import Client
-from openface_classifier.msg import trackLabelAction
+from openface_classifier.msg import labels2FeaturesAction
 
 from spencer_vision_msgs.msg import (
     PersonEmbedding,
@@ -18,82 +18,84 @@ from spencer_vision_msgs.msg import (
 
 import pickle
 import numpy as np
+import os
 
-classifier_path = 'classifier.pkl'
-feature_path = 'features.npy'
-labels_path = 'labels.npy'
+dir = os.path.dirname(__file__)
 
 class Trainer:
 	# create messages that are used to publish feedback/result
-	_feedback = openface_classifier.msg.trackLabelFeedback()
-	_result = openface_classifier.msg.trackLabelResult()
 
 	def __init__(self):
-		self.classifier_path = rospy.get_param('~classifier_path')
-		self.feature_path = rospy.get_param('~feature_path')
-		self.labels_path = rospy.get_param('~labels_path')
+		# self.classifier_path = rospy.get_param('~classifier_path')
+		# self.feature_path = rospy.get_param('~feature_path')
+		# self.labels_path = rospy.get_param('~labels_path')
+		self.classifier_path =  os.path.join(dir, '../config/models/classifier.pkl') #TODO: pick from rosparam
+		self.feature_path =  os.path.join(dir, '../config/models/features.npy')		 #TODO: pick from rosparam
+		self.labels_path =  os.path.join(dir, '../config/models/labels.npy')		 #TODO: pick from rosparam
 
-		self.track_feature_map = defaultdict(list) #track_id->feature
-
-		rospy.Subscriber("input", PersonEmbeddings, self.track_feature_msg_callback) #subscribes to (track,feature) message
-		self.action_server = actionlib.SimpleActionServer('trackLabel', trackLabelAction, self.track_label_actionlib_callback, False)
+		self.action_server = actionlib.SimpleActionServer('labels2Features', labels2FeaturesAction, self.labels2Features_actionlib_callback, False)
 		self.action_server.start()
-		self.client = Client('/spencer/classification_internal/classified_tracks/classifier',timeout=30) #dynamic_reconfig for client
+		print 'ActionLib server started'
+		self.client = Client('classifier',timeout=30) #dynamic_reconfig for client
 
 	def get_data(self):
+		# print 'get_data called'
+		self.label_feature_map = defaultdict(list) #label->feature list. Needed for the reset feature.
 		try:
 			features = np.load(self.feature_path) #load feature file. features matrix is n_samples X num_features(128 for openface)
 			labels = np.load(self.labels_path) #load labels file. (n_samples,)
+			for label,feat in zip(labels,features):
+				self.label_feature_map[label].append(feat)
 		except IOError:
-			features = np.empty((0,128),float)
-			labels = np.empty((0),str)
 			print('Files cant be read')
 
-		return features, labels
+	def labels2Features_actionlib_callback(self, goal):
+		print 'labels2Features_actionlib_callback'
 
-	#subscriber callback
-	def track_feature_msg_callback(self, personEmbeddings):
-		for element in personEmbeddings.elements:
-			self.track_feature_map[element.track_id].append(element.embedding)
+		self.get_data()
 
-	def track_label_actionlib_callback(self, goal):
-		self._result.training_success = False
-		query_track = goal.track_id
-		query_label = goal.person_name
+		for datum in goal.elements:
+			shouldReset = datum.reset_label
+			print 'shouldReset:',shouldReset
+			person_name = datum.person_name
+			print 'person_name:', person_name
+			person_embeddings = datum.person_embeddings.elements
+			if shouldReset:
+				self.label_feature_map[person_name] = []
+			for x in person_embeddings:
+				self.label_feature_map[person_name].append(x.embedding)
+		# print self.label_feature_map
+		features = np.empty((0,128),float)
+		labels =  np.empty((0),str)
 
-		if query_track in self.track_feature_map:
-			query_track_feature_list = self.track_feature_map[query_track]
+		for label in self.label_feature_map:
+			feature_list = self.label_feature_map[label]
+			for f in feature_list:
+				features = np.vstack((features,f))
+				labels = np.hstack((labels,label))
 
-			features, labels = self.get_data()
+		# print('features: ', features.shape)
+		print 'Features'
+		print features
+		# print('labels: ', labels.shape)
+		print labels
+		#Training classifier
+		clf = KNeighborsClassifier(n_neighbors=1)
+		clf.fit(features,labels)
 
-			for i,feat in enumerate(query_track_feature_list):
-				features = np.vstack([features,feat])
-				labels = np.hstack([labels,[query_label]])
-				progress = (i+1.0)/len(query_track_feature_list)*100
-				self._feedback.percent_complete = progress
-				self.action_server.publish_feedback(self._feedback)
+		#Saving features, labels and classifier
+		np.save(self.feature_path,features)
+		np.save(self.labels_path,labels)
+		with open(self.classifier_path, 'w') as f:
+			pickle.dump(clf, f)
 
-			print('features: ', features.shape)
-			print('labels: ', labels.shape)
+		#update configuration on classifier_node
+		self.client.update_configuration(
+			{"classifier_path":self.classifier_path,
+			 "feature_path":self.feature_path}
+		)
 
-			#Training classifier
-			clf = KNeighborsClassifier(n_neighbors=1)
-			clf.fit(features,labels)
-
-			#Saving features, labels and classifier
-			np.save(self.feature_path,features)
-			np.save(self.labels_path,labels)
-			with open(self.classifier_path, 'w') as f:
-				pickle.dump(clf, f)
-
-			self._result.training_success = True
-			#update configuration on classifier_node
-			# self.client.update_configuration(
-			# 	{"classifier_path":self.classifier_path,
-			# 	 "feature_path":self.feature_path}
-			# )
-
-		self.action_server.set_succeeded(self._result)
+		self.action_server.set_succeeded()
 
 if __name__ == '__main__':
 	rospy.init_node('trainer_node')

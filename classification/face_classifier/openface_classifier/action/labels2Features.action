@@ -1,6 +1,5 @@
 #goal
-uint64 track_id
-string person_name
+LabelToFeatures[] elements
 ---
 #result
 bool training_success
