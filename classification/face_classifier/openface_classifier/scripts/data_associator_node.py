@@ -27,7 +27,6 @@ class DataAssociator:
 	def __init__(self):
 		self.requests_map = {}
 		self.lock = threading.Lock()
-
 		self.embeddings_topic = rospy.get_param('~embeddings_topic')
 		rospy.Subscriber(self.embeddings_topic, PersonEmbeddings, self.track_feature_msg_callback) 		#subscribes to (track,feature) message
 		rospy.Service('track_label', TrackLabelAssociationService, self.track_label_service_callback)
