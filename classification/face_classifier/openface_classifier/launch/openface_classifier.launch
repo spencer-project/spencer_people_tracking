@@ -61,6 +61,11 @@
         <node name="data_associator" type="data_associator_node.py" pkg="openface_classifier" output="screen">
             <param name="embeddings_topic" value="embeddings" type="string"/>
         </node>
+
+        <node name="call_person" type="call_person_by_name.py" pkg="openface_classifier" output="screen">
+            <param name="labeled_tracks_topic" value="labeled_tracks" type="string"/>
+            <param name="call_person_topic" value="call_person" type="string"/>
+        </node>
     </group>
 
 </launch>
