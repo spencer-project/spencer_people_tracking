@@ -21,20 +21,18 @@ from spencer_vision_msgs.msg import (
 import pickle
 import os
 
-dir = os.path.dirname(__file__)
-
 class Classifier:
     def __init__(self):
         self.lock = threading.Lock()
-        # self.classifier_path = rospy.get_param('~classifier_path')
-        # self.feature_path = rospy.get_param('~feature_path')
+        self.classifier_path = rospy.get_param('~classifier_path')
+        self.feature_path = rospy.get_param('~feature_path')
         self.embeddings_topic = rospy.get_param('~embeddings_topic')
         self.labeled_tracks_topic = rospy.get_param('~labeled_tracks_topic')
+        self.clf = None
+        self.features = None
         rospy.Subscriber(self.embeddings_topic, PersonEmbeddings, self.track_feature_msg_callback) #subscribes to (track,feature) message
         self.track_person_assoc_pub = rospy.Publisher(self.labeled_tracks_topic, TrackIdentityAssociations, queue_size=10)
         self.server = Server(ClassifierConfig, self.reconfigure_classifier_callback)
-        self.classifier_path = os.path.join(dir, '../config/models/classifier.pkl') #TODO: pick from rosparam
-        self.feature_path =  os.path.join(dir, '../config/models/features.npy')      #TODO: pick from rosparam
         self.load_model(self.classifier_path)
         self.load_features(self.feature_path)
 
@@ -92,14 +90,17 @@ class Classifier:
         with self.lock:
             self.load_model(self.classifier_path)
             self.load_features(self.feature_path)
-            for element in elements:
-                track_assoc = TrackIdentityAssociation()
-                label = self.classify(element.embedding)
-                track_assoc.track_id = element.track_id
-                track_assoc.detection_id = element.detection_id
-                track_assoc.person_name = label
-                track_assocs.tracks.append(track_assoc)
-        self.track_person_assoc_pub.publish(track_assocs)
+            if self.clf and self.features:
+                for element in elements:
+                    track_assoc = TrackIdentityAssociation()
+                    label = self.classify(element.embedding)
+                    track_assoc.track_id = element.track_id
+                    track_assoc.detection_id = element.detection_id
+                    track_assoc.person_name = label
+                    track_assocs.tracks.append(track_assoc)
+                self.track_person_assoc_pub.publish(track_assocs)
+            else:
+                print 'No model initialised'
 
 
 if __name__ == '__main__':
