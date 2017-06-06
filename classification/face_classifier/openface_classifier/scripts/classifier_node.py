@@ -28,8 +28,8 @@ class Classifier:
         self.feature_path = rospy.get_param('~feature_path')
         self.embeddings_topic = rospy.get_param('~embeddings_topic')
         self.labeled_tracks_topic = rospy.get_param('~labeled_tracks_topic')
-        self.model_loaded = False
-        self.features_loaded = False
+        self.clf = None
+        self.features = None
         rospy.Subscriber(self.embeddings_topic, PersonEmbeddings, self.track_feature_msg_callback) #subscribes to (track,feature) message
         self.track_person_assoc_pub = rospy.Publisher(self.labeled_tracks_topic, TrackIdentityAssociations, queue_size=10)
         self.server = Server(ClassifierConfig, self.reconfigure_classifier_callback)
@@ -42,7 +42,6 @@ class Classifier:
         try:
             with open(classifier_path, 'r') as f:
                 self.clf = pickle.load(f)
-                self.model_loaded = True
         except IOError:
             print 'File path for classifier not exist'
 
@@ -50,7 +49,6 @@ class Classifier:
         # print 'load from ',feature_path
         try:
             self.features = np.load(feature_path)
-            self.features_loaded = True
         except IOError:
             print 'File path for features not exist'
 
@@ -92,8 +90,7 @@ class Classifier:
         with self.lock:
             self.load_model(self.classifier_path)
             self.load_features(self.feature_path)
-
-            if self.model_loaded and self.features_loaded:
+            if self.clf and self.features:
                 for element in elements:
                     track_assoc = TrackIdentityAssociation()
                     label = self.classify(element.embedding)
