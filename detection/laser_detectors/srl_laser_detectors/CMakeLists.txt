@@ -85,7 +85,10 @@ install(DIRECTORY launch/
   PATTERN ".svn" EXCLUDE
 )
 
-
+install(DIRECTORY models/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
+  PATTERN ".svn" EXCLUDE
+)
 
 ### Learned detectors ###
 if(OpenCV_FOUND)

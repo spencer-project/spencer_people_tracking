@@ -76,3 +76,20 @@ target_link_libraries(nnt_node ${catkin_LIBRARIES})
 add_executable(logger_node ${SOURCE_DIR}/ros/nodes/logger_node.cpp)
 add_dependencies(logger_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(logger_node ${catkin_LIBRARIES})
+
+install(TARGETS nnt_node logger_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE
+)
