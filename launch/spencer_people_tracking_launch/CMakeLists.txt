@@ -15,7 +15,6 @@ install(DIRECTORY rviz/
   PATTERN ".svn" EXCLUDE
 )
 
-install(DIRECTORY data/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data
-  PATTERN ".svn" EXCLUDE
+install(PROGRAMS scripts/download_example_bagfiles.sh
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

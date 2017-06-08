@@ -1,5 +1,5 @@
 <launch>
-    <arg name="bagfile_folder" default="$(find spencer_people_tracking_launch)/data/rgbd_2dlaser_example"/>
+    <arg name="bagfile_folder" default="$(env HOME)/.ros/spencer_tracking_rgbd_2dlaser_example_bagfiles/"/> <!-- download using script in scripts/ folder -->
 
     <arg name="front_laser" default="true"/>
     <arg name="front_rgbd" default="true"/>
