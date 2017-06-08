@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
 # Generate messages in the 'msg' folder
 add_message_files(
    FILES
+   PersonEmbedding.msg
+   PersonEmbeddings.msg
    PersonImage.msg
    PersonImages.msg
    PersonROI.msg
@@ -40,5 +42,5 @@ generate_messages(
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs message_runtime 
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs message_runtime
 )

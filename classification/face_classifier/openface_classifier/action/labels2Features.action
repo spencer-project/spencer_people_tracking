@@ -1,0 +1,8 @@
+#goal
+LabelToFeatures[] elements
+---
+#result
+bool training_success
+---
+#feedback
+float32 percent_complete

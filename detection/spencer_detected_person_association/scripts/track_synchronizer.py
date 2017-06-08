@@ -30,12 +30,20 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import collections, rospy, message_filters
-from spencer_tracking_msgs.msg import DetectedPersons
+from spencer_tracking_msgs.msg import (
+    DetectedPerson,
+    DetectedPersons,
+    TrackedPerson,
+    TrackedPersons,
+    )
 from spencer_detected_person_association import TrackSynchronizer
 
-def detectedPersonsCallback(trackAssociation, detectedPersons):
+def detectedPersonsCallback(trackAssociation, detectedPersons, syncronized_person_pub):
     age = rospy.Time.now() - detectedPersons.header.stamp
     output = "New detections with track association available (age of detections = %.2f sec)! Detection to track association: " % age.to_sec()
+
+    syncronizedPersons = TrackedPersons()
+    syncronizedPersons.header = detectedPersons.header
 
     if detectedPersons.detections:
         for detectedPerson in detectedPersons.detections:
@@ -43,24 +51,30 @@ def detectedPersonsCallback(trackAssociation, detectedPersons):
             # track association is available for these detections (by comparing message timestamps of tracks and detections).
             detectionId = detectedPerson.detection_id
             trackId = trackAssociation.lookupTrackId(detectionId) # <-- this is what this is all about
-
             output += "\n[det %d --> track %s]" % (detectionId, str(trackId))
+            if trackId:
+                syncronizedPerson = TrackedPerson()
+                syncronizedPerson.track_id = trackId
+                syncronizedPerson.detection_id = detectionId
+                syncronizedPersons.tracks.append(syncronizedPerson)
     else:
         output += "Empty set of detections!"
 
+    syncronized_person_pub.publish(syncronizedPersons)
     rospy.loginfo(output)
-
 
 
 if __name__ == '__main__':
     arguments = rospy.myargv()
-    rospy.init_node("track_synchronizer_test")
+    rospy.init_node("track_synchronizer")
 
-    detectionsTopic = "/spencer/perception_internal/detected_persons/rgbd_front_top/upper_body"
+    detectionsTopic = "input"
+    syncronizedTopic = "output"
     detected_person_sub = message_filters.Subscriber(detectionsTopic, DetectedPersons)
+    syncronized_person_pub = rospy.Publisher(syncronizedTopic, TrackedPersons, queue_size=10)
 
     track_sync = TrackSynchronizer(detected_person_sub, 100)
-    track_sync.registerCallback(detectedPersonsCallback)
+    track_sync.registerCallback(detectedPersonsCallback, syncronized_person_pub)
 
     rospy.loginfo("Subscribed to %s and waiting for detection-to-track association!" % detectionsTopic)
 

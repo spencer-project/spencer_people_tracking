@@ -28,6 +28,8 @@
 #include "Globals.h"
 #include "ConfigFile.h"
 
+#include <rwth_perception_people_msgs/AnnotatedFrame.h>
+#include <rwth_perception_people_msgs/Annotation.h>
 #include <rwth_perception_people_msgs/UpperBodyDetector.h>
 #include <rwth_perception_people_msgs/GroundPlane.h>
 
@@ -43,6 +45,7 @@ using namespace message_filters;
 using namespace rwth_perception_people_msgs;
 
 ros::Publisher pub_message;
+ros::Publisher pub_annotations;
 image_transport::Publisher pub_result_image;
 ros::Publisher pub_centres;
 spencer_diagnostics::MonitoredPublisher pub_detected_persons;
@@ -179,7 +182,7 @@ void colorImageCallback(const ImageConstPtr &color) {
 void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const CameraInfoConstPtr &info)
 {
     // Check if calculation is necessary
-    bool detect = pub_message.getNumSubscribers() > 0 || pub_centres.getNumSubscribers() > 0 || pub_detected_persons.getNumSubscribers() > 0;
+    bool detect = pub_message.getNumSubscribers() > 0 || pub_annotations.getNumSubscribers() > 0 || pub_centres.getNumSubscribers() > 0 || pub_detected_persons.getNumSubscribers() > 0;
     bool vis = pub_result_image.getNumSubscribers() > 0;
 
     if(!detect && !vis)
@@ -220,10 +223,12 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
 
     // Generate messages
     UpperBodyDetector detection_msg;
+    AnnotatedFrame annotations_msg;
     geometry_msgs::PoseArray bb_centres;
     spencer_tracking_msgs::DetectedPersons detected_persons;
 
     detection_msg.header = depth->header;
+    annotations_msg.header = depth->header;
     bb_centres.header    = depth->header;
     detected_persons.header = depth->header;
 
@@ -236,6 +241,16 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
         detection_msg.height.push_back(detected_bounding_boxes(i)(3));
         detection_msg.dist.push_back(detected_bounding_boxes(i)(4));
         detection_msg.median_depth.push_back(detected_bounding_boxes(i)(5));
+
+        // AnnotatedFrame message
+        Annotation annotation;
+        annotation.header = depth->header;
+        annotation.id = current_detection_id;
+        annotation.tlx = detected_bounding_boxes(i)(0);
+        annotation.tly = detected_bounding_boxes(i)(1);
+        annotation.width = detected_bounding_boxes(i)(2);
+        annotation.height = detected_bounding_boxes(i)(3);
+        annotations_msg.annotations.push_back(annotation);
 
         // Calculate centres of bounding boxes
         double mid_point_x = detected_bounding_boxes(i)(0)+detected_bounding_boxes(i)(2)/2.0;
@@ -266,7 +281,7 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
         detected_person.detection_id = current_detection_id;
         current_detection_id += detection_id_increment;
 
-        detected_persons.detections.push_back(detected_person);  
+        detected_persons.detections.push_back(detected_person);
     }
 
     // Creating a ros image with the detection results an publishing it
@@ -297,6 +312,7 @@ void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const
 
     // Publishing detections
     pub_message.publish(detection_msg);
+    pub_annotations.publish(annotations_msg);
     pub_centres.publish(bb_centres);
     pub_detected_persons.publish(detected_persons);
 }
@@ -307,7 +323,7 @@ void connectCallback(message_filters::Subscriber<CameraInfo> &sub_cam,
                      boost::shared_ptr<image_transport::Subscriber> &sub_col,
                      image_transport::SubscriberFilter &sub_dep,
                      image_transport::ImageTransport &it) {
-    if(!pub_message.getNumSubscribers() && !pub_result_image.getNumSubscribers() && !pub_centres.getNumSubscribers() && !pub_detected_persons.getNumSubscribers()) {
+    if(!pub_message.getNumSubscribers() && !pub_annotations.getNumSubscribers() && !pub_result_image.getNumSubscribers() && !pub_centres.getNumSubscribers() && !pub_detected_persons.getNumSubscribers()) {
         ROS_DEBUG("Upper Body Detector: No subscribers. Unsubscribing.");
         sub_cam.unsubscribe();
         sub_gp.unsubscribe();
@@ -323,7 +339,7 @@ void connectCallback(message_filters::Subscriber<CameraInfo> &sub_cam,
     if(pub_result_image.getNumSubscribers()) {
         sub_col = boost::make_shared<image_transport::Subscriber>( it.subscribe(topic_color_image, 1, &colorImageCallback) );
     }
-}  
+}
 
 int main(int argc, char **argv)
 {
@@ -340,6 +356,7 @@ int main(int argc, char **argv)
     string topic_gp;
 
     string pub_topic_centres;
+    string pub_topic_uba;
     string pub_topic_ubd;
     string pub_topic_result_image;
     string pub_topic_detected_persons;
@@ -366,7 +383,7 @@ int main(int argc, char **argv)
 
     current_detection_id = detection_id_offset;
 
-   
+
     // Checking if all config files could be loaded
     if(strcmp(config_file.c_str(),"") == 0) {
         ROS_ERROR("No config file specified.");
@@ -432,6 +449,9 @@ int main(int argc, char **argv)
     private_node_handle_.param("upper_body_detections", pub_topic_ubd, string("/upper_body_detector/detections"));
     pub_message = n.advertise<UpperBodyDetector>(pub_topic_ubd.c_str(), 10, con_cb, con_cb);
 
+    private_node_handle_.param("upper_body_annotations", pub_topic_uba, string("/upper_body_detector/annotations"));
+    pub_annotations = n.advertise<AnnotatedFrame>(pub_topic_uba.c_str(), 10, con_cb, con_cb);
+
     private_node_handle_.param("upper_body_bb_centres", pub_topic_centres, string("/upper_body_detector/bounding_box_centres"));
     pub_centres = n.advertise<geometry_msgs::PoseArray>(pub_topic_centres.c_str(), 10, con_cb, con_cb);
 
@@ -444,7 +464,7 @@ int main(int argc, char **argv)
     double min_expected_frequency, max_expected_frequency;
     private_node_handle_.param("min_expected_frequency", min_expected_frequency, 10.0);
     private_node_handle_.param("max_expected_frequency", max_expected_frequency, 100.0);
-    
+
     pub_detected_persons.setExpectedFrequency(min_expected_frequency, max_expected_frequency);
     pub_detected_persons.setMaximumTimestampOffset(0.3, 0.1);
     pub_detected_persons.finalizeSetup();
@@ -454,4 +474,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
