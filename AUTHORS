@@ -1,5 +1,9 @@
-The spencer_people_tracking framework was developed in the context of the EU FP7 research project SPENCER.
+The spencer_people_tracking framework was developed in the context of the EU FP7 research project SPENCER,
+and is being extended in the context of the EU H2020 research and innovation action ILIAD.
+
 This work has been partly supported by the European Commission under contract number FP7-ICT-600877.
+This work has received funding from the European Union’s Horizon 2020 research and innovation programme
+under grant agreement No. 732737 (ILIAD).
 
 The framework was initially created and is being maintained by:
 
@@ -14,5 +18,6 @@ We are also very thankful to the following additional contributors:
     Fabian Girrbach
     João Avelino
     Kota Weaver
+    Marc Hanheide
 
 ...and anybody who we, by accident, forgot to mention here!
