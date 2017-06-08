@@ -29,7 +29,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(srl_nearest_neighbor_tracker)
 
-find_package(catkin REQUIRED COMPONENTS roscpp tf eigen_conversions tf_conversions spencer_diagnostics spencer_tracking_msgs cmake_modules srl_laser_segmentation)
+find_package(catkin REQUIRED COMPONENTS roscpp tf eigen_conversions tf_conversions spencer_diagnostics spencer_tracking_msgs cmake_modules angles srl_laser_segmentation)
 
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})

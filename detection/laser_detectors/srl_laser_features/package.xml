@@ -2,7 +2,7 @@
 <package>
 
   <name>srl_laser_features</name>
-  <version>1.0.0</version>
+  <version>1.0.5</version>
   <description>Features that can be calculated on segments of laser range data, based upon the features described in Matthias Luber's PhD thesis</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
@@ -20,4 +20,4 @@
   <run_depend>roscpp</run_depend>
   <run_depend>eigen_conversions</run_depend>
   
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_tracking_utils</name>
-  <version>1.0.0</version>
+  <version>1.0.5</version>
   <description>
     Utilities for filtering spencer_tracking_msgs/TrackedPersons output of a person tracker
   </description>
@@ -16,10 +16,13 @@
   <build_depend>tf</build_depend> 
   <build_depend>spencer_tracking_msgs</build_depend>
   <build_depend>cmake_modules</build_depend>
-
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>nav_msgs</build_depend>
   <run_depend>rospy</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  <run_depend>nav_msgs</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

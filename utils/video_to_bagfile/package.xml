@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>video_to_bagfile</name>
-  <version>0.0.1</version>
+  <version>1.0.5</version>
   <description>
     Converts video files (e.g. *.mov, *.avi) into ROS bagfiles.
   </description>
@@ -15,12 +15,14 @@
   <build_depend>roscpp</build_depend> 
   <build_depend>roslib</build_depend> 
   <build_depend>rosbag</build_depend> 
+  <build_depend>image_transport</build_depend>
   <build_depend>cv_bridge</build_depend> 
   
   <run_depend>rospy</run_depend>
   <run_depend>roslib</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rosbag</run_depend>
+  <run_depend>image_transport</run_depend>
   <run_depend>cv_bridge</run_depend>
 
 </package>

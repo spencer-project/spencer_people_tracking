@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_human_attribute_msgs</name>
-  <version>0.0.0</version>
+  <version>1.0.5</version>
   <description>Messages used for Human Attribute Recognition</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
@@ -19,4 +19,4 @@
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

@@ -1,6 +1,6 @@
 <package>
   <name>spencer_tracking_rviz_plugin</name>
-  <version>0.1.0</version>
+  <version>1.0.5</version>
 
   <description>
      RViz plugin for visualizing tracked and detected persons and groups
@@ -27,4 +27,4 @@
   <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

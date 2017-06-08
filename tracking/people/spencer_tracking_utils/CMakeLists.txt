@@ -29,7 +29,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(spencer_tracking_utils)
 
-find_package(catkin REQUIRED COMPONENTS rospy roscpp tf spencer_tracking_msgs cmake_modules)
+find_package(catkin REQUIRED COMPONENTS rospy roscpp tf spencer_tracking_msgs nav_msgs cmake_modules)
 
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
@@ -140,3 +140,43 @@ add_executable(filter_tracks_by_fov
 )
 add_dependencies(filter_tracks_by_fov ${catkin_EXPORTED_TARGETS})
 target_link_libraries(filter_tracks_by_fov ${catkin_LIBRARIES})
+
+
+
+## Mark executable scripts (Python etc.) for installation
+## in contrast to setup.py, you can choose the destination
+# install(PROGRAMS
+#   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+
+## Mark executables and/or libraries for installation
+install(TARGETS 
+	filter_tracks_logically
+	filter_visually_confirmed_tracks
+	filter_non_moving_targets
+	fix_orientation_of_non_moving_targets
+	tracks_to_detections
+	simulate_occluded_detections_via_raytracing
+	filter_tracks_by_distance
+	mark_all_tracks_as_occluded
+	match_tracks_against_laser
+	filter_detections_by_static_map
+	filter_detections_by_fov
+	filter_tracks_by_fov	
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+## Mark cpp header files for installation
+#install(DIRECTORY include/${PROJECT_NAME}/
+#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#  FILES_MATCHING PATTERN "*.h"
+#  PATTERN ".svn" EXCLUDE
+#)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE
+)

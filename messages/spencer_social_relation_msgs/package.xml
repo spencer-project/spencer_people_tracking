@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_social_relation_msgs</name>
-  <version>0.0.0</version>
+  <version>1.0.5</version>
   <description>Messages used for Social Activity Detection and Social Relation Analysis</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
@@ -25,4 +25,4 @@
   <run_depend>nav_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

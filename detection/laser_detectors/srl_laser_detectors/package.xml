@@ -2,7 +2,7 @@
 <package>
 
   <name>srl_laser_detectors</name>
-  <version>1.0.0</version>
+  <version>1.0.5</version>
   <description>Person detectors for laser range data</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
@@ -36,4 +36,4 @@
   <run_depend>spencer_diagnostics</run_depend>
   <run_depend>libopencv-dev</run_depend>  
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

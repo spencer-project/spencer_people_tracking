@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_people_tracking_launch</name>
-  <version>1.0.0</version>
+  <version>1.0.5</version>
   <description>
     Launch files for multi-modal people tracking on the SPENCER robot platform
   </description>
@@ -20,4 +20,4 @@
   <run_depend>spencer_detected_person_association</run_depend>
   <run_depend>jsk_rviz_plugins</run_depend>
   
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

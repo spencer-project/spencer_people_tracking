@@ -1,6 +1,6 @@
 <package>
   <name>srl_nearest_neighbor_tracker</name>
-  <version>1.0.0</version>
+  <version>1.0.5</version>
   <description>
     Nearest-neighbor person tracker
   </description>
@@ -21,6 +21,7 @@
   <build_depend>spencer_diagnostics</build_depend>
   <build_depend>cmake_modules</build_depend>
   <build_depend>srl_laser_segmentation</build_depend>
+  <build_depend>angles</build_depend>
 
   <run_depend>srl_laser_segmentation</run_depend>
   <run_depend>tf</run_depend>
@@ -28,5 +29,6 @@
   <run_depend>eigen_conversions</run_depend>
   <run_depend>tf_conversions</run_depend>
   <run_depend>spencer_diagnostics</run_depend>
+  <run_depend>angles</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>

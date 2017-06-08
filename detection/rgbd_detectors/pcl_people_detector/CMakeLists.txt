@@ -3,7 +3,7 @@ project(pcl_people_detector)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp roslib pcl_conversions eigen_conversions tf_conversions cmake_modules
-  spencer_tracking_msgs spencer_vision_msgs
+  spencer_tracking_msgs visualization_msgs spencer_vision_msgs
 )
 
 
@@ -32,7 +32,8 @@ install(TARGETS detect_people
 
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-  PATTERN ".svn" EXCLUDE)
+  PATTERN ".svn" EXCLUDE
+)
 
 install(DIRECTORY parameters/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/parameters

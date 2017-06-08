@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_detected_person_conversion</name>
-  <version>1.0.0</version>
+  <version>1.0.5</version>
   <description>
     Converter scripts for converting geometry_msgs/PoseArray or people_msgs/PositionMeasurementArray
     to spencer_tracking_msgs/DetectedPersons, and vice versa. 
@@ -18,4 +18,4 @@
   <run_depend>rospy</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>
 
-</package>
+<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>
