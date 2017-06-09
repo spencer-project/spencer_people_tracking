@@ -1,4 +1,5 @@
-### SPENCER Multi-Modal People Detection & Tracking Framework
+### SPENCER Multi-Modal People Detection & Tracking Framework `  `[![Build Status](https://lcas.lincoln.ac.uk/buildfarm/buildStatus/icon?job=Kbin_uX64__spencer_people_tracking_full__ubuntu_xenial_amd64__binary)](https://lcas.lincoln.ac.uk/buildfarm/job/Kbin_uX64__spencer_people_tracking_full__ubuntu_xenial_amd64__binary)
+
 ###### Multi-modal ROS-based people and group detection & tracking framework for mobile robots developed within the context of the EU FP7 project [SPENCER](http://www.spencer.eu).
 
 ![Tracked persons projected into the front RGB-D camera](/../screenshots/screenshots/full-system-3-front-cam-edited.png?raw=true "Tracked persons projected into the front RGB-D camera")
