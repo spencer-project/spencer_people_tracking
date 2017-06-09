@@ -1,0 +1,5 @@
+# Avoid chages in metafiles breaking build cache
+.docker
+.git
+.gitignore
+README.md

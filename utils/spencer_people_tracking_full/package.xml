@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<package>
+  <name>spencer_people_tracking_full</name>
+  <version>1.0.5</version>
+  
+  <description>
+    A metapackage which depends on all subpackages of the SPENCER People Tracking Framework.
+  </description>
+  
+  <maintainer email="linder@cs.uni-freiburg.de">Timm Linder</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>pcl_people_detector</run_depend>
+  <run_depend>rwth_ground_hog</run_depend>
+  <run_depend>rwth_ground_plane</run_depend>
+  <run_depend>rwth_perception_people_msgs</run_depend>
+  <run_depend>rwth_upper_body_detector</run_depend>
+  <run_depend>spencer_bagfile_tools</run_depend>
+  <run_depend>spencer_control_msgs</run_depend>
+  <run_depend>spencer_detected_person_association</run_depend>
+  <run_depend>spencer_detected_person_conversion</run_depend>
+  <run_depend>spencer_diagnostics</run_depend>
+  <run_depend>spencer_group_tracking</run_depend>
+  <run_depend>spencer_human_attribute_msgs</run_depend>
+  <run_depend>spencer_leg_detector_wrapper</run_depend>
+  <run_depend>spencer_people_tracking_launch</run_depend>
+  <run_depend>spencer_perception_mocks</run_depend>
+  <run_depend>spencer_social_relation_msgs</run_depend>
+  <run_depend>spencer_social_relations</run_depend>
+  <run_depend>spencer_tracking_metrics</run_depend>
+  <run_depend>spencer_tracking_msgs</run_depend>
+  <run_depend>spencer_tracking_rviz_plugin</run_depend>
+  <run_depend>spencer_tracking_utils</run_depend>
+  <run_depend>spencer_vision_msgs</run_depend>
+  <run_depend>srl_laser_detectors</run_depend>
+  <run_depend>srl_laser_features</run_depend>
+  <run_depend>srl_laser_segmentation</run_depend>
+  <run_depend>srl_nearest_neighbor_tracker</run_depend>
+  <run_depend>srl_tracking_exporter</run_depend>
+  <run_depend>srl_tracking_logfile_import</run_depend>
+  <run_depend>track_annotation_tool</run_depend>
+  <run_depend>video_to_bagfile</run_depend>
+
+  <export>
+    <metapackage />
+  </export> 
+
+</package>

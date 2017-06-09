@@ -264,9 +264,10 @@ The software in this repository is maintained by:
 - [Timm Linder](http://www.timmlinder.com), Social Robotics Lab, Albert-Ludwigs-Universität Freiburg
 - [Stefan Breuers](http://www.vision.rwth-aachen.de/people/stefan-breuers), Computer Vision Group, RWTH Aachen University
 
-Credits of the different ROS packages go to the particular authors listed in the respective `README.md` and `package.xml` files.
+Credits of the different ROS packages go to the particular authors listed in the respective `README.md` and `package.xml` files. See also the `AUTHORS.md` file for a list of further contributors.
 
-This work has been supported by the EC under contract number FP7-ICT-600877 (SPENCER).
+This work has been supported by the European Commission under contract number FP7-ICT-600877 (SPENCER), and has received additional funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 732737 (ILIAD).
+
 If you use the software contained in this repository for your research, please cite the following publication:
 
 > On Multi-Modal People Tracking from Mobile Platforms in Very Crowded and Dynamic Environments    

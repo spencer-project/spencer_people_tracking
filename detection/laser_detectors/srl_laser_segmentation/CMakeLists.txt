@@ -89,3 +89,10 @@ add_executable(ahc_segmentation
 )
 add_dependencies(ahc_segmentation ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(ahc_segmentation ${catkin_LIBRARIES})
+
+install(TARGETS jump_distance_segmentation extended_jump_distance_segmentation ahc_segmentation
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
