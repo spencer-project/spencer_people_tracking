@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_detected_person_association</name>
-  <version>1.0.5</version>
+  <version>1.0.7</version>
   <description>
     Provides C++ nodelets for fusing spencer_tracking_msgs/DetectedPersons messages output
     by different detectors, associating detected persons with tracked persons, and associating persons detected by a

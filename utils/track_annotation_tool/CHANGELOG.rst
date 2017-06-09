@@ -2,6 +2,12 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.7 (2017-06-09)
+------------------
+
+1.0.6 (2017-06-09)
+------------------
+
 1.0.5 (2017-05-12)
 ------------------
 * Merge branch 'master' of https://github.com/lcas/spencer_people_tracking
