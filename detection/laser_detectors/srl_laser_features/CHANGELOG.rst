@@ -2,6 +2,9 @@
 Changelog for package srl_laser_features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.5 (2017-05-12)
 ------------------
 

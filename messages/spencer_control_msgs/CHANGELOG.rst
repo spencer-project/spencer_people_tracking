@@ -2,6 +2,9 @@
 Changelog for package spencer_control_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.5 (2017-05-12)
 ------------------
 

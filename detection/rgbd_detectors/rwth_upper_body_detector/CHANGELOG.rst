@@ -2,6 +2,9 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.5 (2017-05-12)
 ------------------
 
