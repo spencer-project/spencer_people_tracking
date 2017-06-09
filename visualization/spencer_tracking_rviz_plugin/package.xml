@@ -1,6 +1,6 @@
 <package>
   <name>spencer_tracking_rviz_plugin</name>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
 
   <description>
      RViz plugin for visualizing tracked and detected persons and groups
