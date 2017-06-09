@@ -2,8 +2,8 @@
 Changelog for package spencer_people_tracking_full
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2017-06-09)
+------------------
 * corrected version
 * Adding metapackage spencer_people_tracking_full
 * Contributors: Marc Hanheide, Timm Linder

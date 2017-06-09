@@ -2,8 +2,8 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2017-06-09)
+------------------
 * Fix tracking_on_bagfile.launch to work in Docker container
 * Contributors: Timm Linder
 

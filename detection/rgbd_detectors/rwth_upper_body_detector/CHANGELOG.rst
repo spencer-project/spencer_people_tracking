@@ -2,8 +2,8 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2017-06-09)
+------------------
 * Add missing install targets
 * Contributors: Timm Linder
 

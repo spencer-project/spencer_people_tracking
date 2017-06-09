@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>rwth_upper_body_detector</name>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <description>The upper_body_detector package</description>
   
   <!-- SPENCER integration: -->

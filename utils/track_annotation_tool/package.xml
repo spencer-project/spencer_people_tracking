@@ -42,7 +42,7 @@ and http://p.yusukekamiyamane.com/ for details on the icons.
 
 <package>
   <name>track_annotation_tool</name>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
 
   <description>
      Standalone tool and supplementary RViz plugin for annotating person tracks
