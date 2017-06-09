@@ -2,6 +2,9 @@
 Changelog for package spencer_social_relation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.6 (2017-06-09)
 ------------------
 

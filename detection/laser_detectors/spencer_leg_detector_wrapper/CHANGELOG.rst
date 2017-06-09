@@ -2,6 +2,9 @@
 Changelog for package spencer_leg_detector_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.6 (2017-06-09)
 ------------------
 

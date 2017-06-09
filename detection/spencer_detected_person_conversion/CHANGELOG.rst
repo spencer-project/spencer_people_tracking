@@ -2,6 +2,9 @@
 Changelog for package spencer_detected_person_conversion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.6 (2017-06-09)
 ------------------
 

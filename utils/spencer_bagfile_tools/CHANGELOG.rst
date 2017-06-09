@@ -2,6 +2,9 @@
 Changelog for package spencer_bagfile_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.6 (2017-06-09)
 ------------------
 

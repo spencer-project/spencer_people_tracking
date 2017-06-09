@@ -2,6 +2,11 @@
 Changelog for package spencer_detected_person_association
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add missing install targets
+* Contributors: Timm Linder
+
 1.0.6 (2017-06-09)
 ------------------
 

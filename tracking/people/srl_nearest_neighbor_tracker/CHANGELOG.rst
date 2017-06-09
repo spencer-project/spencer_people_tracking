@@ -2,6 +2,11 @@
 Changelog for package srl_nearest_neighbor_tracker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add missing install targets
+* Contributors: Timm Linder
+
 1.0.6 (2017-06-09)
 ------------------
 
