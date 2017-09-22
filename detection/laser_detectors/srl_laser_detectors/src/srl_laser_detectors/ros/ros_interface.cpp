@@ -69,7 +69,7 @@ void ROSInterface::connect(Detector* detector, const string& laserTopic, const s
     m_privateNodeHandle.param<int>("synchronizer_queue_size", synchronizer_queue_size, 5);
 
     // Subscribers
-    m_laserscanSubscriber.reset( new message_filters::Subscriber<sensor_msgs::LaserScan>(m_nodeHandle, laserTopic, queue_size) );
+    m_laserscanSubscriber.reset( new message_filters::Subscriber<sensor_msgs::LaserScan>(m_nodeHandle, ros::names::remap(laserTopic), queue_size) );
     m_segmentationSubscriber.reset (new message_filters::Subscriber<srl_laser_segmentation::LaserscanSegmentation>(m_nodeHandle, segmentationTopic, queue_size) );
 
     m_inputSynchronizer.reset( new Synchronizer(SyncPolicy(synchronizer_queue_size), *m_laserscanSubscriber, *m_segmentationSubscriber) );

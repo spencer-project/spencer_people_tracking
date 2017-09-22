@@ -49,7 +49,7 @@ void ROSInterface::connect(SegmentationAlgorithm* segmentationAlgorithm, const s
     int queue_size = 5;
     m_privateNodeHandle.getParam("queue_size", queue_size);
 
-    m_laserscanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(laserTopic, queue_size, &ROSInterface::newLaserscanAvailable, this);
+    m_laserscanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(ros::names::remap(laserTopic), queue_size, &ROSInterface::newLaserscanAvailable, this);
     m_laserscanSegmentationPublisher = m_nodeHandle.advertise<srl_laser_segmentation::LaserscanSegmentation>(segmentationTopic, queue_size);
 
     m_laserscanSegmentationUnfilteredPublisher = m_nodeHandle.advertise<srl_laser_segmentation::LaserscanSegmentation>(segmentationTopic + "_unfiltered", queue_size);
