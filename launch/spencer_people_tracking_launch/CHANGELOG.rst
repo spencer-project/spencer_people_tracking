@@ -2,8 +2,8 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.8 (2017-09-22)
+------------------
 * Merge pull request `#2 <https://github.com/LCAS/spencer_people_tracking/issues/2>`_ from spencer-project/master
   Integrate multiple fixes from upstream
 * Add missing dependencies for tracking_on_bagfile.launch
