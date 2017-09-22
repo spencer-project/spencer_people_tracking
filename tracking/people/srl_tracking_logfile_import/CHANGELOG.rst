@@ -2,6 +2,12 @@
 Changelog for package srl_tracking_logfile_import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.8 (2017-09-22)
+------------------
+* Merge pull request `#41 <https://github.com/LCAS/spencer_people_tracking/issues/41>`_ from LCAS/master
+  1.0.7
+* Contributors: Timm Linder
+
 1.0.7 (2017-06-09)
 ------------------
 
