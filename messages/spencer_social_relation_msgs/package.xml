@@ -6,7 +6,7 @@
   <description>Messages used for Social Activity Detection and Social Relation Analysis</description>
 
   <maintainer email="linder@informatik.uni-freiburg.de">Timm Linder</maintainer>
-  <license>TODO</license>
+  <license>BSD</license>
   
   <author email="linder@informatik.uni-freiburg.de">Timm Linder</author>
 
