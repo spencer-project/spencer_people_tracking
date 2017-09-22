@@ -2,6 +2,16 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#2 <https://github.com/LCAS/spencer_people_tracking/issues/2>`_ from spencer-project/master
+  Integrate multiple fixes from upstream
+* Add missing dependencies for tracking_on_bagfile.launch
+  map_server and openni2_launch were missing
+* Merge pull request `#41 <https://github.com/LCAS/spencer_people_tracking/issues/41>`_ from LCAS/master
+  1.0.7
+* Contributors: Marc Hanheide, Timm Linder
+
 1.0.7 (2017-06-09)
 ------------------
 * Fix tracking_on_bagfile.launch to work in Docker container

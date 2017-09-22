@@ -2,6 +2,12 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#41 <https://github.com/LCAS/spencer_people_tracking/issues/41>`_ from LCAS/master
+  1.0.7
+* Contributors: Timm Linder
+
 1.0.7 (2017-06-09)
 ------------------
 * Add missing install targets

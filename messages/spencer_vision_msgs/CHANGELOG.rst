@@ -2,6 +2,15 @@
 Changelog for package spencer_vision_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#2 <https://github.com/LCAS/spencer_people_tracking/issues/2>`_ from spencer-project/master
+  Integrate multiple fixes from upstream
+* Specify correct license in package.xmls
+* Merge pull request `#41 <https://github.com/LCAS/spencer_people_tracking/issues/41>`_ from LCAS/master
+  1.0.7
+* Contributors: Marc Hanheide, Timm Linder
+
 1.0.7 (2017-06-09)
 ------------------
 
