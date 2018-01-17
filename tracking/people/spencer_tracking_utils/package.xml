@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_tracking_utils</name>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
   <description>
     Utilities for filtering spencer_tracking_msgs/TrackedPersons output of a person tracker
   </description>
