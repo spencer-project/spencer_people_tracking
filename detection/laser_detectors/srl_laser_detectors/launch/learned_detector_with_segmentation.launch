@@ -8,15 +8,17 @@
     <arg name="synchronizer_queue_size" default="5"/>
 
     <!-- Detection -->
-    <arg name="model" default="$(find srl_laser_detectors)/models/lms200_0.50deg_height70cm_ahc.adaboost"/>  <!-- full path to learned classifier model -->
-    <arg name="type" default="adaboost"/>  <!-- must be equal to file extension -->
+    <arg name="type" default="random_forest"/>
+    <arg name="model_prefix" default="lms500_0.25deg_height70cm_fr_rathausgasse"/>  <!-- feel free to try out other models here from "models" folder -->
+    <arg name="model_suffix" default="kinetic"/>
+    <arg name="model" default="$(find srl_laser_detectors)/models/$(arg model_prefix)_$(arg model_suffix).$(arg type).gz"/>  <!-- full path to learned classifier model -->
 
     <arg name="detected_persons" default="detected_persons"/> <!-- output detected persons topic -->
     <arg name="detection_id_increment" default="1"/>
     <arg name="detection_id_offset" default="0"/>
 
     <arg name="pose_variance" default="0.1"/> <!-- diagonal element of output R matrix (position uncertainty) -->
-    <arg name="adaboost_threshold" default="0.0"/> <!-- decision threshold for the signum function -->
+    <arg name="decision_threshold" default="0.0"/> <!-- decision threshold for the signum function -->
 
     <!-- Segmentation -->
     <arg name="segmentation" default="true"/>  <!-- set to false if segmentation is provided externally -->
@@ -48,7 +50,7 @@
         <param name="detection_id_increment" value="$(arg detection_id_increment)"/>
         <param name="detection_id_offset" value="$(arg detection_id_offset)"/>
         <param name="pose_variance" value="$(arg pose_variance)"/>
-        <param name="adaboost_threshold" value="$(arg adaboost_threshold)"/>
+        <param name="decision_threshold" value="$(arg decision_threshold)"/>
         <param name="subscriber_queue_size" value="$(arg subscriber_queue_size)"/>
         <param name="synchronizer_queue_size" value="$(arg synchronizer_queue_size)"/>
     </node>

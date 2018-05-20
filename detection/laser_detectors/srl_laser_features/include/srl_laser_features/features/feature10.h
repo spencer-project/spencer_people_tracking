@@ -54,18 +54,19 @@ public:
 		if (dimension == 0) {
 			return "Linearity.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Linearity mean error.";
 		}
-		if (dimension == 2) {
+		else if (dimension == 2) {
 			return "Linearity min error.";
 		}
-		if (dimension == 3) {
+		else if (dimension == 3) {
 			return "Linearity max error.";
 		}
-		if (dimension == 4) {
+		else if (dimension == 4) {
 			return "Linearity ratio of min and max error.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

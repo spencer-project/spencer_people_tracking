@@ -38,6 +38,8 @@ SVMDetector::SVMDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNo
 {
     m_svm.reset( new CvSVM() );
     loadModel();
+    
+    m_privateNodeHandle.param<double>("decision_threshold", m_decisionThreshold, 0); // probability in this case
     ROS_INFO("SVM detector initialized!");
 }
 
@@ -53,8 +55,9 @@ CvStatModel* SVMDetector::getStatModel()
 
 void SVMDetector::classifyFeatureVector(const cv::Mat& featureVector, Label& label, double& confidence)
 {
-    label = (Label) m_svm->predict(featureVector);
-    confidence = 1.0;
+    float signed_margin = m_svm->predict(featureVector, true);
+    label = signed_margin > m_decisionThreshold ? FOREGROUND : BACKGROUND; // FIXME: Is the > sign correct?
+    confidence = signed_margin;
 }
 
 void SVMDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::Mat& labelVector)
@@ -99,7 +102,7 @@ void SVMDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::Mat& l
     else
         ROS_ERROR_STREAM("Unknown SVM kernel type: " << kernelType);
 
-    ROS_INFO_STREAM("Automatically training SVM classifier using cross-validation... this may take a while!");
+    ROS_INFO_STREAM("Automatically training SVM classifier with " << kernelType << " kernel using cross-validation... this may take a while!");
     m_svm->train_auto(featureMatrix, labelVector, cv::Mat(), maskSamplesWithNonfiniteValues(featureMatrix), params);
 }
 

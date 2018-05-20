@@ -22,7 +22,8 @@ roslaunch srl_nearest_neighbor_tracker test_with_groundtruth.launch filename:=12
             <arg name="timing_mode" value="$(arg timing_mode)"/>
         </include>
 
-        <include file="$(find srl_laser_detectors)/launch/adaboost_detector_with_ahc_lms200.launch">
+        <include file="$(find srl_laser_detectors)/launch/learned_detector_with_segmentation.launch">
+            <arg name="model_prefix" value="lms291_0.50deg_height75cm_fr_mainstation"/>
             <arg name="detected_persons" value="/spencer/perception/detected_persons/unused"/>
         </include>
     </group>

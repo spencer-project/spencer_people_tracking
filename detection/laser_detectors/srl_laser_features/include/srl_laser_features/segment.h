@@ -52,6 +52,9 @@ struct Segment {
 
     // Moments and other useful characteristics
     Point2D mean, median, precedingPoint, succeedingPoint;
+
+    // Angular distance to closest sensor FOV boundary, in radians
+    double meanAngle, minAngle, maxAngle, angularDistanceToClosestBoundary;
 };
 
 typedef std::vector<Segment> Segments;

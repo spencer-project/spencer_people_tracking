@@ -54,24 +54,25 @@ public:
 		if (dimension == 0) {
 			return "Circularity.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Radius of fitted circle.";
 		}
-		if (dimension == 2) {
+		else if (dimension == 2) {
 			return "Variance of distance from points to center of circle.";
 		}
-		if (dimension == 3) {
+		else if (dimension == 3) {
 			return "Minimal difference to radius.";
 		}
-		if (dimension == 4) {
+		else if (dimension == 4) {
 			return "Maximal difference to radius.";
 		}
-		if (dimension == 5) {
+		else if (dimension == 5) {
 			return "Ratio between min and max difference.";
 		}
-		if (dimension == 6) {
+		else if (dimension == 6) {
 			return "Area of rectangles to fitted circle center.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

@@ -140,6 +140,12 @@ void SegmentUtils::extractSegments(const sensor_msgs::LaserScan::ConstPtr& laser
             segment.succeedingPoint = pointsInCartesianCoords[lastIndex+1];
         }
 
+        // Angular distance to closest sensor FOV boundary (used by Feature16)
+        segment.minAngle = laserscan->angle_min + laserscan->angle_increment * inputSegment.measurement_indices[0];
+        segment.maxAngle = laserscan->angle_min + laserscan->angle_increment * inputSegment.measurement_indices[inputSegment.measurement_indices.size()-1];
+        segment.meanAngle = (segment.minAngle + segment.maxAngle) / 2.0;
+        segment.angularDistanceToClosestBoundary = std::min(laserscan->angle_max - segment.maxAngle, segment.minAngle - laserscan->angle_min);
+
         // Store the segment
         segments.push_back(segment);
     }

@@ -63,11 +63,12 @@ void RandomForestDetector::trainOnFeatures(const cv::Mat& featureMatrix, const c
 {
     CvRTParams params;
 
-    double sufficientAccuracy = 0.1; int numTrees = 50;
-    m_privateNodeHandle.getParamCached("rf_sufficient_accuracy", sufficientAccuracy);
+    double sufficientAccuracy = -1.0; int numTrees = 50; int minSampleCount = 10;
+    m_privateNodeHandle.getParamCached("rf_sufficient_accuracy", sufficientAccuracy); // not used with CV_TERMCRIT_ITER!
     m_privateNodeHandle.getParamCached("rf_num_trees", numTrees);
+    m_privateNodeHandle.getParamCached("rf_min_sample_count", minSampleCount);
 
-    params.term_crit = cvTermCriteria( CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, numTrees, sufficientAccuracy );
+    params.term_crit = cvTermCriteria( CV_TERMCRIT_ITER + (sufficientAccuracy >= 0.0 ? CV_TERMCRIT_EPS : 0), numTrees, sufficientAccuracy );
 
     params.max_depth = 5;
     m_privateNodeHandle.getParamCached("rf_max_depth", params.max_depth);

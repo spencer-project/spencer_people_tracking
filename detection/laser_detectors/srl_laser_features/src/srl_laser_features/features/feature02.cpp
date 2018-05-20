@@ -37,7 +37,7 @@ namespace srl_laser_features {
 void Feature02::evaluate(const Segment& segment, Eigen::VectorXd& result) const
 {
 	result = Eigen::Vector2d::Zero();
-	if (segment.points.size() > 1 && segment.ranges.size() == segment.points.size()) {
+	if (segment.points.size() > 1 && segment.ranges.size() == segment.points.size()) { // FIXME: When should the second condition ever fail?
 		std::vector<double> differences;
 
 		// mean

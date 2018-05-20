@@ -39,7 +39,7 @@ AdaboostDetector::AdaboostDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle&
     m_adaboost.reset( new CvBoost() );
     loadModel();
 
-    m_privateNodeHandle.param<double>("adaboost_threshold", m_decisionThreshold, 0.0);
+    m_privateNodeHandle.param<double>("decision_threshold", m_decisionThreshold, -10.0);
     ROS_INFO("Adaboost detector initialized!");
 }
 
@@ -65,6 +65,9 @@ void AdaboostDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::M
     params.boost_type=CvBoost::DISCRETE;
     params.weight_trim_rate = 0;
     params.weak_count = 100;
+
+    m_privateNodeHandle.getParamCached("adaboost_type", params.boost_type);
+    m_privateNodeHandle.getParamCached("adaboost_weight_trim_rate", params.weight_trim_rate);
     m_privateNodeHandle.getParamCached("adaboost_weak_count", params.weak_count);
 
     ROS_INFO_STREAM("Training Adaboost classifier with " << params.weak_count << " weak classifiers... this may take a while!");

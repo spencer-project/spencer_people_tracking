@@ -57,6 +57,8 @@ void ROSInterface::connect(SegmentationAlgorithm* segmentationAlgorithm, const s
 
 void ROSInterface::newLaserscanAvailable(const sensor_msgs::LaserScan::ConstPtr& laserscan)
 {
+    if(laserscan->ranges.empty()) return; // used as "end of dataset" marker in evaluation
+
     // Convert laserscan into Cartesian coordinates
     std::vector<Point2D> pointsInCartesianCoords;
     for(size_t pointIndex = 0; pointIndex < laserscan->ranges.size(); pointIndex++) {

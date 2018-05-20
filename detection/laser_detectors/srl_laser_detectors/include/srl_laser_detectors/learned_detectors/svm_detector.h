@@ -60,6 +60,7 @@ public:
 
 private:
     boost::shared_ptr< CvSVM > m_svm;
+    double m_decisionThreshold;
 };
 
 

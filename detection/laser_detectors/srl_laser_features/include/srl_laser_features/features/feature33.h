@@ -52,9 +52,10 @@ public:
 		if (dimension == 0) {
 			return "Jump distance to previous segment.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Jump distance to next segment.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

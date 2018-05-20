@@ -52,9 +52,10 @@ public:
 		if (dimension == 0) {
 			return "Error of fitted quadratic b-spline.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Error of fitted cubic b-spline.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

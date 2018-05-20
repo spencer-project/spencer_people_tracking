@@ -54,9 +54,10 @@ public:
 		if (dimension == 0) {
 			return "Mean curvature.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Mean angular difference.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

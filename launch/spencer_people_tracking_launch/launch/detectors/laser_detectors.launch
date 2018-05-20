@@ -1,6 +1,6 @@
 <launch>
     <arg name="rear"  default="true"/>
-    <arg name="detector_model" default="$(find srl_laser_detectors)/models/lms500_0.25deg_height70cm_rathausgasse.random_forest"/>
+    <arg name="detector_model" default="lms500_0.25deg_height70cm_fr_rathausgasse"/>
     <arg name="detector_type" default="random_forest"/>
 
     <arg name="detection_id_increment" default="20"/>
@@ -12,7 +12,7 @@
         <group>
             <!-- Front laser detector (Adaboost) -->
             <include file="$(find srl_laser_detectors)/launch/learned_detector_with_segmentation.launch" ns="laser_front">
-                <arg name="model" value="$(arg detector_model)"/>
+                <arg name="model_prefix" value="$(arg detector_model)"/>
                 <arg name="type" value="$(arg detector_type)"/>
                 <arg name="detected_persons" value="/spencer/perception_internal/detected_persons/laser_front"/>
                 <arg name="laser" value="/spencer/sensors/laser_front/echo0"/>

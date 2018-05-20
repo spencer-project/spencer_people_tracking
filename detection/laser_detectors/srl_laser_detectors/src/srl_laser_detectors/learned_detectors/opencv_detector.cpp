@@ -128,14 +128,19 @@ bool OpenCvDetector::loadModel(const std::string& filename)
         return false;
     }
 
+    ROS_INFO_STREAM("Loading model: " << theFilename);
     cv::FileStorage fileStorage(theFilename, cv::FileStorage::READ);
+    if(!fileStorage.isOpened()) {
+        ROS_FATAL_STREAM("Failed to open specified laser detector model: " << theFilename);
+        throw std::exception();
+    }
 
     // Check type of detector that was used to train the model
     cv::FileNode detectorTypeNode = fileStorage["detector_type"];
     std::string detectorType = (std::string) detectorTypeNode[0];
     if(detectorType != getName()) {
         ROS_ERROR_STREAM("Detector of type '" << getName() << "' cannot load a model learned for detector of type '" << detectorType << "'!");
-        return false;
+        throw std::exception();
     }
 
     // Check feature dimensions that were used to train the model
@@ -148,7 +153,7 @@ bool OpenCvDetector::loadModel(const std::string& filename)
 
         if(std::find(allFeatureDimensions.begin(), allFeatureDimensions.end(), currentDimension) == allFeatureDimensions.end()) {
             ROS_ERROR_STREAM("Unknown feature dimension: " << currentDimension);
-            return false;
+            throw std::exception();
         }
         featureDimensions.push_back( currentDimension );
     }
@@ -157,12 +162,21 @@ bool OpenCvDetector::loadModel(const std::string& filename)
 
     cv::FileNode classifierNode = fileStorage["classifier"];
     getStatModel()->read(*fileStorage, *classifierNode);
+
+    /* only supported in OpenCV 3+
+    if(getStatModel()->empty()) {
+        ROS_FATAL_STREAM("OpenCV failed to deserialize trained laser detector model: " << theFilename);
+        throw std::exception();
+    }
+    */
+
     return true; // FIXME: How to check success? Does load() throw an exception if it fails?
 }
 
 
 bool OpenCvDetector::saveModel(const std::string& filename)
 {
+    ROS_INFO_STREAM("Saving model: " << filename);
     cv::FileStorage fileStorage(filename, cv::FileStorage::WRITE);
 
     fileStorage << "detector_type" << getName();

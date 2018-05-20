@@ -60,10 +60,10 @@ public:
 			sprintf(text, "Number of local minima (noise %.2f).", 0.01 * dimension);
 			return text;
 		}
-
-		if (dimension == 15) {
+		else if (dimension == 15) {
 			return "Ratio between shortest and longest beam.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

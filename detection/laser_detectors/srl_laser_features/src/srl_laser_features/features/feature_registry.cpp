@@ -46,6 +46,7 @@
 #include <srl_laser_features/features/feature13.h>
 #include <srl_laser_features/features/feature14.h>
 #include <srl_laser_features/features/feature15.h>
+#include <srl_laser_features/features/feature16.h>
 #include <srl_laser_features/features/feature33.h>
 
 
@@ -73,6 +74,7 @@ FeatureRegistry::FeatureRegistry() {
         new Feature13,
         new Feature14,
         new Feature15,
+        new Feature16,
         new Feature33
     };
 

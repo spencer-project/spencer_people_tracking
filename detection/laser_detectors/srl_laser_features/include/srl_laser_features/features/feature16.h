@@ -30,8 +30,8 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SRL_LASER_FEATURES_FEATURE07_H_
-#define SRL_LASER_FEATURES_FEATURE07_H_
+#ifndef SRL_LASER_FEATURES_FEATURE16_H_
+#define SRL_LASER_FEATURES_FEATURE16_H_
 
 #include <srl_laser_features/features/feature.h>
 
@@ -39,34 +39,22 @@
 namespace srl_laser_features {
 
 /**
- * Use convex hull to calculate:
- * Boundary length (open contour),
- * and the perimeter,
- * and regularity of the contour.
+ * Angular distance of boundary of laser segment to closest boundary of laser FOV, in radians.
  *
- * @author Matthias Luber, Luciano Spinello, Oscar Martinez, Kai O. Arras
+ * @author Timm Linder
  */
-class Feature07: public Feature
+class Feature16: public Feature
 {
 public:
 	inline virtual const FeatureDimension getDescription(unsigned int dimension) const
 	{
 		assert(dimension < getNDimensions());
-		if (dimension == 0) {
-			return "Boundary length.";
-		}
-		else if (dimension == 1) {
-			return "Perimeter.";
-		}
-		else if (dimension == 2) {
-			return "Contour regularity.";
-		}
-		else throw std::exception();
+		return "Angular distance of boundary of laser segment to closest boundary of laser FOV, in radians.";
 	}
 
 	inline unsigned int getNDimensions() const
 	{
-		return 3;
+		return 4;
 	}
 
 	virtual void evaluate(const Segment& segment, Eigen::VectorXd& result) const;
@@ -74,4 +62,4 @@ public:
 
 } // end of namespace srl_laser_features
 
-#endif // SRL_LASER_FEATURES_FEATURE07_H_
+#endif // SRL_LASER_FEATURES_FEATURE01_H_

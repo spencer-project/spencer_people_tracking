@@ -54,15 +54,16 @@ public:
 		if (dimension == 0) {
 			return "Width.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Min distance between points.";
 		}
-		if (dimension == 2) {
+		else if (dimension == 2) {
 			return "Max distance between points.";
 		}
-		if (dimension == 3) {
+		else if (dimension == 3) {
 			return "Ratio between min and max distance between points.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

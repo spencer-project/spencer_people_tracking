@@ -171,7 +171,7 @@ class LogfilePublisher(object):
                             pass
 
                         else:
-                            rospy.logwarn("Unknown reading of type %s in line %d" % (readingType, self._lineCounter) )
+                            rospy.logdebug("Unknown reading of type %s in line %d" % (readingType, self._lineCounter) )
                             self._numUnknownReadings += 1
 
                 self._lineCounter += 1

@@ -68,6 +68,7 @@ add_library(${LASER_FEATURE_LIB}
   ${SOURCE_DIR}/features/feature13.cpp
   ${SOURCE_DIR}/features/feature14.cpp
   ${SOURCE_DIR}/features/feature15.cpp
+  ${SOURCE_DIR}/features/feature16.cpp
   ${SOURCE_DIR}/features/feature33.cpp
 )
 add_dependencies(${LASER_FEATURE_LIB} ${catkin_EXPORTED_TARGETS})

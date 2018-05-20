@@ -53,9 +53,10 @@ public:
 		if (dimension == 0) {
 			return "Mean of difference in range of consecutive beams.";
 		}
-		if (dimension == 1) {
+		else if (dimension == 1) {
 			return "Variance of difference in range of consecutive beams.";
 		}
+		else throw std::exception();
 	}
 
 	inline unsigned int getNDimensions() const

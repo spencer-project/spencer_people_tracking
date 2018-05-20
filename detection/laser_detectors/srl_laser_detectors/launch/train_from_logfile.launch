@@ -9,6 +9,8 @@
 
     <!-- Detector type-specific options -->
     <arg name="adaboost_weak_count" default="250"/>
+    <arg name="rf_num_trees" default="15"/>
+    <arg name="rf_max_depth" default="10"/>
 
     <!-- Segmentation -->
     <arg name="segmentation" default="true"/>  <!-- set to false if segmentation is provided externally -->
@@ -52,6 +54,8 @@
             <param name="queue_size" value="100000"/>
         </node>
 
+        <node name="publish_test_flag" type="transform" pkg="topic_tools" output="screen" required="true" args="/laser_annotations /test_data_flag srl_laser_segmentation/BoolStamped '(m.header, False)'"/> <!-- in every frame, publish a bool with same timestamp which states that this is training (not testing) data -->
+
         <node name="train_laser_detector" type="train_detector" pkg="srl_laser_detectors" output="screen" required="true">
             <param name="type" value="$(arg type)"/>
             <param name="shuffle_data_before_train_test_split" value="$(arg shuffle_data_before_train_test_split)"/>
@@ -60,9 +64,8 @@
             <param name="output_folder" value="$(arg output_folder)"/>
             <param name="filename_prefix" value="$(arg filename_prefix)"/>
 
-            <param name="rf_num_trees" value="15"/>
-            <param name="rf_max_depth" value="10"/>
-
+            <param name="rf_num_trees" value="$(arg rf_num_trees)"/>
+            <param name="rf_max_depth" value="$(arg rf_max_depth)"/>
             <param name="adaboost_weak_count" value="$(arg adaboost_weak_count)"/>
         </node>
 

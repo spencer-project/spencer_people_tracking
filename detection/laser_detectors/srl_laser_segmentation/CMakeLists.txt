@@ -43,6 +43,7 @@ add_message_files(
    FILES
    LaserscanSegment.msg
    LaserscanSegmentation.msg
+   BoolStamped.msg
 )
 
 catkin_python_setup()
