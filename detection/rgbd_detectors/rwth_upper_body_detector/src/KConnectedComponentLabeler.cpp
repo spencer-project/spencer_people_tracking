@@ -86,9 +86,9 @@ void KConnectedComponentLabeler::Process()
 	int	nWest = 0;
 	int	nEast = 0;
 	
-	int		 * regionLabel = NULL;
-	int		 * lookUpTable = NULL;
-	long int * regionArea  = NULL;
+        std::vector<int> regionLabel;
+        std::vector<long int> regionArea;
+        std::vector<int> lookUpTable;
 	
 	int	regionNumber;
 
@@ -166,9 +166,9 @@ void KConnectedComponentLabeler::Process()
 
 	if( regionNumber > 0 ) 
 	{
-		regionLabel  = new int[regionNumber];
-		regionArea   = new long int[label];
-
+                regionLabel.reserve(regionNumber);
+		regionArea.reserve(label);
+                 
 		for(i=0; i<label; i++ )
 			regionArea[i]=0;
 
@@ -182,7 +182,7 @@ void KConnectedComponentLabeler::Process()
 		}
 		while(tmp!=NULL);
 
-		lookUpTable = new int[label];
+		lookUpTable.reserve(label);
 	
 		p  = eqTable.header;
 		p2 = p;
@@ -229,17 +229,15 @@ void KConnectedComponentLabeler::Process()
 			}
 		}
 
-		int* trueLabelArray = new int[label];
+                std::vector<int> trueLabelArray(label);
 		for(i=0; i<label; i++)
 		{
 			trueLabelArray[i] = 0;
 
 			KBox newComponent;
 			newComponent.ID = i+1;
-                        newComponent.bottomRight_x = RAND_MAX;
-                        newComponent.bottomRight_y = RAND_MAX;
-                        newComponent.topLeft_x     = -RAND_MAX;
-                        newComponent.topLeft_y     = -RAND_MAX;
+                        newComponent.bottomRight = CPoint(RAND_MAX, RAND_MAX);
+                        newComponent.topLeft     = CPoint(-RAND_MAX, -RAND_MAX);
 			m_Components.push_back(newComponent);
 		}
 
@@ -261,10 +259,10 @@ void KConnectedComponentLabeler::Process()
 				{
 					m_ObjectNumber++;
 
-					m_Components[ m_ObjectNumber-1 ].topLeft_x     = x;
-					m_Components[ m_ObjectNumber-1 ].topLeft_y     = y;
-					m_Components[ m_ObjectNumber-1 ].bottomRight_x = x;
-					m_Components[ m_ObjectNumber-1 ].bottomRight_y = y;
+					m_Components[ m_ObjectNumber-1 ].topLeft.x     = x;
+					m_Components[ m_ObjectNumber-1 ].topLeft.y     = y;
+					m_Components[ m_ObjectNumber-1 ].bottomRight.x = x;
+					m_Components[ m_ObjectNumber-1 ].bottomRight.y = y;
 
 					trueLabelArray[ m_MaskArray[i] ] = m_ObjectNumber;
 					m_MaskArray[i] = m_ObjectNumber;
@@ -273,36 +271,24 @@ void KConnectedComponentLabeler::Process()
 				{
 					m_MaskArray[i] = trueLabelArray[ m_MaskArray[i] ];
 
-					if( x > m_Components[ m_MaskArray[i]-1 ].bottomRight_x )
-						m_Components[ m_MaskArray[i]-1 ].bottomRight_x = x;
+					if( x > m_Components[ m_MaskArray[i]-1 ].bottomRight.x )
+						m_Components[ m_MaskArray[i]-1 ].bottomRight.x = x;
 
-					if( x < m_Components[ m_MaskArray[i]-1 ].topLeft_x     )
-						m_Components[ m_MaskArray[i]-1 ].topLeft_x     = x;
+					if( x < m_Components[ m_MaskArray[i]-1 ].topLeft.x     )
+						m_Components[ m_MaskArray[i]-1 ].topLeft.x     = x;
 
-					if( y > m_Components[ m_MaskArray[i]-1 ].bottomRight_y )
-						m_Components[ m_MaskArray[i]-1 ].bottomRight_y = y;
+					if( y > m_Components[ m_MaskArray[i]-1 ].bottomRight.y )
+						m_Components[ m_MaskArray[i]-1 ].bottomRight.y = y;
 					
-					if( y < m_Components[ m_MaskArray[i]-1 ].topLeft_y     )
-						m_Components[ m_MaskArray[i]-1 ].topLeft_y     = y;
+					if( y < m_Components[ m_MaskArray[i]-1 ].topLeft.y     )
+						m_Components[ m_MaskArray[i]-1 ].topLeft.y     = y;
 				}
 			}
 		}
 
         while( m_Components.size() != m_ObjectNumber )
             m_Components.pop_back();
-
-
-		delete trueLabelArray; trueLabelArray = NULL;
 	}
-	
-	delete []lookUpTable;
-	lookUpTable = NULL;
-
-	delete []regionArea;
-	regionArea = NULL;
-
-	delete []regionLabel;
-	regionLabel = NULL;
 }
 
 //////// private KNode implementations ////////////////////
@@ -323,10 +309,8 @@ KConnectedComponentLabeler::KNode::~KNode()
 KBox::KBox()
 {
 	ID = 0;
-	bottomRight_x = 0;
-	bottomRight_y = 0;
-	topLeft_x = 0;
-	topLeft_y = 0;
+	bottomRight = 0;
+	topLeft = 0;
 }
 
 KBox::~KBox()

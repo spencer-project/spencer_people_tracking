@@ -4,6 +4,7 @@
 
 Detector::Detector()
 {
+   visualize_roi=false;
 }
 
 void Detector::ProcessFrame(const Camera &camera_origin, const Matrix<double> &depth_map, const PointCloud &point_cloud,
@@ -124,13 +125,21 @@ void Detector::ComputeFreespace(const Camera& camera,
 
                 int pos_x = (int)round(x / step_x);
                 int pos_z = (int)round(z / step_z);
-
-                if (pos_x >= 0 && pos_x < x_bins)
+                
+                if (pos_x >= 0 && pos_x < x_bins && pos_z >= 0 && pos_z < z_bins)
                 {
-                    occ_map(pos_x, pos_z) += z;
 
-                    mat_2D_pos_x.data()[j] = pos_x;
-                    mat_2D_pos_y.data()[j] = pos_z;
+//                occ_map(pos_x, pos_z) += z*(log(z) / log_2);
+                   occ_map(pos_x, pos_z) += z;
+                   //ROS_INFO("pos_x:%i, pos_z:%i, z:%f",pos_x,pos_z,z);
+
+                   mat_2D_pos_x.data()[j] = pos_x;
+                   mat_2D_pos_y.data()[j] = pos_z;
+                   //ROS_INFO("data recorded for mat_2D_pos_x, mat_2D_pos_y");
+                }
+                else
+                {
+                   ROS_INFO("upper_body_detector: compute freespace - pos_x:%i/%i, pos_z:%i/%i - out of range!", pos_x,x_bins,pos_z,z_bins);
                 }
             }
         }
@@ -146,9 +155,15 @@ void Detector::ComputeFreespace(const Camera& camera,
 // occ_map.WriteToTXT("after.txt");
  
     int occ_map_length = x_bins*z_bins;
-    for(int i = 0; i < occ_map_length; i++)
+for(int z = 0; z < occ_map.y_size(); z++)
     {
-        occ_map_binary.data()[i] = (occ_map.data()[i] < Globals::freespace_threshold) ? 0 : 1;
+        for(int x = 0; x < occ_map.x_size(); x++)
+        {
+	    //ROS_INFO("occ_map_binary -> x:%d, z:%i",x,z);
+            
+            occ_map_binary(x,z) = (occ_map(x,z) < Globals::freespace_threshold) ? 0 : 1;
+	   // occ_map_binary(x,z) = 0 ;
+        }
     }
 }
 
