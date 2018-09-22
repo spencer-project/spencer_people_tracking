@@ -2,6 +2,12 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master
+  1.0.8
+* Contributors: Timm Linder
+
 1.0.9 (2018-01-17)
 ------------------
 
