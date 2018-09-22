@@ -2,7 +2,7 @@
 <package>
 
   <name>spencer_control_msgs</name>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
   <description>Messages used for controlling the SPENCER robot platform.</description>
 
   <maintainer email="linder@cs.uni-freiburg.de">Timm Linder</maintainer>

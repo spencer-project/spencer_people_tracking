@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>rwth_ground_plane</name>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
   <description>The rwth_ground_plane package</description>
 
   <maintainer email="mitzel@umic.rwth-aachen.de">Dennis Mitzel</maintainer>
