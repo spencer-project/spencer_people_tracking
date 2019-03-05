@@ -2,6 +2,7 @@
 #
 
 uint64          detection_id
+float64         confidence
 
 sensor_msgs/RegionOfInterest    roi
 
