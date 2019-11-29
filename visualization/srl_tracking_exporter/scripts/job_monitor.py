@@ -55,7 +55,7 @@ def main(argv=None):
     global numTotalJobs
     numTotalJobs = rospy.get_param('~count', 0)
     if 0 == numTotalJobs:
-        rospy.logerror("Job count is 0, not monitoring any jobs, terminating!")
+        rospy.logerr("Job count is 0, not monitoring any jobs, terminating!")
 
     else:
         rospy.loginfo("Will run until %d jobs have been completed." % numTotalJobs)
