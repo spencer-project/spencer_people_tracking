@@ -10,6 +10,10 @@
     
     <arg name="tracker" default="true"/>
     <arg name="occlusion_geodesics" default="false"/>
+
+    <arg name="base_footprint_frame_id" default="base_footprint"/>
+    <arg name="world_frame_id" default="odom"/>
+
     
     <!-- Detection-to-detection fusion pipeline. NOTE: Detectors need to be launched separately via
          roslaunch spencer_people_tracking_launch front_rgbd_detectors.launch
@@ -22,8 +26,8 @@
         <remap from="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated" to="/spencer/perception_internal/detected_person_association/lasers_high_recall_aggregated_unfiltered" if="$(arg static_map_filter)"/>
 
         <include file="$(find spencer_detected_person_association)/launch/detection_to_detection_fusion_pipeline.launch">
-            <!-- Also fuse RGB-D detectors, or just use high-recall and high-precision lasers? -->
-            <arg name="rgbd" value="$(arg rgbd)"/>
+            <arg name="rgbd" value="$(arg rgbd)"/>  <!-- Also fuse RGB-D detectors, or just use high-recall and high-precision lasers? -->
+            <arg name="common_frame_id" default="$(arg base_footprint_frame_id)"/>
         </include>
     </group>
 
@@ -50,6 +54,7 @@
         <include file="$(find srl_nearest_neighbor_tracker)/launch/nnt.launch">
             <arg name="subscriber_queue_size" value="$(arg subscriber_queue_size)"/>
             <arg name="use_imm" value="true"/>
+            <arg name="world_frame" default="$(arg world_frame_id)"/>
             
             <arg name="occlusion_param_file" value="occlusion_geodesics_manager_dynamic.yaml" if="$(arg occlusion_geodesics)"/> <!-- NOTE: Only uses front laser!!! -->
             <arg name="use_laser_shade_occlusion_manager" value="true" if="$(arg occlusion_geodesics)"/>
@@ -61,6 +66,8 @@
     </group>
 
     <!-- Filter tracks that are output by people tracker (e.g. visually confirmed tracks, moving tracks etc. on separate topics) -->
-    <include file="$(find spencer_people_tracking_launch)/launch/tracking/filter_tracks.launch"/>
+    <include file="$(find spencer_people_tracking_launch)/launch/tracking/filter_tracks.launch">
+        <arg name="base_footprint_frame_id" value="$(arg base_footprint_frame_id)"/>
+    </include>
 
 </launch>

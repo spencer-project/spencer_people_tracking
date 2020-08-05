@@ -59,6 +59,7 @@ boost::shared_ptr<tf::TransformListener> g_transformListener;
 int g_deleteUnseenTracksAfterNumFrames;
 double g_minRequiredAvgVelocity;
 bool waitedForTransform = false;
+std::string g_targetFrame;
 
 
 double getSpeed(const TrackedPerson& trackedPerson) {
@@ -112,13 +113,12 @@ void newTrackedPersonsReceived(const TrackedPersons::ConstPtr& trackedPersons) {
                 poseInSourceFrame.header = trackedPersons->header;
                 poseInSourceFrame.pose = trackedPerson.pose.pose;
 
-                const std::string targetFrame = "base_footprint";
                 try {
                     if(!waitedForTransform) {
-                        g_transformListener->waitForTransform(targetFrame, poseInSourceFrame.header.frame_id, poseInSourceFrame.header.stamp, ros::Duration(3.0));
+                        g_transformListener->waitForTransform(g_targetFrame, poseInSourceFrame.header.frame_id, poseInSourceFrame.header.stamp, ros::Duration(3.0));
                         waitedForTransform = true;
                     }
-                    g_transformListener->transformPose(targetFrame, poseInSourceFrame, poseInTargetFrame);
+                    g_transformListener->transformPose(g_targetFrame, poseInSourceFrame, poseInTargetFrame);
                 }
                 catch(tf::TransformException e) {
                     ROS_WARN_STREAM_THROTTLE(5.0, "TF lookup failed. Reason: " << e.what());
@@ -155,9 +155,11 @@ int main(int argc, char **argv)
 
     g_deleteUnseenTracksAfterNumFrames = 10;
     g_minRequiredAvgVelocity = 0.15;
+    g_targetFrame = "base_footprint";
 
     privateHandle.getParam("delete_unseen_tracks_after_num_frames", g_deleteUnseenTracksAfterNumFrames);
     privateHandle.getParam("min_required_avg_velocity", g_minRequiredAvgVelocity);
+    privateHandle.getParam("target_frame", g_targetFrame);
 
     std::string inputTopic = "input_tracks";
     std::string outputTopic = "output_tracks";
@@ -168,7 +170,7 @@ int main(int argc, char **argv)
     g_resultingTracksPublisher = nodeHandle.advertise<TrackedPersons>(outputTopic, 3);
 
     ROS_INFO_STREAM("Fixing orientations of tracks on topic " << ros::names::remap(inputTopic) << " and publishing to output topic " << ros::names::remap(outputTopic)
-        << ". Orientation of slow-moving targets (slower than " << g_minRequiredAvgVelocity << " m/s) will be set to their last known orientation, or facing towards base_footprint if last known orientation is not available.");
+        << ". Orientation of slow-moving targets (slower than " << g_minRequiredAvgVelocity << " m/s) will be set to their last known orientation, or facing towards " << g_targetFrame << " if last known orientation is not available.");
 
     ros::spin();
 }

@@ -30,3 +30,13 @@ cmake_minimum_required(VERSION 2.8.3)
 project(spencer_leg_detector_wrapper)
 
 find_package(catkin REQUIRED COMPONENTS)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE
+)
+
+install(DIRECTORY configs/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/configs
+  PATTERN ".svn" EXCLUDE
+)

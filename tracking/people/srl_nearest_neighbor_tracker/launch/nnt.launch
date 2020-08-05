@@ -4,6 +4,7 @@ Launches the nearest-neighbor tracker with a set of parameters that worked well 
 
 <launch>
     <arg name="subscriber_queue_size" default="1"/>
+    <arg name="world_frame" default="odom"/>
 
     <arg name="use_laser_shade_occlusion_manager" default="false"/>
     <arg name="use_imm" default="false"/>
@@ -27,6 +28,9 @@ Launches the nearest-neighbor tracker with a set of parameters that worked well 
 
         <!-- Publisher and subscriber queue lengths -->
         <param name="queue_size" value="$(arg subscriber_queue_size)"/>
+
+        <!-- TF frame IDs -->
+        <param name="world_frame" value="$(arg world_frame)"/>
 
         <!-- Only used when publishing tracks, to take latencies into account -->
         <param name="published_track_forward_predict_time" value="0.10"/>

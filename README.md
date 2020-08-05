@@ -15,7 +15,7 @@
 - **Extensible and reusable:** Well-structured ROS message types and clearly defined interfaces make it easy to integrate custom detection and tracking components.
 - **Powerful visualization:** A series of reusable RViz plugins that can be configured via mouse click, plus scripts for generating animated (2D) SVG files.
 - **Evaluation tools:** Metrics (CLEAR-MOT, OSPA) for evaluation of tracking performance.
-- **ROS integration:** All components are fully integrated with ROS and written in C++ or Python. ROS Indigo and Kinetic are supported, Noetic is work in progress.
+- **ROS integration:** All components are fully integrated with ROS and written in C++ or Python. ROS Kinetic, Melodic and Noetic are supported.
 
 #### Motivation
 
@@ -132,37 +132,42 @@ With this configuration, the components run in real-time at 20-25 Hz (with visua
 
 #### Installation from L-CAS package repository
 
-A packaged version of the entire framework for *ROS Kinetic* on *Ubuntu 16.04 (Xenial)* is kindly provided by the Lincoln Research Centre for Autonomous Systems (L-CAS) and built by their continuous integration system. You must first add their package repository to your apt/sources.list [as described here](https://github.com/LCAS/rosdistro/wiki#using-the-l-cas-repository-if-you-just-want-to-use-our-software). Then, install the framework via
+A packaged version of the entire framework for *ROS Kinetic (Ubuntu 16.04 Xenial)* and *ROS Melodic (Ubuntu 18.04 Bionic)* is kindly provided by the Lincoln Research Centre for Autonomous Systems (L-CAS) and built by their continuous integration system. You must first add their package repository to your apt/sources.list [as described here](https://github.com/LCAS/rosdistro/wiki#using-the-l-cas-repository-if-you-just-want-to-use-our-software). Then, install the framework via
 
-    sudo apt-get install ros-kinetic-spencer-people-tracking-full
+    sudo apt-get install ros-${ROS_DISTRO}-spencer-people-tracking-full
     
 Note that the `groundHOG` detector in the packaged version is non-functional.
 
-#### Installation from source
+#### Building from source
 
-The people and group detection and tracking framework has been tested on Ubuntu 14.04 / ROS Indigo and Ubuntu 16.04 / ROS Kinetic. For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
+In this paragraph, we describe how to build the framework from source code. This is useful, for example, if you want to conduct larger changes in the supplied launch files. You can either follow this step-by-step guide, or use one of the [exemplary Docker files](/.docker) to automate these steps and isolate the build process from your existing ROS installation.
+
+The people and group detection and tracking framework has been tested on Ubuntu 16.04 (ROS Kinetic), Ubuntu 18.04 (ROS Melodic) and Ubuntu 20.04 (ROS Noetic). For more information on the Robot Operating System (ROS), please refer to [ros.org](http://www.ros.org/).
 
 *NOTE: The entire framework only works on 64-bit systems. On 32-bit systems, you will encounter Eigen-related alignment issues (failed assertions). See issue [#1](https://github.com/spencer-project/spencer_people_tracking/issues/1)*
 
 ##### 1. Cloning the source code repository
 
-As we currently do not yet provide any pre-built Debian packages, you have to build our framework from source code. As a first step, create a folder for a new catkin workspace and clone the GitHub repository into the `src` subfolder:
+First create an empty folder for a new catkin workspace and clone the GitHub repository into the `src` subfolder:
 
     cd ~/Code
     mkdir -p spencer-people-tracking-ws/src
     cd spencer-people-tracking-ws/src
     git clone https://github.com/spencer-project/spencer_people_tracking.git
+    git checkout $ROS_DISTRO
+
+where in the last step, `$ROS_DISTRO$` should refer to one of the available git branches specific to the particular ROS distribution (`kinetic`, `melodic` or `noetic`).
     
 ##### 2. Installing required dependencies
 
-Assuming you have ROS Indigo or ROS Kinetic already installed, we recommend installing the required depencencies of our framework via:
+Assuming you have ROS itself already installed, we recommend installing the required depencencies of our framework via:
 
     rosdep update
     rosdep install -r --from-paths . --ignore-src
     
 ##### 3. Initializing the catkin workspace
  
-Next, we suggest to use `catkin` (available via `sudo apt-get install python-catkin-tools`) to setup the workspace:
+Next, we suggest to use `catkin` (available via `sudo apt-get install python-catkin-tools` or `python3-catkin-tools` in ROS Noetic) to setup the workspace:
 
     cd ..
     catkin config --init --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -180,9 +185,9 @@ After building the workspace, source it via:
     source devel/setup.bash
 
 
-##### Special note on CUDA SDK for the groundHOG detector
+##### Special note on CUDA SDK for the groundHOG far-range detector
 
-The cudaHOG library used by `rwth_ground_hog` requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality.
+The cudaHOG library used by `rwth_ground_hog` requires an nVidia graphics card and an installed CUDA SDK (recommended version: 6.5). As installing CUDA (especially on laptops with Optimus/Bumblebee) and compiling the library is not straightforward, detailled installation instructions are provided [here](/detection/monocular_detectors/3rd_party). Once these instructions have been followed, the `rwth_ground_hog` package needs to be rebuilt using catkin. If no CUDA SDK is installed, the ROS package will still compile, but it will not provide any functionality. As this detector is slightly outdated, we recommend to ignore this unless really needed. We hope to incorporate a more recent far-range person detector based upon a modern deep learning framework in the future.
 
 #### Quick start tutorial
 
@@ -198,7 +203,7 @@ Then, you can launch
 
     roslaunch spencer_people_tracking_launch tracking_on_bagfile.launch
     
-which will start playing back a bagfile (as soon as you unpause by pressing `SPACE`) and run Rviz for visualization.
+which will start playing back a bagfile (as soon as you unpause by pressing `SPACE`) and run Rviz for visualization. If everything went well, you should see detections from the upper-body detector, the 2D laser detector, and resulting person tracks.
 
 ###### Using the PCL people detector instead of the upper-body detector ######
 
@@ -267,12 +272,12 @@ Note that the fusion pipeline reconfigures automatically if only a subset of the
 The multi-modal "Motion Capture" sequence from our ICRA 2016 paper is available upon request to let you evaluate your own detection / tracking algorithms on our dataset. For a fair comparison, please use the CLEAR-MOT metrics implementation contained in this repository, if possible. The raw data from the airport sequence cannot be shared for privacy reasons, though we might provide the extracted detections at a later point.
 
 
-#### Credits, license & how to cite
+#### Credits & How to cite
 
 The software in this repository is maintained by:
 
-- [Timm Linder](http://www.timmlinder.com), Social Robotics Lab, Albert-Ludwigs-Universität Freiburg
-- [Stefan Breuers](http://www.vision.rwth-aachen.de/people/stefan-breuers), Computer Vision Group, RWTH Aachen University
+- [Timm Linder](http://www.timmlinder.com), formerly at the Social Robotics Lab, Albert-Ludwigs-Universität Freiburg
+- [Stefan Breuers](http://www.vision.rwth-aachen.de/people/stefan-breuers), formerly at the Computer Vision Group, RWTH Aachen University
 
 Credits of the different ROS packages go to the particular authors listed in the respective `README.md` and `package.xml` files. See also the `AUTHORS.md` file for a list of further contributors.
 
@@ -291,7 +296,17 @@ also optionally:
 > Robot Operating System (ROS): The Complete Reference (Vol. 1).   
 > Springer Studies in Systems, Decision and Control, 2016   
 
-Most of the software in this repository is released under a BSD license. For details, however, please check the individual ROS packages.
+The framework is further described in the PhD thesis:
+
+> Multi-Modal Human Detection, Tracking and Analysis for Robots in Crowded Environments
+> Linder, T.
+> PhD thesis, Technical Faculty, University of Freiburg, 2020
+
+#### License & disclaimer
+
+This software is a research prototype. It is not ready for production use. However, the license conditions of the applicable Open Source licenses allow you to adapt the software to your needs. Before using it in a safety relevant setting, make sure that the software fulfills your requirements and adjust it according to any applicable safety standards (e.g. ISO 26262).
+
+Most of the ROS packages in this repository are released under a BSD license. For details, however, please check the individual ROS packages (`package.xml` or `LICENSE` file) as there are some exceptions.
 
 
 #### References

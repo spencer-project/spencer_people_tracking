@@ -32,8 +32,8 @@ project(spencer_detected_person_association)
 find_package(catkin REQUIRED COMPONENTS rospy roscpp message_filters spencer_tracking_msgs std_msgs message_generation nodelet eigen_conversions tf_conversions cmake_modules)
 
 
-FIND_PACKAGE(Eigen REQUIRED)
-include_directories(${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+FIND_PACKAGE(Eigen3 REQUIRED)
+include_directories(${Eigen3_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 add_service_files(
   FILES

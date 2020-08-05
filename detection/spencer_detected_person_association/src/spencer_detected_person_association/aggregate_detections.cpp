@@ -38,7 +38,7 @@ namespace spencer_detected_person_association
 {
     void AggregateDetectionsNodelet::onInit()
     {
-        NODELET_INFO("Initializing AggregateDetectionsNodelet...");
+        NODELET_DEBUG("Initializing AggregateDetectionsNodelet...");
         initSynchronizer(getName(), getNodeHandle(), getPrivateNodeHandle());
         m_seq = 0;
     }

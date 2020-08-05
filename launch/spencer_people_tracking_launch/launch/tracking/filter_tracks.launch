@@ -1,10 +1,12 @@
 <launch>
+    <arg name="base_footprint_frame_id" default="base_footprint"/>
 
     <group ns="/spencer/perception_internal/people_tracking/post_processing/">
 
         <!-- Fix orientation of non-moving targets (assume previous orientation while it was still moving, or face towards sensor if unknown) -->
         <node name="fix_orientation_of_non_moving_targets" pkg="spencer_tracking_utils" type="fix_orientation_of_non_moving_targets">
             <param name="min_required_avg_velocity" value="0.15"/>
+            <param name="target_frame" value="$(arg base_footprint_frame_id)"/>
             <remap from="input_tracks" to="/spencer/perception/tracked_persons"/>
             <remap from="output_tracks" to="/spencer/perception/tracked_persons_orientation_fixed"/>
         </node>

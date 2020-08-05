@@ -41,7 +41,7 @@ namespace spencer_detected_person_association
 {
     void NearestNeighborFuserNodelet::onInit()
     {
-        NODELET_INFO("Initializing NearestNeighborFuserNodelet...");
+        NODELET_DEBUG("Initializing NearestNeighborFuserNodelet...");
         initSynchronizer(getName(), getNodeHandle(), getPrivateNodeHandle(), 1, 2); // we require at most two input topics
         m_seq = 0;
 

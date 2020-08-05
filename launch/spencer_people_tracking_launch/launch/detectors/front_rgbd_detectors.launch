@@ -4,14 +4,14 @@
     <arg name="hog" default="false"/>
 
     <arg name="ground_plane" value="/spencer/sensors/rgbd_front_top/ground_plane"/>
-
+    <arg name="base_footprint_frame_id" default="base_footprint"/>
     <arg name="detection_id_increment" default="20"/>
 
     <group ns="/spencer/perception_internal/people_detection">
 
         <!-- RWTH tf based groundplane -->
         <node pkg="rwth_ground_plane" type="ground_plane_tf_based_fixed" name="ground_plane_front_top" output="screen">
-            <param name="base_footprint" value="base_footprint" type="string"/>
+            <param name="base_footprint" value="$(arg base_footprint_frame_id)" type="string"/>
             <param name="camera_frame" value="rgbd_front_top_depth_optical_frame" type="string"/>
             <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
             <param name="rate" value="30.0"/>
@@ -35,7 +35,7 @@
             <include file="$(find pcl_people_detector)/launch/start.launch" ns="rgbd_front_top">
                 <arg name="input_topic" value="/spencer/sensors/rgbd_front_top/depth_registered/points"/>
                 <arg name="camera_info_topic" value="/spencer/sensors/rgbd_front_top/rgb/camera_info"/>
-                <arg name="base_link_frame" value="base_footprint"/>
+                <arg name="base_link_frame" value="$(arg base_footprint_frame_id)"/>
                 <arg name="detection_frame" value="pcl_people_detector_front_link"/>
                 <arg name="ground_coeffs" value="0 0 -1 0"/>
                 <arg name="detection_id_offset" value="11"/>

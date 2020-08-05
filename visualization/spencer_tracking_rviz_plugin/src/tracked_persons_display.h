@@ -127,6 +127,7 @@ namespace spencer_tracking_rviz_plugin
         // User-editable property variables.
         rviz::FloatProperty* m_occlusion_alpha_property;
         rviz::FloatProperty* m_missed_alpha_property;
+        rviz::StringProperty* m_tracking_frame_property;
         rviz::IntProperty*   m_history_length_property;
         rviz::IntProperty*   m_delete_after_ncycles_property;
 

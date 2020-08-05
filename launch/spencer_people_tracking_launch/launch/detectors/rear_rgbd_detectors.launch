@@ -4,6 +4,7 @@
     <arg name="hog" default="false"/>
 
     <arg name="ground_plane" value="/spencer/sensors/rgbd_rear_top/ground_plane"/>
+    <arg name="base_footprint_frame_id" default="base_footprint"/>
 
     <arg name="detection_id_increment" default="20"/>
 
@@ -11,7 +12,7 @@
 
         <!-- RWTH tf based groundplane -->
         <node pkg="rwth_ground_plane" type="ground_plane_tf_based_fixed" name="ground_plane_rear_top" output="screen">
-            <param name="base_footprint" value="base_footprint" type="string"/>
+            <param name="base_footprint" value="$(arg base_footprint_frame_id)" type="string"/>
             <param name="camera_frame" value="rgbd_rear_top_depth_optical_frame" type="string"/>
             <param name="ground_plane" value="$(arg ground_plane)" type="string"/>
             <param name="rate" value="30.0"/> <!-- limits how fast upper-body and HOG detector can run -->

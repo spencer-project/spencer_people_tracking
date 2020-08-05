@@ -9,6 +9,9 @@
     <arg name="use_pcl_detector" default="false"/> <!-- use ROI-HOG detector from PCL? Cannot be combined with upper-body detector! -->
     <arg name="use_hog_detector" default="false"/> <!-- use RGB groundHOG detector? Requires cudaHOG library-->
 
+    <!-- TF frame IDs used by some detectors, and tracking components -->
+    <arg name="base_footprint_frame_id" default="base_footprint"/>  <!-- name of the robot's base frame after projection onto the ground plane -->
+    <arg name="world_frame_id" default="odom"/>  <!-- this is the fixed tracking frame -->
 
     <!-- Run OpenNi driver if desired -->
     <group ns="spencer/sensors" if="$(arg load_driver)">
@@ -28,8 +31,8 @@
 
     <!-- Set up dummy transforms into an imaginary robot and odom frame -->
     <group if="$(arg dummy_transforms)">
-        <node name="tf_base_footprint" pkg="tf" type="static_transform_publisher" args="0 0 $(arg height_above_ground) 0 0 0 base_footprint rgbd_front_top_link 10"/>
-        <node name="tf_odom"           pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 odom base_footprint 10"/>
+        <node name="tf_base_footprint" pkg="tf" type="static_transform_publisher" args="0 0 $(arg height_above_ground) 0 0 0 $(arg base_footprint_frame_id) rgbd_front_top_link 10"/>
+        <node name="tf_odom"           pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 odom $(arg base_footprint_frame_id) 10"/>
     </group>
 
 
@@ -44,6 +47,7 @@
             <arg name="upper_body" default="$(arg use_upper_body_detector)"/>
             <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
             <arg name="hog" default="$(arg use_hog_detector)"/>
+            <arg name="base_footprint_frame_id" value="$(arg base_footprint_frame_id)"/>
         </include>
     </group>
     
@@ -52,6 +56,8 @@
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
         <arg name="rgbd" default="true"/>
         <arg name="laser_low_confidence_detections" default="false"/>
+        <arg name="base_footprint_frame_id" value="$(arg base_footprint_frame_id)"/>
+        <arg name="world_frame_id" value="$(arg world_frame_id)"/>
     </include>
 
     <!-- As there is not yet any high-recall/low-confidence detector for RGB-D, and we are not using laser, tracks may get deleted too quickly in case of missed detections.

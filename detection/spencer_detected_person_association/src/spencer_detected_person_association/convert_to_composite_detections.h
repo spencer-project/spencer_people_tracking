@@ -74,7 +74,8 @@ namespace spencer_detected_person_association
         // For monitoring if there are any publishers on the subscribed topic
         boost::mutex m_monitorMutex;
         boost::thread m_monitorThread;
-        double m_topicMonitorInterval;
+        double m_topicMonitorInterval, m_assumeTopicDeadAfter;
+        ros::Time m_lastMessageReceivedAt;
     };
 }
 

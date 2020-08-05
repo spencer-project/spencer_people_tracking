@@ -14,7 +14,11 @@
     <arg name="use_upper_body_detector" default="false"    if="$(arg use_pcl_detector)"/>
 
     <arg name="static_map" default="true"/>
-    
+
+    <!-- TF frame IDs used by some detectors, and tracking components -->
+    <arg name="base_footprint_frame_id" default="base_footprint"/>  <!-- name of the robot's base frame after projection onto the ground plane -->
+    <arg name="world_frame_id" default="odom"/>  <!-- this is the fixed tracking frame -->
+
     <arg name="loop" default="true"/>
     <arg name="rate" default="0.2"/>
 
@@ -51,12 +55,14 @@
         <arg name="upper_body" value="$(arg use_upper_body_detector)"/>
         <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
         <arg name="hog" value="$(arg use_hog_detector)"/>
+        <arg name="base_footprint_frame_id" value="$(arg base_footprint_frame_id)"/>
     </include>
 
     <include file="$(find spencer_people_tracking_launch)/launch/detectors/rear_rgbd_detectors.launch" if="$(arg rear_rgbd)">
         <arg name="upper_body" value="$(arg use_upper_body_detector)"/>
         <arg name="pcl_detector" value="$(arg use_pcl_detector)"/>
         <arg name="hog" value="$(arg use_hog_detector)"/>
+        <arg name="base_footprint_frame_id" value="$(arg base_footprint_frame_id)"/>
     </include>
 
     <include file="$(find spencer_people_tracking_launch)/launch/detectors/laser_detectors.launch" if="$(arg front_laser)">
@@ -68,6 +74,8 @@
     <include file="$(find spencer_people_tracking_launch)/launch/tracking/freiburg_people_tracking.launch">
         <arg name="rgbd" value="$(arg front_rgbd)"/>
         <arg name="laser_low_confidence_detections" value="$(arg front_laser)"/>
+        <arg name="base_footprint_frame_id" value="$(arg base_footprint_frame_id)"/>
+        <arg name="world_frame_id" value="$(arg world_frame_id)"/>
     </include>
 
     <!-- Only needed if no laser available -->

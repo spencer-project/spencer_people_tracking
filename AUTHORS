@@ -11,7 +11,7 @@ The framework was initially created and is being maintained by:
     Stefan Breuers
 
 For the authors of the individual ROS packages, please check the respective README or package.xml files.
-We are also very thankful to the following additional contributors:
+We are also very thankful to the following additional contributors (the ones prefixed by @ are Github user names):
 
     Lucas Beyer
     Christian Dondrup
@@ -19,5 +19,9 @@ We are also very thankful to the following additional contributors:
     João Avelino
     Kota Weaver
     Marc Hanheide
+    Manuel Fernandez-Carmona
+    @rpg711
+    @Sangheli
+    @dandedrick
 
 ...and anybody who we, by accident, forgot to mention here!

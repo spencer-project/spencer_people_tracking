@@ -1,8 +1,9 @@
+# ROS base image without GPU support
 FROM ros:kinetic-perception
 
 # Install build tools
 RUN apt-get update && apt-get install -y \
-      python-catkin-tools \
+      python-catkin-tools tmux vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Setup workspace
@@ -11,8 +12,8 @@ RUN mkdir -p $CATKIN_WS/src
 WORKDIR $CATKIN_WS/src
 
 # Acquire source
-RUN git clone https://github.com/spencer-project/spencer_people_tracking.git
-# COPY . spencer_people_tracking/
+#RUN git clone https://github.com/spencer-project/spencer_people_tracking.git
+COPY . spencer_people_tracking/
 
 # Install dependencies
 RUN apt-get update && \
@@ -27,4 +28,7 @@ WORKDIR $CATKIN_WS
 ENV TERM xterm
 ENV PYTHONIOENCODING UTF-8
 RUN catkin config --extend /opt/ros/$ROS_DISTRO && \
-    catkin build
+    catkin build -c -s
+
+ # Initialize bashrc
+RUN echo "source ~/catkin_ws/devel/setup.bash" >> /root/.bashrc

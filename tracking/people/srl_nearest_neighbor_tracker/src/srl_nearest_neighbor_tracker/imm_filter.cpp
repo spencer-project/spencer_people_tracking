@@ -30,6 +30,7 @@
 
 #include <srl_nearest_neighbor_tracker/base/stl_helpers.h>
 #include <srl_nearest_neighbor_tracker/ros/params.h>
+#include <srl_nearest_neighbor_tracker/ros/geometry_utils.h>
 #include <srl_nearest_neighbor_tracker/imm_filter.h>
 
 #include <tf/tf.h>
@@ -88,7 +89,7 @@ IMMFilter::IMMFilter(const ros::NodeHandle& nodeHandle, const ros::NodeHandle& p
     if(m_sendDebugInformation){
         m_immDebugPublisher = m_privateNodeHandle.advertise<spencer_tracking_msgs::ImmDebugInfos>("imm_debug_infos",10);
         m_debugMessages.header.seq = 0;
-        m_debugMessages.header.frame_id = "odom";
+        m_debugMessages.header.frame_id = GeometryUtils::getInstance().getWorldFrame();
     }
 
 
@@ -117,7 +118,7 @@ FilterState::Ptr IMMFilter::initializeTrackState(Observation::ConstPtr observati
         hypothesis->m_probability = 1.0/(double) m_numberModels;
         immState->m_hypotheses.push_back(hypothesis);
         //ROS_INFO_STREAM("Initialize ekf with hypothesis C" << hypothesis->C() << " x " << hypothesis->x());
-        m_debugMessages.header.frame_id = "odom";
+        m_debugMessages.header.frame_id = GeometryUtils::getInstance().getWorldFrame();
 
     }
 

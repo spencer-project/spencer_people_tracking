@@ -1,10 +1,12 @@
 <launch>
     <!-- Launch file arguments -->
     <arg name="rgbd" default="false"/>
+    <arg name="common_frame_id" default="base_footprint"/>
 
     <!-- Aggregate detections from all detectors -->
     <include file="$(find spencer_detected_person_association)/launch/aggregate_all.launch">
         <arg name="rgbd" value="$(arg rgbd)"/>
+        <arg name="common_frame_id" value="$(arg common_frame_id)"/>
     </include>
 
     <!-- If RGB-D is enabled, fuse lasers and RGB-D -->

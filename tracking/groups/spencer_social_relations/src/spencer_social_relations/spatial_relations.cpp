@@ -90,7 +90,11 @@ double diff_angle_unwrap(double alpha1, double alpha2)
 /// Callback when new tracks have arrived. This is where all the magic happens.
 void newTrackedPersonsReceived(const TrackedPersons::ConstPtr& trackedPersons)
 {
-    ROS_ASSERT_MSG(trackedPersons->header.frame_id == "odom" || trackedPersons->header.frame_id == "map", "Input tracks must be in ground-plane (x y) coordinates!");    
+    if(trackedPersons->header.frame_id.find("odom") == std::string::npos 
+    && trackedPersons->header.frame_id.find("map") == std::string::npos 
+    && trackedPersons->header.frame_id.find("world") == std::string::npos ) {
+        ROS_WARN_STREAM_ONCE("Input tracks for spatial relations must be in ground-plane (x y) coordinates, but they are in " << trackedPersons->header.frame_id << " frame!");    
+    }
 
     SocialRelations::Ptr socialRelations(new SocialRelations);
     socialRelations->header = trackedPersons->header;
