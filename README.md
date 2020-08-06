@@ -15,7 +15,7 @@
 - **Extensible and reusable:** Well-structured ROS message types and clearly defined interfaces make it easy to integrate custom detection and tracking components.
 - **Powerful visualization:** A series of reusable RViz plugins that can be configured via mouse click, plus scripts for generating animated (2D) SVG files.
 - **Evaluation tools:** Metrics (CLEAR-MOT, OSPA) for evaluation of tracking performance.
-- **ROS integration:** All components are fully integrated with ROS and written in C++ or Python. No Matlab required.
+- **ROS integration:** All components are fully integrated with ROS and written in C++ or Python. ROS Indigo and Kinetic are supported, Noetic is work in progress.
 
 #### Motivation
 
@@ -51,6 +51,7 @@ We have integrated the following person detection modules:
 
 Further external detectors which output `geometry_msgs/PoseArray` or `people_msgs/PositionMeasurementArray` messages can easily be integrated into our framework using the scripts from [this package](/detection/spencer_detected_person_conversion). Examples of such detectors include:
 - The **[laser-based leg detector](https://github.com/wg-perception/people/tree/indigo-devel/leg_detector)** from wg-perception, which might work better than our own laser detector if the sensor is located very close to the ground. See our [wrapper package](/detection/laser_detectors/spencer_leg_detector_wrapper/) and [`leg_detectors.launch`](/launch/spencer_people_tracking_launch/launch/detectors/leg_detectors.launch) (replaces `laser_detectors.launch`).
+- The deep learning-based **[DROW and DR-SPAAM person detectors](https://github.com/VisualComputingInstitute/DR-SPAAM-Detector)** for 2D laser range data by Beyer et al. [5] and Jia et al. [6], which fuse information from multiple successive frames.
 
 ##### Multi-modal detection and fusion
 
@@ -302,3 +303,7 @@ Most of the software in this repository is released under a BSD license. For det
 [3] Arras K.O. and Martinez Mozos O. and Burgard W.. *Using Boosted Features for the Detection of People in 2D Range Data*. IEEE International Conference on Robotics and Automation (ICRA'07), Rome, Italy, 2007.
 
 [4] Munaro M. and Menegatti E. *Fast RGB-D people tracking for service robots*. In Autonomous Robots, Volume 37 Issue 3, pp. 227-242, Springer, 2014.
+
+[5] Beyer L. and Hermans A. and Linder T. and Arras K. O. and Leibe B. *Deep Person Detection in 2D Range Data*. IEEE Robotics and Automation Letters 3(3), pp. 2726-2733, 2018.
+
+[6] Jia D. and Hermans A. and Leibe B. *DR-SPAAM: A Spatial-Attention and Auto-regressive Model for Person Detection in 2D Range Data*. IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS'20), 2020.
