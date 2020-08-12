@@ -7,8 +7,8 @@ project(rwth_upper_body_detector)
 find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge sensor_msgs std_msgs rwth_perception_people_msgs message_filters geometry_msgs image_transport spencer_diagnostics spencer_tracking_msgs visualization_msgs)
 
 find_package(Boost REQUIRED COMPONENTS thread)
-find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
-include(${QT_USE_FILE})
+find_package(Qt5 REQUIRED Core Widgets)
+set(QT_LIBRARIES Qt5::Widgets)
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -103,8 +103,6 @@ target_link_libraries(upper_body_detector
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${QT_LIBRARIES}
-  ${QT_QTCORE_LIBRARY}
-  ${QT_QTGUI_LIBRARY}
 )
 
 #############

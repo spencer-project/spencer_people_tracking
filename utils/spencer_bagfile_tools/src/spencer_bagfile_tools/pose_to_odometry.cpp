@@ -46,7 +46,6 @@
 #include <boost/thread/mutex.hpp>
 
 using namespace std;
-using namespace boost;
 
 #include <ros/ros.h>
 #include <geometry_msgs/TransformStamped.h>
@@ -55,15 +54,15 @@ using namespace boost;
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 
-auto_ptr<ros::Publisher> g_odometryPublisher, g_additionalOdometryDataPublisher;
-auto_ptr<tf::TransformBroadcaster> g_transformBroadcaster;
+boost::shared_ptr<ros::Publisher> g_odometryPublisher, g_additionalOdometryDataPublisher;
+boost::shared_ptr<tf::TransformBroadcaster> g_transformBroadcaster;
 
 bool g_publishTF, g_stamped;
 string g_odomFrame, g_baseFrame;
 
 geometry_msgs::PoseWithCovariance g_lastPose;
 ros::Time g_lastPoseGeneratedAt;
-mutex g_lastPoseMutex;
+boost::mutex g_lastPoseMutex;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +70,7 @@ void processPoseWithCovariance(const geometry_msgs::PoseWithCovariance* poseWith
 {
 	// Lock to make access to g_lastPose atomic
 	{
-		lock_guard<mutex> lock(g_lastPoseMutex);
+		boost::lock_guard<boost::mutex> lock(g_lastPoseMutex);
     
 		nav_msgs::Odometry odom;
 		odom.header.stamp = poseGeneratedAt;
@@ -171,8 +170,8 @@ int main(int argc, char **argv)
  		poseWithCovarianceSubscriber = rootNode.subscribe<geometry_msgs::PoseWithCovariance>("poseWithCovariance", 100, &poseWithCovarianceCallback);
 
 	// Create publishers and broadcasters
-	g_odometryPublisher = auto_ptr<ros::Publisher>( new ros::Publisher(rootNode.advertise<nav_msgs::Odometry>("odom", 100) ));
-	g_transformBroadcaster = auto_ptr<tf::TransformBroadcaster> ( new tf::TransformBroadcaster() );
+	g_odometryPublisher.reset( new ros::Publisher(rootNode.advertise<nav_msgs::Odometry>("odom", 100) ));
+	g_transformBroadcaster.reset( new tf::TransformBroadcaster() );
 
 	ros::spin();
 	return 0;

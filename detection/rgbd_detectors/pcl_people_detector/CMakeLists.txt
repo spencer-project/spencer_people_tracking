@@ -7,9 +7,9 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV REQUIRED)
 message(STATUS "Using OpenCV version ${OpenCV_VERSION} installed at: ${OpenCV_INCLUDE_DIRS}")
-message(STATUS "OpenCV supported compute capabilities are: ${OpenCV_COMPUTE_CAPABILITIES}")
+message(STATUS "OpenCV supported compute capabilities are: ${OpenCV_COMPUTE_CAPABILITIES}, compiled with CUDA version: ${OpenCV_CUDA_VERSION}")
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
@@ -18,6 +18,10 @@ catkin_package()
 
 include_directories(include src ${catkin_INCLUDE_DIRS} ${Eigen3_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
+if(OpenCV_CUDA_VERSION)
+  add_definitions(-DOPENCV_HAS_CUDA)
+  message(STATUS "Building with OpenCV CUDA support enabled")
+endif()
 
 add_executable(detect_people src/detect_people.cpp)
 add_dependencies(detect_people ${catkin_EXPORTED_TARGETS}) # for generated message headers etc.

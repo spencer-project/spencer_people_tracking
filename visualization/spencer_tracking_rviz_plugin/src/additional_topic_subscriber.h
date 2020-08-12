@@ -32,8 +32,15 @@
 #define ADDITIONAL_TOPIC_SUBSCRIBER_H
 
 #ifndef Q_MOC_RUN
+
 #include <message_filters/subscriber.h>
-#include <tf/message_filter.h>
+
+#if ROS_VERSION_MINIMUM(1, 14, 0)
+  #include <tf2_ros/message_filter.h>
+#else
+  #include <tf/message_filter.h>
+#endif
+
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <iostream>
@@ -90,7 +97,7 @@ public:
      * the long templated class name to refer to their super class. */
     typedef AdditionalTopicSubscriber<MessageType> ATSClass;
 
-    AdditionalTopicSubscriber(const QString& propertyName, Display* display, DisplayContext* context, ros::NodeHandle& update_nh, const function<void (shared_ptr<const MessageType>)>& messageCallback)
+    AdditionalTopicSubscriber(const QString& propertyName, Display* display, DisplayContext* context, ros::NodeHandle& update_nh, const boost::function<void (boost::shared_ptr<const MessageType>)>& messageCallback)
             : tf_filter(NULL), m_messagesReceived(0), m_display(display), m_context(context), m_updateNodeHandle(update_nh), m_enabled(false), m_messageCallback(messageCallback)
     {
         _AdditionalTopicSubscriber::initialize(display, context->getFrameManager());
@@ -100,7 +107,11 @@ public:
         additional_topic_property_->setMessageType(message_type);
         additional_topic_property_->setDescription(message_type + " topic to subscribe to.");
 
-        tf_filter = new tf::MessageFilter<MessageType>(*m_context->getTFClient(), "map", 10, m_updateNodeHandle);
+        #if ROS_VERSION_MINIMUM(1, 14, 0)
+            tf_filter = new tf2_ros::MessageFilter<MessageType>(*m_context->getTF2BufferPtr(), "map", 10, m_updateNodeHandle);
+        #else
+            tf_filter = new tf::MessageFilter<MessageType>(*m_context->getTFClient(), "map", 10, m_updateNodeHandle);
+        #endif
 
         tf_filter->connectInput(m_subscriber);
         tf_filter->registerCallback(boost::bind(&AdditionalTopicSubscriber<MessageType>::incomingMessage, this, _1));
@@ -189,7 +200,11 @@ protected:
         m_messageCallback(msg);
     }
 
-    tf::MessageFilter<MessageType>* tf_filter;
+    #if ROS_VERSION_MINIMUM(1, 14, 0)
+        tf2_ros::MessageFilter<MessageType>* tf_filter;
+    #else
+        tf::MessageFilter<MessageType>* tf_filter;
+    #endif
 
 private:
     std::string m_topic;
@@ -200,7 +215,7 @@ private:
     message_filters::Subscriber<MessageType> m_subscriber;
     uint32_t m_messagesReceived;
 
-    const function<void (shared_ptr<const MessageType>)> m_messageCallback;
+    const boost::function<void (boost::shared_ptr<const MessageType>)> m_messageCallback;
 };
 
 } // end namespace rviz

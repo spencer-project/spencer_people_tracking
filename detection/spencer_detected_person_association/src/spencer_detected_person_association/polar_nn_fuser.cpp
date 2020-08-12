@@ -148,4 +148,4 @@ namespace spencer_detected_person_association
 }
 
 
-PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, PolarNNFuserNodelet, spencer_detected_person_association::PolarNNFuserNodelet, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(spencer_detected_person_association::PolarNNFuserNodelet, nodelet::Nodelet)

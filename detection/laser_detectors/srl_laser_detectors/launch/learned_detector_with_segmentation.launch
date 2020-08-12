@@ -10,7 +10,7 @@
     <!-- Detection -->
     <arg name="type" default="random_forest"/>
     <arg name="model_prefix" default="lms500_0.25deg_height70cm_fr_rathausgasse"/>  <!-- feel free to try out other models here from "models" folder -->
-    <arg name="model_suffix" default="kinetic"/>
+    <arg name="model_suffix" default="melodic"/>
     <arg name="model" default="$(find srl_laser_detectors)/models/$(arg model_prefix)_$(arg model_suffix).$(arg type).gz"/>  <!-- full path to learned classifier model -->
 
     <arg name="detected_persons" default="detected_persons"/> <!-- output detected persons topic -->

@@ -69,4 +69,4 @@ namespace spencer_detected_person_association
 }
 
 
-PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, AggregateDetectionsNodelet, spencer_detected_person_association::AggregateDetectionsNodelet, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(spencer_detected_person_association::AggregateDetectionsNodelet, nodelet::Nodelet)

@@ -40,7 +40,7 @@ and http://p.yusukekamiyamane.com/ for details on the icons.
 
 -->
 
-<package>
+<package format="2">
   <name>track_annotation_tool</name>
   <version>1.0.8</version>
 
@@ -55,26 +55,18 @@ and http://p.yusukekamiyamane.com/ for details on the icons.
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>rviz</build_depend>
-  <build_depend>rqt_gui</build_depend>
-  <build_depend>rqt_gui_py</build_depend>
-  <build_depend>spencer_tracking_msgs</build_depend>
-  <build_depend>spencer_human_attribute_msgs</build_depend>
-  <build_depend>libqt4</build_depend>
-  <build_depend>libqt4-dev</build_depend>
-  <build_depend>qt4-qmake</build_depend>
-
-  <run_depend>rviz</run_depend>
-  <run_depend>rqt_gui</run_depend>
-  <run_depend>rqt_gui_py</run_depend>
-  <run_depend>spencer_tracking_msgs</run_depend>
-  <run_depend>spencer_human_attribute_msgs</run_depend>
-  <run_depend>libqt4</run_depend>
-  <run_depend>libqt4-dev</run_depend>
-  <run_depend>qt4-qmake</run_depend>
+  <depend>rviz</depend>
+  <depend>rqt_gui</depend>
+  <depend>rqt_gui_py</depend>
+  <depend>spencer_tracking_msgs</depend>
+  <depend>spencer_human_attribute_msgs</depend>
+  <depend>roslib</depend>
+  <depend>pluginlib</depend>
+  <depend>python_qt_binding</depend>
 
   <export>
       <rviz plugin="${prefix}/rviz_plugin.xml"/>
       <rqt_gui plugin="${prefix}/rqt_plugin.xml"/>
   </export>
-<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>
+
+</package>

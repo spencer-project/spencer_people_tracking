@@ -72,10 +72,10 @@ int main(int argc, char **argv)
     return 2;
   }
   
-  float fps = (float) cap.get(CV_CAP_PROP_FPS);
+  float fps = (float) cap.get(cv::CAP_PROP_FPS);
   ROS_INFO_STREAM("Video frame rate is " << fps << " FPS");
   
-  size_t frameCount = cap.get(CV_CAP_PROP_FRAME_COUNT);
+  size_t frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
   ROS_INFO_STREAM("Video has " << frameCount << " frames");
 
   // Read timestamp
@@ -131,9 +131,9 @@ int main(int argc, char **argv)
         msg.format = compression;
 
         vector<int> compressionParams;
-        compressionParams.push_back(CV_IMWRITE_PNG_COMPRESSION);
+        compressionParams.push_back(cv::IMWRITE_PNG_COMPRESSION);
         compressionParams.push_back(9);
-        compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
+        compressionParams.push_back(cv::IMWRITE_JPEG_QUALITY);
         compressionParams.push_back(80);
 
         vector<unsigned char> data;

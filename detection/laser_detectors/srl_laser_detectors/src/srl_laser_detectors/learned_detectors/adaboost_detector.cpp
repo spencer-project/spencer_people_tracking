@@ -36,7 +36,7 @@ namespace srl_laser_detectors {
 
 AdaboostDetector::AdaboostDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle) : OpenCvDetector(nodeHandle, privateNodeHandle)
 {
-    m_adaboost.reset( new CvBoost() );
+    m_adaboost = cv::ml::Boost::create();
     loadModel();
 
     m_privateNodeHandle.param<double>("decision_threshold", m_decisionThreshold, -10.0);
@@ -48,7 +48,7 @@ const std::string AdaboostDetector::getName()
     return "adaboost";
 }
 
-CvStatModel* AdaboostDetector::getStatModel()
+cv::ml::StatModel* AdaboostDetector::getStatModel()
 {
     return m_adaboost.get();
 }
@@ -61,17 +61,19 @@ void AdaboostDetector::classifyFeatureVector(const cv::Mat& featureVector, Label
 
 void AdaboostDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::Mat& labelVector)
 {
-    CvBoostParams params;
-    params.boost_type=CvBoost::DISCRETE;
-    params.weight_trim_rate = 0;
-    params.weak_count = 100;
+    int weakCount = 100; double weightTrimRate = 0.0; int boostType = cv::ml::Boost::DISCRETE;
+    m_privateNodeHandle.getParamCached("adaboost_type", boostType);
+    m_privateNodeHandle.getParamCached("adaboost_weight_trim_rate", weightTrimRate);
+    m_privateNodeHandle.getParamCached("adaboost_weak_count", weakCount);
+    
+    m_adaboost->setBoostType(boostType);
+    m_adaboost->setWeakCount(weakCount);
+    m_adaboost->setWeightTrimRate(weightTrimRate);
 
-    m_privateNodeHandle.getParamCached("adaboost_type", params.boost_type);
-    m_privateNodeHandle.getParamCached("adaboost_weight_trim_rate", params.weight_trim_rate);
-    m_privateNodeHandle.getParamCached("adaboost_weak_count", params.weak_count);
+    ROS_INFO_STREAM("Training Adaboost classifier with " << weakCount << " weak classifiers... this may take a while!");
 
-    ROS_INFO_STREAM("Training Adaboost classifier with " << params.weak_count << " weak classifiers... this may take a while!");
-    m_adaboost->train(featureMatrix, CV_ROW_SAMPLE, labelVector, cv::Mat(), maskSamplesWithNonfiniteValues(featureMatrix), cv::Mat(), cv::Mat(), params);
+    cv::Ptr<cv::ml::TrainData> trainData = cv::ml::TrainData::create(featureMatrix, cv::ml::ROW_SAMPLE, labelVector, cv::noArray(), maskSamplesWithNonfiniteValues(featureMatrix));
+    m_adaboost->train(trainData);
 }
 
 

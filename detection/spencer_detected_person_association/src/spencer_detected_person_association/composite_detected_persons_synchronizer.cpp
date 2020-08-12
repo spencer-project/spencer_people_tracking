@@ -87,7 +87,7 @@ namespace spencer_detected_person_association
 
     void CompositeDetectedPersonsSynchronizer::monitorActiveTopics()
     {
-        boost::posix_time::seconds monitorInterval( m_topicMonitorInterval );
+        boost::chrono::milliseconds monitorInterval( int(m_topicMonitorInterval * 1000.0) );
 
         while(true) {
             // Get currently active topics
@@ -123,7 +123,7 @@ namespace spencer_detected_person_association
             }
 
             // Sleep for a while
-            try { boost::this_thread::sleep(monitorInterval); }
+            try { boost::this_thread::sleep_for(monitorInterval); }
             catch(boost::thread_interrupted&) { return; } // stop thread
         }
     }

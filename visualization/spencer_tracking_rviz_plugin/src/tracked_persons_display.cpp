@@ -92,7 +92,7 @@ void TrackedPersonsDisplay::onInitialize()
     //m_render_state_prediction_property  = new rviz::BoolProperty( "Render state prediction", true, "Render state prediction from Kalman filter", this, SLOT( updateRenderFlags() ));
 
     // Create a scene node for visualizing track history
-    m_trackHistorySceneNode = shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode());
+    m_trackHistorySceneNode = boost::shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode());
 }
 
 TrackedPersonsDisplay::~TrackedPersonsDisplay()
@@ -119,7 +119,7 @@ void TrackedPersonsDisplay::update(float wall_dt, float ros_dt)
     // Update position of deleted tracks (because they are not being updated by ROS messages any more)
     foreach(const track_map::value_type& entry, m_cachedTracks)
     {
-        const shared_ptr<TrackedPersonVisual>& trackedPersonVisual = entry.second;
+        const boost::shared_ptr<TrackedPersonVisual>& trackedPersonVisual = entry.second;
         if(trackedPersonVisual->isDeleted) {
             Ogre::Matrix4 poseInCurrentFrame = mapFrameTransform * trackedPersonVisual->lastObservedPose;
             Ogre::Vector3 position = poseInCurrentFrame.getTrans(); Ogre::Quaternion orientation = poseInCurrentFrame.extractQuaternion();
@@ -144,7 +144,7 @@ void TrackedPersonsDisplay::stylesChanged()
     foreach(const track_map::value_type& entry, m_cachedTracks)
     {
         const track_id trackId = entry.first;
-        const shared_ptr<TrackedPersonVisual>& trackedPersonVisual = entry.second;
+        const boost::shared_ptr<TrackedPersonVisual>& trackedPersonVisual = entry.second;
 
         // Update common styles to person visual, such as line width
         applyCommonStyles(trackedPersonVisual->personVisual);
@@ -180,7 +180,7 @@ void TrackedPersonsDisplay::stylesChanged()
         trackedPersonVisual->history.rset_capacity(m_history_length_property->getInt());
 
         // Update history color
-        foreach(shared_ptr<TrackedPersonHistoryEntry> historyEntry, trackedPersonVisual->history) {
+        foreach(boost::shared_ptr<TrackedPersonHistoryEntry> historyEntry, trackedPersonVisual->history) {
             const double historyShapeDiameter = 0.1;
             Ogre::ColourValue historyColor = trackColorWithFullAlpha;
             historyColor.a *= m_commonProperties->alpha->getFloat(); // general alpha
@@ -243,7 +243,7 @@ void TrackedPersonsDisplay::personVisualTypeChanged()
 {
     foreach(const track_map::value_type& entry, m_cachedTracks)
     {
-        const shared_ptr<TrackedPersonVisual>& trackedPersonVisual = entry.second;
+        const boost::shared_ptr<TrackedPersonVisual>& trackedPersonVisual = entry.second;
         trackedPersonVisual->personVisual.reset();
         createPersonVisualIfRequired(trackedPersonVisual->sceneNode.get(), trackedPersonVisual->personVisual);
     }
@@ -271,7 +271,7 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
     set<unsigned int> encounteredTrackIds;
     for (vector<spencer_tracking_msgs::TrackedPerson>::const_iterator trackedPersonIt = msg->tracks.begin(); trackedPersonIt != msg->tracks.end(); ++trackedPersonIt)
     {
-        shared_ptr<TrackedPersonVisual> trackedPersonVisual;
+        boost::shared_ptr<TrackedPersonVisual> trackedPersonVisual;
 
         // See if we encountered this track ID before in this loop (means duplicate track ID)
         if (encounteredTrackIds.find(trackedPersonIt->track_id) != encounteredTrackIds.end()) {
@@ -288,13 +288,13 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
         }
         else {
             // Create a new visual representation of the tracked person
-            trackedPersonVisual = shared_ptr<TrackedPersonVisual>(new TrackedPersonVisual);
+            trackedPersonVisual = boost::shared_ptr<TrackedPersonVisual>(new TrackedPersonVisual);
             m_cachedTracks[trackedPersonIt->track_id] = trackedPersonVisual;
 
             // This scene node is the parent of all visualization elements for the tracked person
-            trackedPersonVisual->sceneNode = shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode());
-            trackedPersonVisual->historySceneNode = shared_ptr<Ogre::SceneNode>(m_trackHistorySceneNode->createChildSceneNode());
-            trackedPersonVisual->historyLineSceneNode = shared_ptr<Ogre::SceneNode>(m_trackHistorySceneNode->createChildSceneNode());
+            trackedPersonVisual->sceneNode = boost::shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode());
+            trackedPersonVisual->historySceneNode = boost::shared_ptr<Ogre::SceneNode>(m_trackHistorySceneNode->createChildSceneNode());
+            trackedPersonVisual->historyLineSceneNode = boost::shared_ptr<Ogre::SceneNode>(m_trackHistorySceneNode->createChildSceneNode());
         }
 
         // These values need to be remembered for later use in stylesChanged()
@@ -322,7 +322,7 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
         //
 
         // Create new visual for the person itself, if needed
-        shared_ptr<PersonVisual> &personVisual = trackedPersonVisual->personVisual;
+        boost::shared_ptr<PersonVisual> &personVisual = trackedPersonVisual->personVisual;
         createPersonVisualIfRequired(currentSceneNode, personVisual);
 
         const double personHeight = personVisual ? personVisual->getHeight() : 0;
@@ -347,7 +347,7 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
         if((trackedPersonVisual->positionOfLastHistoryEntry - newHistoryEntryPosition).length() > MIN_HISTORY_ENTRY_DISTANCE)
         {
             // General history
-            shared_ptr<TrackedPersonHistoryEntry> newHistoryEntry(new TrackedPersonHistoryEntry);
+            boost::shared_ptr<TrackedPersonHistoryEntry> newHistoryEntry(new TrackedPersonHistoryEntry);
             newHistoryEntry->trackId = trackedPersonIt->track_id;
             newHistoryEntry->position = newHistoryEntryPosition; // used by history lines (below) even if no shape is set
             newHistoryEntry->wasOccluded = trackedPersonIt->is_occluded;
@@ -362,7 +362,7 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
                     trackedPersonVisual->historyLine->setLineWidth(m_history_line_width_property->getFloat());
                     trackedPersonVisual->historyLine->setMaxPointsPerLine(trackedPersonVisual->history.size());
 
-                    foreach(const shared_ptr<TrackedPersonHistoryEntry>& historyEntry, trackedPersonVisual->history) {
+                    foreach(const boost::shared_ptr<TrackedPersonHistoryEntry>& historyEntry, trackedPersonVisual->history) {
                         historyEntry->shape.reset(); // remove existing dot shapes, if any, for better performance
                         trackedPersonVisual->historyLine->addPoint(historyEntry->position);
                     }
@@ -370,7 +370,7 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
             }
             else {
                 // History dots
-                newHistoryEntry->shape = shared_ptr<rviz::Shape>(new rviz::Shape(rviz::Shape::Cylinder, context_->getSceneManager(), trackedPersonVisual->historySceneNode.get()));
+                newHistoryEntry->shape = boost::shared_ptr<rviz::Shape>(new rviz::Shape(rviz::Shape::Cylinder, context_->getSceneManager(), trackedPersonVisual->historySceneNode.get()));
                 newHistoryEntry->shape->setPosition(newHistoryEntryPosition);
                 newHistoryEntry->shape->setOrientation(shapeQuaternion);
             }
@@ -437,7 +437,7 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
                 trackedPersonVisual->hasZeroVelocity = velocityVector.length() < 0.05;
             }
 
-            shared_ptr<MeshPersonVisual> meshPersonVisual = boost::dynamic_pointer_cast<MeshPersonVisual>(personVisual);
+            boost::shared_ptr<MeshPersonVisual> meshPersonVisual = boost::dynamic_pointer_cast<MeshPersonVisual>(personVisual);
             if(meshPersonVisual) {
                 meshPersonVisual->setWalkingSpeed(velocityVector.length());
             }
@@ -467,9 +467,9 @@ void TrackedPersonsDisplay::processMessage(const spencer_tracking_msgs::TrackedP
     // First hide, then delete old cached tracks which have not been seen for a while
     //
     set<unsigned int> trackIdsToDelete;
-    for (map<unsigned int, shared_ptr<TrackedPersonVisual> >::const_iterator cachedTrackIt = m_cachedTracks.begin(); cachedTrackIt != m_cachedTracks.end(); ++cachedTrackIt) {
+    for (map<unsigned int, boost::shared_ptr<TrackedPersonVisual> >::const_iterator cachedTrackIt = m_cachedTracks.begin(); cachedTrackIt != m_cachedTracks.end(); ++cachedTrackIt) {
         if (encounteredTrackIds.end() == encounteredTrackIds.find(cachedTrackIt->first)) {
-            const shared_ptr<TrackedPersonVisual>& trackedPersonVisual = cachedTrackIt->second;
+            const boost::shared_ptr<TrackedPersonVisual>& trackedPersonVisual = cachedTrackIt->second;
 
             // Update state and visibility
             if(!trackedPersonVisual->isDeleted) {

@@ -1,9 +1,9 @@
 # ROS base image without GPU support
-FROM ros:kinetic-perception
+FROM ros:melodic-perception
 
 # Install build tools
 RUN apt-get update && apt-get install -y \
-      python-catkin-tools tmux vim \
+      python-catkin-tools python-rosdep tmux vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Setup workspace

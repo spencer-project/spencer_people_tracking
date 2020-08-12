@@ -12,9 +12,9 @@ help:
 
 build:
 		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking:kinetic --file=.docker/kinetic/Dockerfile
+		docker build --tag=spencer/spencer_people_tracking:melodic --file=.docker/melodic/Dockerfile
 
 build_gpu:
-		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking_gpu:kinetic-gpu --file=.docker/kinetic-gpu/Dockerfile .
+ 		cd .. && \
+		docker build --tag=spencer/spencer_people_tracking_gpu:melodic-gpu --file=.docker/melodic-gpu/Dockerfile .
 

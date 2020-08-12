@@ -29,11 +29,16 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(srl_laser_detectors)
 
-find_package(OpenCV 2)
+find_package(OpenCV)
+
 if(OpenCV_FOUND)
   message(STATUS "Using OpenCV version ${OpenCV_VERSION} installed at: ${OpenCV_INCLUDE_DIRS}")
   message(STATUS "OpenCV supported compute capabilities are: ${OpenCV_COMPUTE_CAPABILITIES}")
   include_directories(${OpenCV_INCLUDE_DIRS})
+
+  if(${OpenCV_VERSION} VERSION_LESS 3.0.0)
+    message(FATAL_ERROR "This version of the ROS package requires at least OpenCV 3.0.0 with the new ML API; however, only version ${OpenCV_VERSION} has been found.")
+  endif()
 endif()
 
 find_package(catkin REQUIRED COMPONENTS

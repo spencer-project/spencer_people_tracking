@@ -82,4 +82,4 @@ namespace spencer_detected_person_association
 }
 
 
-PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, EuclideanNNFuserNodelet, spencer_detected_person_association::EuclideanNNFuserNodelet, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(spencer_detected_person_association::EuclideanNNFuserNodelet, nodelet::Nodelet)

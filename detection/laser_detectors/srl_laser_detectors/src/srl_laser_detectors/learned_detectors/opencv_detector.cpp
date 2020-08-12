@@ -160,15 +160,13 @@ bool OpenCvDetector::loadModel(const std::string& filename)
     m_featureDimensions = featureDimensions;
     ROS_INFO("Trained model uses %zu feature dimension(s)", featureDimensions.size());
 
-    cv::FileNode classifierNode = fileStorage["classifier"];
-    getStatModel()->read(*fileStorage, *classifierNode);
+    cv::FileNode classifierNode = fileStorage[getStatModel()->getDefaultName()];
+    getStatModel()->read(classifierNode);
 
-    /* only supported in OpenCV 3+
     if(getStatModel()->empty()) {
         ROS_FATAL_STREAM("OpenCV failed to deserialize trained laser detector model: " << theFilename);
         throw std::exception();
     }
-    */
 
     return true; // FIXME: How to check success? Does load() throw an exception if it fails?
 }
@@ -177,7 +175,10 @@ bool OpenCvDetector::loadModel(const std::string& filename)
 bool OpenCvDetector::saveModel(const std::string& filename)
 {
     ROS_INFO_STREAM("Saving model: " << filename);
-    cv::FileStorage fileStorage(filename, cv::FileStorage::WRITE);
+    getStatModel()->save(filename);
+
+    cv::Ptr<cv::FileStorage> fileStoragePtr(new cv::FileStorage(filename, cv::FileStorage::APPEND));
+    cv::FileStorage& fileStorage = *fileStoragePtr;
 
     fileStorage << "detector_type" << getName();
     fileStorage << "used_feature_dimensions" << "[";
@@ -187,8 +188,6 @@ bool OpenCvDetector::saveModel(const std::string& filename)
     }
 
     fileStorage << "]";
-
-    getStatModel()->write(*fileStorage, "classifier");
     return true; // FIXME: How to check success?
 }
 

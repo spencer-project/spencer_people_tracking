@@ -249,7 +249,7 @@ bool GeometryUtils::posePassesSanityCheck(const geometry_msgs::PoseWithCovarianc
 
     // Position
     const float MAX_REASONABLE_DISTANCE_FROM_ORIGIN = 1000.0f; // in meters
-    float positionValues[] = { pose.position.x, pose.position.y, pose.position.z };
+    double positionValues[] = { pose.position.x, pose.position.y, pose.position.z };
     for(size_t i = 0; i < sizeof(positionValues) / sizeof(positionValues[0]); i++) {
         if(!isfinite(positionValues[i]) || abs(positionValues[i]) > MAX_REASONABLE_DISTANCE_FROM_ORIGIN) {
             ROS_WARN("Suspicious coordinate value(s) in pose position encountered!");
@@ -259,8 +259,8 @@ bool GeometryUtils::posePassesSanityCheck(const geometry_msgs::PoseWithCovarianc
 
     // Orientation
     if(checkOrientation) {
-        float squaredSum = 0;
-        float orientationValues[] = { pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w };
+        double squaredSum = 0;
+        double orientationValues[] = { pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w };
         for(size_t i = 0; i < sizeof(orientationValues) / sizeof(orientationValues[0]); i++) {
             if(!isfinite(orientationValues[i])) {
                 ROS_WARN("Non-finite pose orientation value(s) encountered!");

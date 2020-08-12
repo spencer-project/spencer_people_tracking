@@ -36,7 +36,7 @@ namespace srl_laser_detectors {
 
 SVMDetector::SVMDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle) : OpenCvDetector(nodeHandle, privateNodeHandle)
 {
-    m_svm.reset( new CvSVM() );
+    m_svm = cv::ml::SVM::create();
     loadModel();
     
     m_privateNodeHandle.param<double>("decision_threshold", m_decisionThreshold, 0); // probability in this case
@@ -48,24 +48,20 @@ const std::string SVMDetector::getName()
     return "svm";
 }
 
-CvStatModel* SVMDetector::getStatModel()
+cv::ml::StatModel* SVMDetector::getStatModel()
 {
     return m_svm.get();
 }
 
 void SVMDetector::classifyFeatureVector(const cv::Mat& featureVector, Label& label, double& confidence)
 {
-    float signed_margin = m_svm->predict(featureVector, true);
+    float signed_margin = m_svm->predict(featureVector, cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
     label = signed_margin > m_decisionThreshold ? FOREGROUND : BACKGROUND; // FIXME: Is the > sign correct?
     confidence = signed_margin;
 }
 
 void SVMDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::Mat& labelVector)
 {
-    CvSVMParams params;
-    params.svm_type=CvSVM::C_SVC;
-    params.C = 0.1;
-
     /* Experiment with class weights, doesn't really do any good (leads to very low recall!)
     // Calculate class weight from distribution of positive and negative samples
     cv::Mat classWeights(2, 1, CV_32FC1, cv::Scalar(0));
@@ -90,20 +86,30 @@ void SVMDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::Mat& l
     */
 
     // Get type of SVM kernel
-    std::string kernelType = "linear"; m_privateNodeHandle.getParamCached("svm_kernel_type", kernelType);
-    if(kernelType == "linear")
-        params.kernel_type = CvSVM::LINEAR;
-    else if(kernelType == "rbf")
-        params.kernel_type = CvSVM::RBF;
-    else if(kernelType == "poly")
-        params.kernel_type = CvSVM::POLY; // polynomial
-    else if(kernelType == "sigmoid")
-        params.kernel_type = CvSVM::SIGMOID;
-    else
-        ROS_ERROR_STREAM("Unknown SVM kernel type: " << kernelType);
+    std::string kernelName = "linear"; m_privateNodeHandle.getParamCached("svm_kernel_type", kernelName);
 
-    ROS_INFO_STREAM("Automatically training SVM classifier with " << kernelType << " kernel using cross-validation... this may take a while!");
-    m_svm->train_auto(featureMatrix, labelVector, cv::Mat(), maskSamplesWithNonfiniteValues(featureMatrix), params);
+    int kernel = cv::ml::SVM::LINEAR;
+    if(kernelName == "linear")
+        kernel = cv::ml::SVM::LINEAR;
+    else if(kernelName == "rbf")
+        kernel = cv::ml::SVM::RBF;
+    else if(kernelName == "poly")
+        kernel = cv::ml::SVM::POLY; // polynomial
+    else if(kernelName == "sigmoid")
+        kernel = cv::ml::SVM::SIGMOID;
+    else {
+        ROS_ERROR_STREAM("Unknown SVM kernel type: " << kernelName);
+        return;
+    }
+
+    m_svm->setType(cv::ml::SVM::C_SVC);
+    m_svm->setC(0.1);
+    m_svm->setKernel(kernel);
+
+    ROS_INFO_STREAM("Automatically training SVM classifier with " << kernelName << " kernel using cross-validation... this may take a while!");
+    
+    cv::Ptr<cv::ml::TrainData> trainData = cv::ml::TrainData::create(featureMatrix, cv::ml::ROW_SAMPLE, labelVector, cv::noArray(), maskSamplesWithNonfiniteValues(featureMatrix));
+    m_svm->trainAuto(trainData);
 }
 
 

@@ -71,8 +71,8 @@ namespace spencer_tracking_rviz_plugin
         struct RelationVisual {
             std::string type;
             double relationStrength;
-            shared_ptr<rviz::BillboardLine> relationLine;
-            shared_ptr<TextNode> relationText;
+            boost::shared_ptr<rviz::BillboardLine> relationLine;
+            boost::shared_ptr<TextNode> relationText;
             track_id trackId1, trackId2; // required to hide certain tracks
         };
 
@@ -80,10 +80,10 @@ namespace spencer_tracking_rviz_plugin
         void processMessage(const spencer_social_relation_msgs::SocialRelations::ConstPtr& msg);
         
         // Helper functions
-        void updateRelationVisualStyles(shared_ptr<RelationVisual>& relationVisual);
+        void updateRelationVisualStyles(boost::shared_ptr<RelationVisual>& relationVisual);
         
         // Scene node for group affiliation history visualization
-        shared_ptr<Ogre::SceneNode> m_socialRelationsSceneNode;
+        boost::shared_ptr<Ogre::SceneNode> m_socialRelationsSceneNode;
 
         // User-editable property variables.
         rviz::StringProperty* m_relation_type_filter_property;
@@ -96,7 +96,7 @@ namespace spencer_tracking_rviz_plugin
         rviz::ColorProperty* m_negative_person_relations_color;
 
         // State variables
-        vector<shared_ptr<RelationVisual> > m_relationVisuals;
+        vector<boost::shared_ptr<RelationVisual> > m_relationVisuals;
         TrackedPersonsCache m_trackedPersonsCache;
 
     private Q_SLOTS:

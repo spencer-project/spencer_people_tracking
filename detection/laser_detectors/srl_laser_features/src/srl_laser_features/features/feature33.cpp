@@ -31,6 +31,7 @@
 */
 
 #include <srl_laser_features/features/feature33.h>
+#include <cmath>
 
 namespace srl_laser_features {
 
@@ -39,7 +40,7 @@ void Feature33::evaluate(const Segment& segment, Eigen::VectorXd& result) const
 	result = Eigen::Vector2d();
 
 	// distance between first point of segment and preceding point
-	if( isnan(segment.precedingPoint(0)) || isnan(segment.precedingPoint(1)) ) {
+	if( std::isnan(segment.precedingPoint(0)) || std::isnan(segment.precedingPoint(1)) ) {
 		// No preceding point exists
 		result(0) = -1.0;
 	}
@@ -48,7 +49,7 @@ void Feature33::evaluate(const Segment& segment, Eigen::VectorXd& result) const
 	}
 
 	// distance between last point of segment and succeeding point
-	if( isnan(segment.succeedingPoint(0)) || isnan(segment.succeedingPoint(1)) ) {
+	if( std::isnan(segment.succeedingPoint(0)) || std::isnan(segment.succeedingPoint(1)) ) {
 		// No succeeding point exists
 		result(1) = -1.0;
 	}

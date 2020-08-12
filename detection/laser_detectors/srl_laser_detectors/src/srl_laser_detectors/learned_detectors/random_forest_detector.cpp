@@ -36,7 +36,7 @@ namespace srl_laser_detectors {
 
 RandomForestDetector::RandomForestDetector(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle) : OpenCvDetector(nodeHandle, privateNodeHandle)
 {
-    m_randomForest.reset( new CvRTrees() );
+    m_randomForest = cv::ml::RTrees::create();
     loadModel();
 
     m_privateNodeHandle.param<double>("decision_threshold", m_decisionThreshold, 0.5); // probability in this case
@@ -48,34 +48,35 @@ const std::string RandomForestDetector::getName()
     return "random_forest";
 }
 
-CvStatModel* RandomForestDetector::getStatModel()
+cv::ml::StatModel* RandomForestDetector::getStatModel()
 {
     return m_randomForest.get();
 }
 
 void RandomForestDetector::classifyFeatureVector(const cv::Mat& featureVector, Label& label, double& confidence)
 {
-    confidence = m_randomForest->predict_prob(featureVector);
+    const int num_trees = m_randomForest->getTermCriteria().maxCount;
+    double sum_votes = m_randomForest->predict(featureVector, cv::noArray(), cv::ml::DTrees::PREDICT_SUM);
+    confidence = sum_votes / num_trees;
     label = confidence > m_decisionThreshold ? FOREGROUND : BACKGROUND;
 }
 
 void RandomForestDetector::trainOnFeatures(const cv::Mat& featureMatrix, const cv::Mat& labelVector)
 {
-    CvRTParams params;
-
-    double sufficientAccuracy = -1.0; int numTrees = 50; int minSampleCount = 10;
-    m_privateNodeHandle.getParamCached("rf_sufficient_accuracy", sufficientAccuracy); // not used with CV_TERMCRIT_ITER!
+    double sufficientAccuracy = -1.0; int numTrees = 50; int minSampleCount = 10; int maxTreeDepth = 5;
+    m_privateNodeHandle.getParamCached("rf_sufficient_accuracy", sufficientAccuracy);
     m_privateNodeHandle.getParamCached("rf_num_trees", numTrees);
-    m_privateNodeHandle.getParamCached("rf_min_sample_count", minSampleCount);
+    m_privateNodeHandle.getParamCached("rf_min_sample_count", minSampleCount); // FIXME: unused
+    m_privateNodeHandle.getParamCached("rf_max_depth", maxTreeDepth);
 
-    params.term_crit = cvTermCriteria( CV_TERMCRIT_ITER + (sufficientAccuracy >= 0.0 ? CV_TERMCRIT_EPS : 0), numTrees, sufficientAccuracy );
+    ROS_INFO_STREAM("Training Random Forest classifier with " << numTrees << " trees and depth " << maxTreeDepth << "... this may take a while!");
 
-    params.max_depth = 5;
-    m_privateNodeHandle.getParamCached("rf_max_depth", params.max_depth);
+    //m_randomForest->setRegressionAccuracy(sufficientAccuracy);
+    m_randomForest->setMaxDepth(maxTreeDepth);
+    m_randomForest->setTermCriteria(cv::TermCriteria( cv::TermCriteria::MAX_ITER + (sufficientAccuracy >= 0.0 ? cv::TermCriteria::EPS : 0), numTrees, sufficientAccuracy) );
 
-
-    ROS_INFO_STREAM("Training Random Forest classifier with " << numTrees << " trees and depth " << params.max_depth << "... this may take a while!");
-    m_randomForest->train(featureMatrix, CV_ROW_SAMPLE, labelVector, cv::Mat(), maskSamplesWithNonfiniteValues(featureMatrix), cv::Mat(), cv::Mat(), params);
+    cv::Ptr<cv::ml::TrainData> trainData = cv::ml::TrainData::create(featureMatrix, cv::ml::ROW_SAMPLE, labelVector, cv::noArray(), maskSamplesWithNonfiniteValues(featureMatrix));
+    m_randomForest->train(trainData);
 }
 
 

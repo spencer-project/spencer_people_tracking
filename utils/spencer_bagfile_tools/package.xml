@@ -72,6 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <run_depend>compressed_image_transport</run_depend>
   <run_depend>compressed_depth_image_transport</run_depend>
   <run_depend>rospy</run_depend>
+  <run_depend>jsk_topic_tools</run_depend>
 
 <build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>
 

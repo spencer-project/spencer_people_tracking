@@ -82,9 +82,9 @@ namespace spencer_tracking_rviz_plugin
 
     private:
         struct SocialActivityVisual {
-            vector<shared_ptr<rviz::Shape> > socialActivityAssignmentCircles;
-            vector<shared_ptr<rviz::BillboardLine> > connectionLines;
-            vector< shared_ptr<TextNode> > typeTexts;
+            vector<boost::shared_ptr<rviz::Shape> > socialActivityAssignmentCircles;
+            vector<boost::shared_ptr<rviz::BillboardLine> > connectionLines;
+            vector< boost::shared_ptr<TextNode> > typeTexts;
             vector<track_id> trackIds;
             activity_type activityType;
             float confidence;
@@ -97,12 +97,12 @@ namespace spencer_tracking_rviz_plugin
         void processMessage(const spencer_social_relation_msgs::SocialActivities::ConstPtr& msg);
 
         // Helper functions
-        void updateSocialActivityVisualStyles(shared_ptr<SocialActivityVisual>& groupVisual);
+        void updateSocialActivityVisualStyles(boost::shared_ptr<SocialActivityVisual>& groupVisual);
         bool isActivityTypeHidden(activity_type activityType);
         Ogre::ColourValue getActivityColor(activity_type activityType, float confidence);
 
         // Scene nodes
-        shared_ptr<Ogre::SceneNode> m_socialActivitiesSceneNode;
+        boost::shared_ptr<Ogre::SceneNode> m_socialActivitiesSceneNode;
 
         // User-editable property variables.
         rviz::StringProperty* m_excluded_activity_types_property;
@@ -141,12 +141,12 @@ namespace spencer_tracking_rviz_plugin
 
         // State variables
         struct PersonVisualContainer {
-            shared_ptr<PersonVisual> personVisual;
-            shared_ptr<Ogre::SceneNode> sceneNode;
+            boost::shared_ptr<PersonVisual> personVisual;
+            boost::shared_ptr<Ogre::SceneNode> sceneNode;
             track_id trackId;
         };
 
-        vector<shared_ptr<SocialActivityVisual> > m_socialActivityVisuals;
+        vector<boost::shared_ptr<SocialActivityVisual> > m_socialActivityVisuals;
         map<track_id, PersonVisualContainer > m_personVisualMap; // to keep person visuals alive across multiple frames, for walking animation
 
         map<track_id, ActivityWithConfidence> m_highestConfidenceActivityPerTrack; // only highest-confidence activity per person

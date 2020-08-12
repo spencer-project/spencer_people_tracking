@@ -1,22 +1,28 @@
 # GPU support (only works if nvidia-container-toolkit is installed on the docker host)!
-FROM nvidia/cudagl:10.1-runtime-ubuntu16.04
-RUN apt-get update && apt-get install -y lsb-release && rm -rf /var/lib/apt/lists/*
+FROM nvidia/cudagl:10.1-runtime-ubuntu18.04
+RUN apt-get update && apt-get install -y lsb-release curl && rm -rf /var/lib/apt/lists/*
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-# Following block originates from https://github.com/osrf/docker_images/blob/master/ros/kinetic/ubuntu/xenial/ros-core/Dockerfile
-# and http://wiki.ros.org/kinetic/Installation/Ubuntu
+# Following block originates from https://github.com/osrf/docker_images/blob/master/ros/melodic/ubuntu/bionic/ros-core/Dockerfile
+# and http://wiki.ros.org/melodic/Installation/Ubuntu
 # Copyright 2020 Open Source Robotics Foundation (CC-BY 3.0 license)
-RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
-RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-RUN apt-get update && apt-get install -y --no-install-recommends ros-kinetic-perception && rm -rf /var/lib/apt/lists/*
+# setup timezone, otherwise we get prompted for it during docker build
+RUN echo 'Etc/UTC' > /etc/timezone && \
+    ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    apt-get update && \
+    apt-get install -q -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
+RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros1-latest.list
+RUN curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | apt-key add -
+RUN apt-get update && apt-get install -y --no-install-recommends ros-melodic-perception && rm -rf /var/lib/apt/lists/*
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV ROS_DISTRO kinetic
+ENV ROS_DISTRO melodic
 
 # Install build tools
 RUN apt-get update && apt-get install -y \
-      python-catkin-tools tmux vim \
+      python-catkin-tools python-rosdep tmux vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Setup workspace

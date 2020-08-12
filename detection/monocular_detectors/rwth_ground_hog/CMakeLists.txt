@@ -9,8 +9,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs sensor_msgs rwth_p
 pkg_check_modules(CUDAHOG cudaHOG)
 
 ## Include Qt
-find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
-include(${QT_USE_FILE})
+find_package(Qt5 REQUIRED Core Widgets)
+set(QT_LIBRARIES Qt5::Widgets)
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -102,8 +102,6 @@ add_dependencies(groundHOG ${catkin_EXPORTED_TARGETS})
  target_link_libraries(groundHOG
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
-   ${QT_QTCORE_LIBRARY}
-   ${QT_QTGUI_LIBRARY}
    ${CUDAHOG_LIBRARIES}
  )
 

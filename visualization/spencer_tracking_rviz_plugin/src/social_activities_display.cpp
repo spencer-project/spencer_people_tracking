@@ -109,7 +109,7 @@ void SocialActivitiesDisplay::onInitialize()
     m_commonProperties->color_map_offset->setHidden(true);
 
     // Create a scene node for visualizing group affiliation history
-    m_socialActivitiesSceneNode = shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode());
+    m_socialActivitiesSceneNode = boost::shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode());
 }
 
 SocialActivitiesDisplay::~SocialActivitiesDisplay()
@@ -164,7 +164,7 @@ void SocialActivitiesDisplay::stylesChanged()
         }
     }
 
-    foreach(shared_ptr<SocialActivityVisual> socialActivityVisual, m_socialActivityVisuals) {
+    foreach(boost::shared_ptr<SocialActivityVisual> socialActivityVisual, m_socialActivityVisuals) {
         updateSocialActivityVisualStyles(socialActivityVisual);
     }
 
@@ -260,7 +260,7 @@ void SocialActivitiesDisplay::personVisualTypeChanged()
     stylesChanged();
 }
 
-void SocialActivitiesDisplay::updateSocialActivityVisualStyles(shared_ptr<SocialActivityVisual>& socialActivityVisual)
+void SocialActivitiesDisplay::updateSocialActivityVisualStyles(boost::shared_ptr<SocialActivityVisual>& socialActivityVisual)
 {
     std::stringstream ss;
 
@@ -268,14 +268,14 @@ void SocialActivitiesDisplay::updateSocialActivityVisualStyles(shared_ptr<Social
     bool hideActivity = isActivityTypeHidden(socialActivityVisual->activityType) || socialActivityVisual->confidence < m_min_confidence_property->getFloat();
     bool showCircles = m_render_circles_property->getBool();
 
-    foreach(shared_ptr<rviz::Shape> circle, socialActivityVisual->socialActivityAssignmentCircles) {
+    foreach(boost::shared_ptr<rviz::Shape> circle, socialActivityVisual->socialActivityAssignmentCircles) {
         circle->setColor(activityColor.r, activityColor.g, activityColor.b, activityColor.a * m_circle_alpha_property->getFloat() * (showCircles ? 1.0f : 0.0f));
         const double circleDiameter = m_circle_radius_property->getFloat() * 2, circleHeight = 0;
         circle->setScale(shapeQuaternion * Ogre::Vector3(circleDiameter, circleDiameter, circleHeight));
     }
 
     double connectionLineVisibilityAlpha = m_render_intraactivity_connections_property->getBool() ? 1.0 : 0.0;
-    foreach(shared_ptr<rviz::BillboardLine> connectionLine, socialActivityVisual->connectionLines) {
+    foreach(boost::shared_ptr<rviz::BillboardLine> connectionLine, socialActivityVisual->connectionLines) {
         connectionLine->setColor(activityColor.r, activityColor.g, activityColor.b, activityColor.a * connectionLineVisibilityAlpha);
         connectionLine->setLineWidth(m_line_width_property->getFloat());
     }
@@ -285,14 +285,14 @@ void SocialActivitiesDisplay::updateSocialActivityVisualStyles(shared_ptr<Social
     if(m_render_confidences_property->getBool()) ss << fixed << setprecision(1) << " (" << 100*socialActivityVisual->confidence << "%)";
 
     for(int i = 0; i < socialActivityVisual->typeTexts.size(); i++) {
-        shared_ptr<TextNode>& typeText = socialActivityVisual->typeTexts[i];
+        boost::shared_ptr<TextNode>& typeText = socialActivityVisual->typeTexts[i];
 
         if(typeText) { // might be not set if center of activity could not be determined
             typeText->setCaption(ss.str());
 
             Ogre::Vector3 centerAt;
             if(m_activity_type_per_track_property->getBool()) {
-                shared_ptr<CachedTrackedPerson> trackedPerson = m_trackedPersonsCache.lookup(socialActivityVisual->trackIds[i]);
+                boost::shared_ptr<CachedTrackedPerson> trackedPerson = m_trackedPersonsCache.lookup(socialActivityVisual->trackIds[i]);
                 if(!trackedPerson) continue;
                 centerAt = Ogre::Vector3(trackedPerson->center.x, trackedPerson->center.y, m_commonProperties->z_offset->getFloat());
             }
@@ -347,7 +347,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
     foreach (const spencer_social_relation_msgs::SocialActivity& socialActivity, msg->elements)
     {
         // Create a new visual representation of the social activity
-        shared_ptr<SocialActivityVisual> socialActivityVisual = shared_ptr<SocialActivityVisual>(new SocialActivityVisual);
+        boost::shared_ptr<SocialActivityVisual> socialActivityVisual = boost::shared_ptr<SocialActivityVisual>(new SocialActivityVisual);
         socialActivityVisual->activityType = socialActivity.type;
         socialActivityVisual->confidence = socialActivity.confidence;
         socialActivityVisual->personCount = socialActivity.track_ids.size();
@@ -363,7 +363,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
         for(size_t trackIndex = 0; trackIndex < socialActivity.track_ids.size(); trackIndex++)
         {
             const track_id trackId = socialActivity.track_ids[trackIndex];
-            shared_ptr<CachedTrackedPerson> trackedPerson = m_trackedPersonsCache.lookup(trackId);
+            boost::shared_ptr<CachedTrackedPerson> trackedPerson = m_trackedPersonsCache.lookup(trackId);
 
             ActivityWithConfidence activityWithConfidence;
             activityWithConfidence.type = socialActivity.type;
@@ -403,7 +403,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
 
                 if(m_render_circles_property->getBool()) // only create circles if they are enabled, for better performance
                 {
-                    shared_ptr<rviz::Shape> circle = shared_ptr<rviz::Shape>(new rviz::Shape(rviz::Shape::Cylinder, context_->getSceneManager(), m_socialActivitiesSceneNode.get()));
+                    boost::shared_ptr<rviz::Shape> circle = boost::shared_ptr<rviz::Shape>(new rviz::Shape(rviz::Shape::Cylinder, context_->getSceneManager(), m_socialActivitiesSceneNode.get()));
 
                     const double circleHeight = 0;
                     circle->setOrientation(shapeQuaternion);
@@ -424,7 +424,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
                     for(size_t otherTrackIndex = trackIndex + 1; otherTrackIndex < socialActivity.track_ids.size(); otherTrackIndex++)
                     {
                         const track_id otherTrackId = socialActivity.track_ids[otherTrackIndex];
-                        shared_ptr<CachedTrackedPerson> otherTrackedPerson = m_trackedPersonsCache.lookup(otherTrackId);
+                        boost::shared_ptr<CachedTrackedPerson> otherTrackedPerson = m_trackedPersonsCache.lookup(otherTrackId);
 
                         // Get other track's position
                         if(otherTrackedPerson) {
@@ -434,7 +434,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
                             const Ogre::Vector3& position2 = verticalShift + otherTrackedPerson->center;
 
                             // Add line connecting the two tracks
-                            shared_ptr<rviz::BillboardLine> connectionLine(new rviz::BillboardLine(context_->getSceneManager(), m_socialActivitiesSceneNode.get()));
+                            boost::shared_ptr<rviz::BillboardLine> connectionLine(new rviz::BillboardLine(context_->getSceneManager(), m_socialActivitiesSceneNode.get()));
                             connectionLine->setMaxPointsPerLine(2);
                             connectionLine->addPoint(position1);
                             connectionLine->addPoint(position2);
@@ -457,7 +457,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
         // Social activity type
         if(numGoodTracksInActivity > 0) {
             for(int i = 0; i < (m_activity_type_per_track_property->getBool() ? socialActivityVisual->trackIds.size() : 1); i++) {
-                shared_ptr<TextNode> typeText(new TextNode(context_->getSceneManager(), m_socialActivitiesSceneNode.get()));
+                boost::shared_ptr<TextNode> typeText(new TextNode(context_->getSceneManager(), m_socialActivitiesSceneNode.get()));
                 typeText->showOnTop();
                 socialActivityVisual->typeTexts.push_back(typeText);
             }
@@ -472,7 +472,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
     for(size_t i = 0; i < msg->elements.size(); i++)
     {
         const spencer_social_relation_msgs::SocialActivity& socialActivity = msg->elements[i];
-        shared_ptr<SocialActivityVisual> socialActivityVisual = m_socialActivityVisuals[i];
+        boost::shared_ptr<SocialActivityVisual> socialActivityVisual = m_socialActivityVisuals[i];
         size_t maxIndexOfThisActivity = 0;
 
         for(size_t trackIndex = 0; trackIndex < socialActivity.track_ids.size(); trackIndex++)
@@ -501,7 +501,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
     set<track_id> seenTrackIds;
     foreach(const TrackedPersonsCache::CachedTrackedPersonsMap::value_type& entry, m_trackedPersonsCache.getMap()) {
         const track_id trackId = entry.first;
-        const shared_ptr<CachedTrackedPerson> trackedPerson = entry.second;
+        const boost::shared_ptr<CachedTrackedPerson> trackedPerson = entry.second;
 
         PersonVisualContainer personVisualContainer;
         if(m_personVisualMap.find(trackId) != m_personVisualMap.end()) {
@@ -509,7 +509,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
         }
         else {
             personVisualContainer.trackId = trackId;
-            personVisualContainer.sceneNode = shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode()); // This scene node is the parent of all visualization elements for the tracked person
+            personVisualContainer.sceneNode = boost::shared_ptr<Ogre::SceneNode>(scene_node_->createChildSceneNode()); // This scene node is the parent of all visualization elements for the tracked person
         }
 
         // Create new visual for the person itself, if needed
@@ -521,7 +521,7 @@ void SocialActivitiesDisplay::processMessage(const spencer_social_relation_msgs:
 
         // Update walking animation if required
         const Ogre::Vector3 velocityVector = getVelocityVector(trackedPerson->twist);
-        shared_ptr<MeshPersonVisual> meshPersonVisual = boost::dynamic_pointer_cast<MeshPersonVisual>(personVisualContainer.personVisual);
+        boost::shared_ptr<MeshPersonVisual> meshPersonVisual = boost::dynamic_pointer_cast<MeshPersonVisual>(personVisualContainer.personVisual);
         if(meshPersonVisual) {
             meshPersonVisual->setWalkingSpeed(velocityVector.length());
         }

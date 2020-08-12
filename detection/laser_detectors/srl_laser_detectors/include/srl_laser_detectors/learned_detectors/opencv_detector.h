@@ -66,7 +66,7 @@ protected:
     virtual const std::string getName() = 0;
 
     /// Get the underlying statistical model (base interface of all OpenCV classifiers). Must not be NULL.
-    virtual CvStatModel* getStatModel() = 0;
+    virtual cv::ml::StatModel* getStatModel() = 0;
 
     /// Classifies the feature vector of a single segment using the learned model. Returned confidence should be always 1.0 if classifier is non-probabilistic.
     virtual void classifyFeatureVector(const cv::Mat& featureVector, Label& label, double& confidence) = 0;

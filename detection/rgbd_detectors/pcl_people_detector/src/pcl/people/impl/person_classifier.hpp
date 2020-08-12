@@ -42,8 +42,11 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/gpu/gpu.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+
+#ifdef OPENCV_HAS_CUDA
+#include <opencv2/cudaobjdetect.hpp>
+#endif
 
 #include <assert.h>
 
@@ -127,8 +130,12 @@ pcl::people::PersonClassifier<PointT>::getSVM (int& window_height, int& window_w
 template <typename PointT> void
 pcl::people::PersonClassifier<PointT>::useOpenCVGpuClassifier(bool enable)
 {
+#ifdef OPENCV_HAS_CUDA
     use_opencv_gpu_classifier_ = enable;
     setSVM(128, 64, cv::gpu::HOGDescriptor::getPeopleDetector64x128(), 0.0);
+#else
+    if(enable) PCL_ERROR("[pcl::people::PersonClassifier::useOpenCVGpuClassifier] OpenCV has not been compiled with CUDA support!\n");
+#endif
 }
 
 
@@ -246,6 +253,11 @@ pcl::people::PersonClassifier<PointT>::evaluate (cv::Mat& rgbImage,
     }
     else // GPU-based classifier
     {
+      #ifdef OPENCV_HAS_CUDA
+        // This code must be updated according to the following API: https://docs.opencv.org/master/de/da6/classcv_1_1cuda_1_1HOG.html
+        // However, note that this requires OpenCV to be compiled from source with CUDA support enabled.
+        #error GPU-based classifier has not yet been ported to OpenCV3/4.
+
         // NOTE: SVM parameters can still be set externally using setSVM(). Use e.g. cv::gpu::HOGDescriptor::getPeopleDetector64x128();
         const bool gammaCorrectionEnabled = false;
         const int numLevels = 16;
@@ -271,6 +283,7 @@ pcl::people::PersonClassifier<PointT>::evaluate (cv::Mat& rgbImage,
 
         assert(confidences.size() == 1);
         confidence = confidences[0];
+      #endif
     }
 
     if(!rgbImageVisualization.empty()) {

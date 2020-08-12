@@ -17,14 +17,17 @@
   <build_depend>spencer_tracking_msgs</build_depend>
   <build_depend>spencer_social_relation_msgs</build_depend>
   <build_depend>spencer_human_attribute_msgs</build_depend>
-  
+  <build_depend>roslib</build_depend>
+
   <run_depend>rviz</run_depend>
   <run_depend>spencer_tracking_msgs</run_depend>
   <run_depend>spencer_social_relation_msgs</run_depend>
   <run_depend>spencer_human_attribute_msgs</run_depend>
+  <run_depend>roslib</run_depend>
 
 
   <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
-<build_depend>roslib</build_depend><run_depend>roslib</run_depend></package>
+
+</package>

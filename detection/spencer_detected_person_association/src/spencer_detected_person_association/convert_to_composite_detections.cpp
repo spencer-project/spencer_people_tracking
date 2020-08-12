@@ -81,7 +81,7 @@ namespace spencer_detected_person_association
 
     void ConvertToCompositeDetectionsNodelet::monitorInputTopic()
     {
-        boost::posix_time::seconds monitorInterval( m_topicMonitorInterval );
+        boost::chrono::milliseconds monitorInterval( int(m_topicMonitorInterval * 1000.0) );
 
         while(true) {
             bool deadInputTopic = ros::Time::now().toSec() - m_lastMessageReceivedAt.toSec() > m_assumeTopicDeadAfter;
@@ -104,7 +104,7 @@ namespace spencer_detected_person_association
             }
 
             // Sleep for a while
-            try { boost::this_thread::sleep(monitorInterval); }
+            try { boost::this_thread::sleep_for(monitorInterval); }
             catch(boost::thread_interrupted&) { return; } // stop thread
         }
     }
@@ -199,4 +199,4 @@ namespace spencer_detected_person_association
 }
 
 
-PLUGINLIB_DECLARE_CLASS(spencer_detected_person_association, ConvertToCompositeDetectionsNodelet, spencer_detected_person_association::ConvertToCompositeDetectionsNodelet, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(spencer_detected_person_association::ConvertToCompositeDetectionsNodelet, nodelet::Nodelet)
