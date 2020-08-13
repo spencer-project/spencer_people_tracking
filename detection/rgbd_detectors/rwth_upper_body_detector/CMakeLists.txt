@@ -4,7 +4,7 @@ project(rwth_upper_body_detector)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge sensor_msgs std_msgs rwth_perception_people_msgs message_filters geometry_msgs image_transport spencer_diagnostics spencer_tracking_msgs ground_plane_estimation visualization_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge sensor_msgs std_msgs rwth_perception_people_msgs message_filters geometry_msgs image_transport spencer_diagnostics spencer_tracking_msgs visualization_msgs)
 
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
@@ -61,11 +61,15 @@ endif()
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES upper_body_detector
-   CATKIN_DEPENDS cv_bridge roscpp sensor_msgs std_msgs rwth_perception_people_msgs
-    geometry_msgs 
-    ground_plane_estimation
-    image_transport 
-    message_filters    
+   CATKIN_DEPENDS
+    cv_bridge
+    roscpp
+    sensor_msgs
+    std_msgs
+    rwth_perception_people_msgs
+    geometry_msgs
+    image_transport
+    message_filters
     visualization_msgs
 #  DEPENDS system_lib
 )
@@ -88,7 +92,7 @@ include_directories( include
 # )
 
 ## Declare a cpp executable
-add_executable(upper_body_detector src/main.cpp src/Camera.cpp src/Globals.cpp src/KConnectedComponentLabeler.cpp src/Math.cpp src/pointcloud.cpp src/ROI.cpp src/CPoint.cpp src/detector.cpp src/AncillaryMethods.cpp src/Hypo.cpp src/FrameInlier.cpp) 
+add_executable(upper_body_detector src/main.cpp src/Camera.cpp src/Globals.cpp src/KConnectedComponentLabeler.cpp src/Math.cpp src/pointcloud.cpp src/ROI.cpp src/detector.cpp src/AncillaryMethods.cpp src/Hypo.cpp src/FrameInlier.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

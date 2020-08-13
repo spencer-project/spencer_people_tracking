@@ -8,6 +8,7 @@
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
@@ -45,7 +46,6 @@ using namespace sensor_msgs;
 using namespace message_filters;
 using namespace rwth_perception_people_msgs;
 
-
 ros::Publisher pub_message;
 image_transport::Publisher pub_result_image;
 ros::Publisher pub_centres;
@@ -58,7 +58,8 @@ VisualisationMarkers* vm;
 
 cv::Mat img_depth_;
 cv_bridge::CvImagePtr cv_depth_ptr;	// cv_bridge for depth image
-//cv_bridge::CvImagePtr cv_color_ptr;
+ImageConstPtr color_image; // we cache the most recent color image for visualization purposes if somebody is listening
+string topic_color_image;
 
 Matrix<double>* upper_body_template;
 Detector* detector;
@@ -66,77 +67,6 @@ Detector* detector;
 int detection_id_increment, detection_id_offset, current_detection_id; // added for multi-sensor use in SPENCER
 double pose_variance; // used in output spencer_tracking_msgs::DetectedPerson.pose.covariance
 
-void PrintMatrix2File(cv::Mat Mat, char filename[])
-{
-    //FILE* pFile;
-    //pFile = fopen(filename, "w");
-    //CvSize Size = cvGetSize(Mat);
-
-    ROS_INFO("image path: %s",filename);
-
-    std::ofstream fs;
-    fs.open(filename);
-    if (fs.is_open())
-    {
-        ROS_INFO("file opened: %s",filename);
-    }
-    else
-    {
-        ROS_INFO("error openning file: %s",filename);
-    }
-    for (int i = 0;i<Mat.rows;i++)
-	{
-        for(int j = 0;j<Mat.cols;j++)
-		{
-            float val = Mat.at<float>(i, j);
-            fs << val << " ";
-//            ROS_INFO("val:%f",val);
-            //CvScalar El = cvGet2D(Mat, i, j);
-            //fprintf(pFile, "%f;" , El.val[0]);
-			//fprintf(pFile, "%f;" , cvmGet(Mat, i, j));
-		}
-        // fprintf(pFile, "\n");
-        fs << std::endl;
-	}
-    //fclose(pFile);
-    fs.close();
-}
-
-void PrintMatrix2File_ushort(cv::Mat Mat, char filename[])
-{
-    //FILE* pFile;
-    //pFile = fopen(filename, "w");
-    //CvSize Size = cvGetSize(Mat);
-
-    ROS_INFO("image path: %s",filename);
-
-    std::ofstream fs;
-    fs.open(filename);
-    if (fs.is_open())
-    {
-        ROS_INFO("file opened: %s",filename);
-    }
-    else
-    {
-        ROS_INFO("error openning file: %s",filename);
-    }
-    for (int i = 0;i<Mat.rows;i++)
-    {
-        for(int j = 0;j<Mat.cols;j++)
-        {
-            int val = Mat.at<ushort>(i, j);
-            fs << val << " ";
-//            ROS_INFO("val:%f",val);
-            //CvScalar El = cvGet2D(Mat, i, j);
-            //fprintf(pFile, "%f;" , El.val[0]);
-            //fprintf(pFile, "%f;" , cvmGet(Mat, i, j));
-        }
-        // fprintf(pFile, "\n");
-        fs << std::endl;
-    }
-    //fclose(pFile);
-    fs.close();
-}
 
 void render_bbox_2D(UpperBodyDetector& detections, QImage& image,
                     int r, int g, int b, int lineWidth)
@@ -158,9 +88,8 @@ void render_bbox_2D(UpperBodyDetector& detections, QImage& image,
         int y =(int) detections.pos_y[i];
         int w =(int) detections.width[i];
         int h =(int) detections.height[i];
-       // ROS_INFO("detection x:%i, y:%i, w:%i, h:%i", x,y,w,h);
 
-        if (x+w<image.width() & y+h < image.height())
+        if (x+w<image.width() && y+h < image.height())
         {
             painter.drawLine(x,y, x+w,y);
             painter.drawLine(x,y, x,y+h);
@@ -272,6 +201,10 @@ void ReadUpperBodyTemplate(std::vector<double> up_temp, int x_size, int y_size)
     }
 }
 
+void colorImageCallback(const ImageConstPtr &color) {
+    color_image = color;
+}
+
 visualization_msgs::MarkerArray createVisualisation(geometry_msgs::PoseArray poses, std::string target_frame) {
     ROS_DEBUG("Creating markers");
     visualization_msgs::MarkerArray marker_array;
@@ -282,10 +215,14 @@ visualization_msgs::MarkerArray createVisualisation(geometry_msgs::PoseArray pos
     return marker_array;
 }
 
-void callback(const ImageConstPtr &depth, const ImageConstPtr &color,const GroundPlane::ConstPtr &gp, const CameraInfoConstPtr &info)
+void callback(const ImageConstPtr &depth, const GroundPlane::ConstPtr &gp, const CameraInfoConstPtr &info)
 {
     // Check if calculation is necessary
-    bool vis = pub_result_image.getNumSubscribers() > 0 || pub_markers.getNumSubscribers() > 0 || pub_detected_persons.getNumSubscribers() > 0;
+    bool detect = pub_message.getNumSubscribers() > 0 || pub_centres.getNumSubscribers() > 0 || pub_detected_persons.getNumSubscribers() > 0;
+    bool vis = pub_result_image.getNumSubscribers() > 0 || pub_markers.getNumSubscribers() > 0;
+
+    if(!detect && !vis)
+        return;
 
     // Get depth image as matrix
     cv_depth_ptr = cv_bridge::toCvCopy(depth);
@@ -293,22 +230,23 @@ void callback(const ImageConstPtr &depth, const ImageConstPtr &color,const Groun
     Matrix<double> matrix_depth(info->width, info->height);
     for (int r = 0;r < info->height;r++){
         for (int c = 0;c < info->width;c++) {
-            
-	    int inttype = img_depth_.type();
-	    uchar type = inttype & CV_MAT_DEPTH_MASK;
-	    if (type == CV_32F) {
-		matrix_depth(c, r) = img_depth_.at<float>(r,c) / Globals::DEPTH_SCALE;
-	    } else if (type == CV_16U) {
-		float raw_val = img_depth_.at<ushort>(r,c);
-		if (raw_val == 0) { // Please double-check if 0 corresponds to NaN.
-		    matrix_depth(c, r) = nanf("");
-		} else {
-		    matrix_depth(c, r) = raw_val / Globals::DEPTH_SCALE;
-		}
-	    } else {
-		ROS_ERROR("Unknown depth-map type, no detections.");
-	    }
-		
+            int inttype = img_depth_.type();
+            uchar type = inttype & CV_MAT_DEPTH_MASK;
+            if (type == CV_32F) {
+                matrix_depth(c, r) = img_depth_.at<float>(r,c) / Globals::DEPTH_SCALE;
+            }
+            else if (type == CV_16U) {
+                float raw_val = img_depth_.at<ushort>(r,c);
+                if (raw_val == 0) { // Please double-check if 0 corresponds to NaN.
+                    matrix_depth(c, r) = nanf("");
+                }
+                else {
+                    matrix_depth(c, r) = raw_val / Globals::DEPTH_SCALE;
+                }
+            }
+            else {
+                ROS_ERROR("Unknown depth format in image message received by upper-body detector. Only CV_32F or CV_16U are supported. Will not output any detections.");
+            }
         }
     }
 
@@ -325,33 +263,9 @@ void callback(const ImageConstPtr &depth, const ImageConstPtr &color,const Groun
     Camera camera(K,R,t,GP);
     PointCloud point_cloud(camera, matrix_depth);
     Vector<Vector< double > > detected_bounding_boxes;
-    //ROS_INFO("upper_body_detector: processing frame...");
-    detector->visualize_roi = true;
+    //detector->visualize_roi = true;
     detector->ProcessFrame(camera, matrix_depth, point_cloud, *upper_body_template, detected_bounding_boxes);
     
-    /*
-    
-    cv::Mat image(cv_depth_ptr->image.rows, cv_depth_ptr->image.cols, CV_8UC3);
-    int x_pos, y_pos;
-    int max_roi = maxOfMatrix(detector->roi_image,x_pos,y_pos);
-    for(int y = 0; y < cv_depth_ptr->image.rows; y++)
-    {
-        for(int x = 0; x < cv_depth_ptr->image.cols; x++)
-        {   
-            unsigned int roi_clr = 0;
-            if (max_roi > 0)
-                roi_clr = (unsigned int)(detector->roi_image(x,y) / max_roi * 255);
-            image.at<cv::Vec3b>(y, x) = cv::Vec3b(roi_clr, 255, 255);
-        }
-    }
-    cv::cvtColor(image, image, CV_HSV2RGB);
-    
-    cv_color_ptr = cv_bridge::toCvCopy(image);
-    cv_color_ptr->image = image;
-    */
-    
-    //ROS_INFO("upper_body_detector: detected...");
-
     // Generate messages
     UpperBodyDetector detection_msg;
     detection_msg.header = depth->header;
@@ -413,51 +327,30 @@ void callback(const ImageConstPtr &depth, const ImageConstPtr &color,const Groun
     }
 
     // Creating a ros image with the detection results an publishing it
-    /*
-    if(vis) {
-        //ROS_DEBUG("Publishing image");
-        QImage image_rgb(&color->data[0], color->width, color->height, QImage::Format_RGB888); // would opencv be better?
-        render_bbox_2D(detection_msg, image_rgb, 0, 0, 255, 2);
+    if(vis && color_image && abs((depth->header.stamp - color_image->header.stamp).toSec()) < 0.2) {  // only if color image is not outdated (not using a synchronizer!)
+        // Check for suppported image format
+        if(color_image->encoding == "rgb8" || color_image->encoding == "bgr8") {
+            ROS_DEBUG("Publishing result image for upper-body detector");
 
-        //ROS_INFO("upper_body_detector: publishing image...");
+            // Make a copy here so that in case `render_bbox_2D` corrupts memory,
+            // we don't corrupt the original buffer in the ROS message and may get better stacktraces.
+            QImage image_rgb = QImage(&color_image->data[0], color_image->width, color_image->height, color_image->step, QImage::Format_RGB888).copy(); // would opencv be better?
+            render_bbox_2D(detection_msg, image_rgb, 0, 0, 255, 2);
+            const uchar *bits = image_rgb.constBits();
 
-        sensor_msgs::Image sensor_image;
-        sensor_image.header = color->header;
-        sensor_image.height = image_rgb.height();
-        sensor_image.width  = image_rgb.width();
-        sensor_image.step   = color->step;
-        vector<unsigned char> image_bits(image_rgb.bits(), image_rgb.bits()+sensor_image.height*sensor_image.width*3);
-        sensor_image.data = image_bits;
-        sensor_image.encoding = color->encoding;
+            sensor_msgs::Image sensor_image;
+            sensor_image.header = color_image->header;
+            sensor_image.height = image_rgb.height();
+            sensor_image.width  = image_rgb.width();
+            sensor_image.step   = image_rgb.bytesPerLine();
+            sensor_image.data   = vector<uchar>(bits, bits + image_rgb.byteCount());
+            sensor_image.encoding = color_image->encoding;
 
-        pub_result_image.publish(sensor_image);
-
-        pub_roi.publish(cv_color_ptr->toImageMsg());
+            pub_result_image.publish(sensor_image);
+        } else {
+            ROS_WARN("Color image not in RGB8/BGR8 format not supported");
+        }
     }
-
-*/
-    if(vis && (color->encoding == "rgb8" || color->encoding == "bgr8")) {
-        ROS_DEBUG("Publishing image");
-
-        // Make a copy here so that in case `render_bbox_2D` corrupts memory,
-        // we don't corrupt the original buffer in the ROS message and may get better stacktraces.
-        QImage image_rgb = QImage(&color->data[0], color->width, color->height, color->step, QImage::Format_RGB888).copy();
-        render_bbox_2D(detection_msg, image_rgb, 255, 0, 0, 2);
-        const uchar *bits = image_rgb.constBits();
-
-        sensor_msgs::Image sensor_image;
-        sensor_image.header = color->header;
-        sensor_image.height = image_rgb.height();
-        sensor_image.width  = image_rgb.width();
-        sensor_image.step   = image_rgb.bytesPerLine();
-        sensor_image.data   = vector<uchar>(bits, bits + image_rgb.byteCount());
-        sensor_image.encoding = color->encoding;
-
-        pub_result_image.publish(sensor_image);
-    } else if(vis && color->encoding != "rgb8" && color->encoding != "bgr8") {
-        ROS_WARN("Color image not in RGB8 or BGR8 format not supported");
-    }
-
 
     // Publishing detections
     pub_message.publish(detection_msg);
@@ -472,9 +365,9 @@ void callback(const ImageConstPtr &depth, const ImageConstPtr &color,const Groun
 // Connection callback that unsubscribes from the tracker if no one is subscribed.
 void connectCallback(message_filters::Subscriber<CameraInfo> &sub_cam,
                      message_filters::Subscriber<GroundPlane> &sub_gp,
-                     image_transport::SubscriberFilter &sub_col,
+                     boost::shared_ptr<image_transport::Subscriber> &sub_col,
                      image_transport::SubscriberFilter &sub_dep,
-                     image_transport::ImageTransport &it){
+                     image_transport::ImageTransport &it) {
     if(!pub_message.getNumSubscribers()
             && !pub_result_image.getNumSubscribers()
             && !pub_centres.getNumSubscribers()
@@ -484,14 +377,17 @@ void connectCallback(message_filters::Subscriber<CameraInfo> &sub_cam,
         ROS_DEBUG("Upper Body Detector: No subscribers. Unsubscribing.");
         sub_cam.unsubscribe();
         sub_gp.unsubscribe();
-        sub_col.unsubscribe();
+        sub_col->shutdown();
         sub_dep.unsubscribe();
     } else {
         ROS_DEBUG("Upper Body Detector: New subscribers. Subscribing.");
         sub_cam.subscribe();
         sub_gp.subscribe();
-        sub_col.subscribe(it,sub_col.getTopic().c_str(),1);
         sub_dep.subscribe(it,sub_dep.getTopic().c_str(),1);
+    }
+
+    if(pub_result_image.getNumSubscribers()) {
+        sub_col = boost::make_shared<image_transport::Subscriber>( it.subscribe(topic_color_image, 1, &colorImageCallback) );
     }
 }
 
@@ -539,7 +435,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    string topic_color_image;
     private_node_handle_.param("rgb_image", topic_color_image, string("/rgb/image_rect_color"));
     topic_color_image = cam_ns + topic_color_image;
     string topic_camera_info;
@@ -554,6 +449,8 @@ int main(int argc, char **argv)
     private_node_handle_.param("detection_id_offset",    detection_id_offset, 0);
     private_node_handle_.param("pose_variance",    pose_variance, 0.05);
 
+    current_detection_id = detection_id_offset;
+
     // Printing queue size
     ROS_DEBUG("upper_body_detector: Queue size for synchronisation is set to: %i", queue_size);
 
@@ -563,10 +460,11 @@ int main(int argc, char **argv)
     // Create a subscriber.
     // Set queue size to 1 because generating a queue here will only pile up images and delay the output by the amount of queued images
     image_transport::SubscriberFilter subscriber_depth;
+    // The color image is not synchronized for performance reasons since it is only needed when somebody is listening to the visualization image topic.
+    // Otherwise, we avoid deserialization -- which can already take 10-20% CPU -- by unsubscribing.
+    boost::shared_ptr<image_transport::Subscriber> subscriber_color;
     subscriber_depth.subscribe(it, topic_depth_image.c_str(),1); subscriber_depth.unsubscribe();
     message_filters::Subscriber<CameraInfo> subscriber_camera_info(n, topic_camera_info.c_str(), 1); subscriber_camera_info.unsubscribe();
-    image_transport::SubscriberFilter subscriber_color;
-    subscriber_color.subscribe(it, topic_color_image.c_str(), 1); subscriber_color.unsubscribe();
     message_filters::Subscriber<GroundPlane> subscriber_gp(n, topic_gp.c_str(), 1); subscriber_gp.unsubscribe();
 
     ros::SubscriberStatusCallback con_cb = boost::bind(&connectCallback,
@@ -583,7 +481,7 @@ int main(int argc, char **argv)
                                                                      boost::ref(it));
 
     //The real queue size for synchronisation is set here.
-    sync_policies::ApproximateTime<Image, Image, GroundPlane, CameraInfo> MySyncPolicy(queue_size);
+    sync_policies::ApproximateTime<Image, GroundPlane, CameraInfo> MySyncPolicy(queue_size);
     MySyncPolicy.setAgePenalty(1000); //set high age penalty to publish older data faster even if it might not be correctly synchronized.
 
     // Initialise detector
@@ -592,14 +490,13 @@ int main(int argc, char **argv)
     detector = new Detector();
 
     // Create synchronization policy. Here: async because time stamps will never match exactly
-    const sync_policies::ApproximateTime<Image, Image, GroundPlane, CameraInfo> MyConstSyncPolicy = MySyncPolicy;
-    Synchronizer< sync_policies::ApproximateTime<Image, Image, GroundPlane, CameraInfo> > sync(MyConstSyncPolicy,
-                                                                                               subscriber_depth,
-                                                                                               subscriber_color,
-                                                                                               subscriber_gp,
-                                                                                               subscriber_camera_info);
+    const sync_policies::ApproximateTime<Image, GroundPlane, CameraInfo> MyConstSyncPolicy = MySyncPolicy;
+    Synchronizer< sync_policies::ApproximateTime<Image, GroundPlane, CameraInfo> > sync(MyConstSyncPolicy,
+                                                                                       subscriber_depth,
+                                                                                       subscriber_gp,
+                                                                                       subscriber_camera_info);
     // Register one callback for all topics
-    sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
+    sync.registerCallback(boost::bind(&callback, _1, _2, _3));
 
 
     // Create publisher
