@@ -57,12 +57,11 @@ if __name__ == '__main__':
     arguments = rospy.myargv()
     rospy.init_node("composite_detections_to_detections")
 
-    
-    compositeDetectedPersonsTopic = rospy.get_param('~inTopic', "/spencer/perception/detected_persons_composite")
+    compositeDetectedPersonsTopic = "/spencer/perception/detected_persons_composite"
     compositeDetectedPersonsSubscriber = rospy.Subscriber(compositeDetectedPersonsTopic, CompositeDetectedPersons, newCompositeDetectedPersonsAvailable, queue_size=5)
 
     global detectedPersonsPublisher
-    detectedPersonsTopic = rospy.get_param('~outTopic', "/spencer/perception/detected_persons")
+    detectedPersonsTopic = "/spencer/perception/detected_persons"
     detectedPersonsPublisher = rospy.Publisher(detectedPersonsTopic, DetectedPersons, queue_size=5)
 
     rospy.loginfo("Re-publishing composite detections from %s as plain detections on %s" % (compositeDetectedPersonsTopic, detectedPersonsTopic))

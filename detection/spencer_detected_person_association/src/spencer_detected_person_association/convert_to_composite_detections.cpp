@@ -49,8 +49,7 @@ namespace spencer_detected_person_association
         m_transformListener.reset(new tf::TransformListener());
 
         // Subscribe to input topic
-        getPrivateNodeHandle().param<std::string>("input", m_inputTopicName, "input");
-        m_subscriber.reset(new ros::Subscriber( getNodeHandle().subscribe<spencer_tracking_msgs::DetectedPersons>(m_inputTopicName, 2, &ConvertToCompositeDetectionsNodelet::onNewInputMessageReceived, this) ));
+        m_subscriber.reset(new ros::Subscriber( getNodeHandle().subscribe<spencer_tracking_msgs::DetectedPersons>("input", 2, &ConvertToCompositeDetectionsNodelet::onNewInputMessageReceived, this) ));
 
         // Read parameters
         m_topicMonitorInterval = 3.0; // How often to check for new topics becoming active or topics going inactive, in seconds
@@ -69,8 +68,7 @@ namespace spencer_detected_person_association
 
 
     void ConvertToCompositeDetectionsNodelet::createPublisher() {
-        getPrivateNodeHandle().param<std::string>("output", m_outputTopicName, "output");
-        m_publisher.reset(new ros::Publisher( getNodeHandle().advertise<spencer_tracking_msgs::CompositeDetectedPersons>(m_outputTopicName, 2) ));
+        m_publisher.reset(new ros::Publisher( getNodeHandle().advertise<spencer_tracking_msgs::CompositeDetectedPersons>("output", 2) ));
     }
 
 

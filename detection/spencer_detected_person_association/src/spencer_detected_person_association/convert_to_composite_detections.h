@@ -75,11 +75,6 @@ namespace spencer_detected_person_association
         boost::mutex m_monitorMutex;
         boost::thread m_monitorThread;
         double m_topicMonitorInterval;
-
-        // Subscriber and Publisher topic names
-        std::string  m_inputTopicName;
-        std::string m_outputTopicName;
-
     };
 }
 

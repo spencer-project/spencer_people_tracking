@@ -47,11 +47,7 @@ ROSInterface::ROSInterface(ros::NodeHandle& nodeHandle, ros::NodeHandle& private
     m_lastCycleTimes.set_capacity(Params::get<int>("cycle_time_buffer_length", 50)); // = size of window for averaging
 
     // Create ROS publishers
-
-    std::string trackedPersonsTopic;
-    m_privateNodeHandle.param<std::string>("tracked_persons_topic", trackedPersonsTopic, "/spencer/perception/tracked_persons");
-
-    m_trackedPersonsPublisher = m_nodeHandle.advertise<spencer_tracking_msgs::TrackedPersons>(trackedPersonsTopic, queue_size);
+    m_trackedPersonsPublisher = m_nodeHandle.advertise<spencer_tracking_msgs::TrackedPersons>("/spencer/perception/tracked_persons", queue_size);
     m_trackedPersonsPublisher.setExpectedFrequency(20.0, 40.0);
     m_trackedPersonsPublisher.setMaximumTimestampOffset(0.3, 0.1);
     m_trackedPersonsPublisher.finalizeSetup();
@@ -67,8 +63,7 @@ ROSInterface::ROSInterface(ros::NodeHandle& nodeHandle, ros::NodeHandle& private
     m_timingMetricsPublisher = m_privateNodeHandle.advertise<spencer_tracking_msgs::TrackingTimingMetrics>("tracking_timing_metrics", 10);
 
     // Create ROS subscribers
-    std::string detectedPersonsTopic;
-    m_privateNodeHandle.param<std::string>("detected_persons_topic", detectedPersonsTopic, "/spencer/perception/detected_persons");
+    const std::string detectedPersonsTopic = "/spencer/perception/detected_persons";
 
     // Subscribe to a single DetectedPersons topic
     ROS_INFO_STREAM("Subscribing to detections topic " << ros::names::remap(detectedPersonsTopic));
