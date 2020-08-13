@@ -2,6 +2,11 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1 (2018-09-14)
+ ------------------
+* Added changes from LCAS versions
+* Contributors: Lucas Beyer, Manuel Fernandez-Carmona, Marc Hanheide
+
 1.0.8 (2017-09-22)
 ------------------
 * Merge pull request `#41 <https://github.com/LCAS/spencer_people_tracking/issues/41>`_ from LCAS/master

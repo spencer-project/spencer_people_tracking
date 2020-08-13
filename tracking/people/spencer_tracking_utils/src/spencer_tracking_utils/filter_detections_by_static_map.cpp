@@ -242,10 +242,19 @@ int main(int argc, char **argv)
         g_modalitiesToAlwaysPassthrough.insert(modality);
     }
 
+    std::string inputTopic;
+    std::string outputTopic;
+    
+    privateHandle.param<std::string>("input_detections", inputTopic, "input_detections");
+    privateHandle.param<std::string>("output_detections", outputTopic,"output_detections");
+    privateHandle.param<std::string>("map_topic", g_mapTopic, "/map");
+
+
+    /*
     std::string inputTopic = ros::names::resolve("input_detections");
     std::string outputTopic = ros::names::resolve("output_detections");
     g_mapTopic = ros::names::resolve("/map");
-    
+    */
     g_transformListener.reset(new tf::TransformListener);
 
     ros::spinOnce();

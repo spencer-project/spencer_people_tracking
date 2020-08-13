@@ -1,6 +1,9 @@
+<?xml version="1.0"?>
+
 <launch>
-    <arg name="config_file" default="$(find rwth_upper_body_detector)/config/config_Asus.inp" />
-    <arg name="template_file" default="$(find rwth_upper_body_detector)/config/upper_temp_n.txt" />
+    <arg name="load_params_from_file" default="true" />
+    <arg name="config_file" default="$(find rwth_upper_body_detector)/config/upper_body_detector.yaml" />
+    <arg name="template_file" default="$(find rwth_upper_body_detector)/config/upper_body_template.yaml" />
     <arg name="queue_size" default="5" />
     <arg name="camera_namespace" default="/head_xtion" />
     <arg name="upper_body_detections" default="/upper_body_detector/detections" />
@@ -10,10 +13,21 @@
     <arg name="detected_persons" default="/detected_persons"/>
     <arg name="detection_id_offset" default="0"/>
     <arg name="detection_id_increment" default="1"/>
+    <arg name="depth_image" default="/depth/image_rect" />
+    <arg name="rgb_image" default="/rgb/image_rect_color" />
+    <arg name="camera_info_depth" default="/depth/camera_info" />
+    <arg name="upper_body_markers" default="/upper_body_detector/marker_array" />
+    <arg name="upper_body_roi" default="/upper_body_detector/roi" />
+    <arg name="upper_body_closest_bb_centres" default="/upper_body_detector/closest_bounding_box_centre" />
+    <arg name="machine" default="localhost" />
+    <arg name="user" default="" />
+
+    <rosparam command="load" file="$(arg config_file)" if="$(arg load_params_from_file)"/>
+    <rosparam command="load" file="$(arg template_file)" if="$(arg load_params_from_file)"/>
+ 
+    <machine name="$(arg machine)" address="$(arg machine)" env-loader="$(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true"/>
     
-    <node pkg="rwth_upper_body_detector" type="upper_body_detector" name="upper_body_detector" output="screen" respawn="true">
-        <param name="config_file" value="$(arg config_file)" type="string"/>
-        <param name="template_file" value="$(arg template_file)" type="string"/>
+    <node pkg="rwth_upper_body_detector" type="upper_body_detector" name="upper_body_detector" output="log" respawn="true">
         <param name="queue_size" value="$(arg queue_size)" type="int"/>
         <param name="camera_namespace" value="$(arg camera_namespace)" type="string"/>
         <param name="upper_body_detections" value="$(arg upper_body_detections)" type="string"/>
@@ -23,6 +37,13 @@
         <param name="detected_persons" value="$(arg detected_persons)" type="string"/>
         <param name="detection_id_offset" value="$(arg detection_id_offset)"/>
         <param name="detection_id_increment" value="$(arg detection_id_increment)"/>
+        <param name="depth_image" value="$(arg depth_image)" type="string"/>
+        <param name="rgb_image" value="$(arg rgb_image)" type="string"/>
+        <param name="camera_info_depth" value="$(arg camera_info_depth)" type="string"/>
+        <param name="upper_body_markers" value="$(arg upper_body_markers)" type="string"/>
+        <param name="upper_body_roi" value="$(arg upper_body_roi)" type="string"/>
+        <param name="upper_body_closest_bb_centres" value="$(arg upper_body_closest_bb_centres)" type="string"/>
+
     </node>
 
 </launch> 
