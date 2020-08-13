@@ -37,7 +37,7 @@
     <group>
         <!-- Remap input topics of detectors from "depth" to "depth_registered" in case we are using the OpenNi 1 driver (for MS Kinect).
              Necessary because OpenNi 1 does not publish both the registered and unregistered depth images (as OpenNi 2 does), and we want to keep depth registration enabled. -->
-        <remap from="/spencer/sensors/rgbd_front_top/depth/image_rect" to="/spencer/sensors/rgbd_front_top/depth_registered/image_rect"  if="$(arg use_openni1)"/>
+        <remap from="/spencer/sensors/rgbd_front_top/depth/image_rect" to="/spencer/sensors/rgbd_front_top/depth_registered/hw_registered/image_rect"  if="$(arg use_openni1)"/>
         <remap from="/spencer/sensors/rgbd_front_top/depth/camera_info" to="/spencer/sensors/rgbd_front_top/depth_registered/camera_info" if="$(arg use_openni1)"/>
 
         <include file="$(find spencer_people_tracking_launch)/launch/detectors/front_rgbd_detectors.launch">
