@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Author: Timm Linder, linder@cs.uni-freiburg.de
 #
 # Publishes fake tracked persons and the corresponding detections (if not occluded) at

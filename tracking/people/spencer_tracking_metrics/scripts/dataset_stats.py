@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -39,7 +39,7 @@ def newTracksAvailable(trackedPersons):
         trackCounts.append(len(trackedPersons.tracks))
         for trackedPerson in trackedPersons.tracks:
             trackIDs.add(trackedPerson.track_id)
-        occludedTracks = filter(lambda person: person.is_occluded, trackedPersons.tracks)
+        occludedTracks = [person for person in trackedPersons.tracks if person.is_occluded]
         occludedTrackCounts.append(len(occludedTracks)) 
         
 

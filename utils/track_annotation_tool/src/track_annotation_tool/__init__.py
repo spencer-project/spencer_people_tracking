@@ -101,7 +101,7 @@ class Simulator(object):
         trackedPersons.header.stamp = timestamp
         trackedPersons.header.frame_id = self.trackingFrame
 
-        for trackKey, track in self.database.getTracks().iteritems():
+        for trackKey, track in self.database.getTracks().items():
             waypoints = self.database.getWaypoints(track)
 
             if waypoints:
@@ -318,7 +318,7 @@ class Visualizer(object):
         trackAlphas = dict()
 
         # Trajectory markers
-        for trackKey, track in self.database.getTracks().iteritems():
+        for trackKey, track in self.database.getTracks().items():
             # Dim alpha of tracks outside of current time window
             oldestStamp = self.database.findOldestTimestamp(track)
             youngestStamp = self.database.findYoungestTimestamp(track)
@@ -350,7 +350,7 @@ class Visualizer(object):
             markerArray.markers.append(trajectoryMarker)
 
         # Waypoint markers
-        for trackKey, track in self.database.getTracks().iteritems():
+        for trackKey, track in self.database.getTracks().items():
             if self.editor is not None and self.hideInactiveTrajectories and track != self.editor.getActiveTrack():
                 continue
 
@@ -420,7 +420,7 @@ class Visualizer(object):
                 waypointIndex += 1
 
         # Track IDs
-        for trackKey, track in self.database.getTracks().iteritems():
+        for trackKey, track in self.database.getTracks().items():
             if self.editor is not None and self.hideInactiveTrajectories and track != self.editor.getActiveTrack():
                 continue
 
@@ -443,7 +443,7 @@ class Visualizer(object):
                     pass
 
         # Delete old markers
-        for markerId in xrange(len(markerArray.markers), self.previousMarkerCount):
+        for markerId in range(len(markerArray.markers), self.previousMarkerCount):
             oldMarkerToDelete = Marker()
             oldMarkerToDelete.header = header
             oldMarkerToDelete.id = markerId
@@ -606,7 +606,7 @@ class Database(object):
         return int(trackKey[6:])
 
     def getTrackIds(self):
-        return [ int(self.getTrackId(trackKey)) for trackKey in self.getTracks().iterkeys() ]
+        return [ int(self.getTrackId(trackKey)) for trackKey in self.getTracks().keys() ]
 
     def getTrack(self, trackId):
         return self.getDict(self.getTrackKey(trackId), self.getTracks())
@@ -623,7 +623,7 @@ class Database(object):
     def findGlobalOldestTimestamp(self):
         # Find oldest timestamp amongst all data, i.e. where the data "begins"
         oldestTimestamp = float("inf")
-        for track in self.getTracks().itervalues():
+        for track in self.getTracks().values():
             oldestTimestamp = min(oldestTimestamp, self.findOldestTimestamp(track))
         return oldestTimestamp
 
@@ -636,7 +636,7 @@ class Database(object):
     def findGlobalYoungestTimestamp(self):
         # Find youngest timestamp amongst all data, i.e. where the data "ends"
         youngestTimestamp = float("-inf")
-        for track in self.getTracks().itervalues():
+        for track in self.getTracks().values():
             youngestTimestamp = max(youngestTimestamp, self.findYoungestTimestamp(track))
         return youngestTimestamp
 
@@ -653,7 +653,7 @@ class Database(object):
         tracks = self.getTracks()
         numTracks = len(tracks)
         numWaypoints = 0
-        for track in tracks.itervalues():
+        for track in tracks.values():
             waypoints = self.getWaypoints(track)
             numWaypoints += len(waypoints)
 
@@ -742,7 +742,7 @@ class Editor(object):
             waypoints.insert(self.activeWaypointIndex+1, waypoint)
 
             self.sortWaypoints(waypoints)  # sort waypoints by time
-            for waypointIndex in xrange(0, len(waypoints)):
+            for waypointIndex in range(0, len(waypoints)):
                 if waypoints[waypointIndex]["timestamp"] == timestamp.to_sec():
                     self.selectActiveWaypoint(waypointIndex)
 

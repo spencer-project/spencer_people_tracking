@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -57,11 +57,11 @@ def newMessageReceived(positionMeasurementArray):
         detectedPerson.pose.pose.position = positionMeasurement.pos
 
         # Covariance
-        for x in xrange(0, 3):
-            for y in xrange(0, 3):
+        for x in range(0, 3):
+            for y in range(0, 3):
                 detectedPerson.pose.covariance[y*6 + x] = positionMeasurement.covariance[y*3 + x] * covScale
 
-        for i in xrange(3, 6):
+        for i in range(3, 6):
             detectedPerson.pose.covariance[i*6 + i] = 99999.0
 
         # Detection ID

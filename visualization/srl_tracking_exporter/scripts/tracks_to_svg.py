@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
@@ -51,7 +51,7 @@ Parameters:
   _cycles (bool):     show cycle number on track (lots of text elements!), default: False
 """
 
-import os, sys, math, time, socket, xmlrpclib, signal, codecs
+import os, sys, math, time, socket, xmlrpc.client, signal, codecs
 import svgwrite
 from multiprocessing import Lock
 
@@ -375,7 +375,7 @@ class TrackRenderer(object):
         velocityGroup = content.add(svg.g(id='velocities'))      
 
         # Track velocities
-        for track_id, track in database.tracks.iteritems():
+        for track_id, track in database.tracks.items():
             trackVelocityGroup = velocityGroup.add(svg.g(id='velocities%d' % track_id))
             
             for step in range(0, len(track.positions)):
@@ -428,7 +428,7 @@ class TrackRenderer(object):
             
     def renderTrackLabels(self):
         labelGroup = content.add(svg.g(id='labels'))        
-        for track_id, track in database.tracks.iteritems():
+        for track_id, track in database.tracks.items():
             trackColor = self.getTrackColor(track_id)
             if len(track.positions) > 0:
                 pos = track.positions[-1]
@@ -439,7 +439,7 @@ class TrackRenderer(object):
 
     def renderTimestamps(self):
         timestampGroup = content.add(svg.g(id='timestamps'))        
-        for track_id, track in database.tracks.iteritems():
+        for track_id, track in database.tracks.items():
             if len(track.positions) == 0:
                 continue
 
@@ -469,11 +469,11 @@ class TrackRenderer(object):
 
     def renderCycles(self):
         cyclesGroup = content.add(svg.g(id='cycles'))        
-        for track_id, track in database.tracks.iteritems():
+        for track_id, track in database.tracks.items():
             trackColor = self.getTrackColor(track_id)
             fontSize = 0.06
 
-            for i in xrange(0, len(track.positions), 2):
+            for i in range(0, len(track.positions), 2):
                 pos = track.positions[i]
                 pos = (pos[0], pos[1])
                 cycleText = str(track.cycles[i])   
@@ -514,7 +514,7 @@ class TrackRenderer(object):
 
         # Tracks
         rospy.loginfo("Writing %d tracks..." % len(database.tracks))
-        for track_id, track in database.tracks.iteritems():
+        for track_id, track in database.tracks.items():
             self.renderTrack(track_id, track)
 
         # Detections
@@ -556,7 +556,7 @@ class TrackRenderer(object):
         try:
             jobFinished = rospy.ServiceProxy('job_monitor', JobFinished)
             jobFinished(rospy.get_name())
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             rospy.loginfo("Failed to notify job monitor (maybe not running?): %s" % e)
 
 
@@ -573,7 +573,7 @@ def __installSignalHandler__():
 ### Makes sure that ROS master is running ###
 def __ensureMasterRunning__():
     caller_id = '/script'
-    m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
+    m = xmlrpc.client.ServerProxy(os.environ['ROS_MASTER_URI'])
 
     messageShown = False
     while not quitRequested:

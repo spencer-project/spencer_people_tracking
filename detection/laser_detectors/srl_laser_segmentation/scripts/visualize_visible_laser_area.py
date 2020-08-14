@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
@@ -62,7 +62,7 @@ class VisibleLaserscanAreaVisualizer(object):
     def newLaserscanReceived(self, laserscan):
         cartesianCoordinates = []
 
-        for pointIndex in xrange(0, len(laserscan.ranges)):
+        for pointIndex in range(0, len(laserscan.ranges)):
             if laserscan.ranges[pointIndex] >= self.minDistanceToSensor:
                 cartesianCoordinates.append( self.calculateCartesianCoordinates(laserscan, pointIndex) )
         pointCount = len(cartesianCoordinates)
@@ -82,7 +82,7 @@ class VisibleLaserscanAreaVisualizer(object):
         fillMarker.scale.x = fillMarker.scale.y = fillMarker.scale.z = 1
         fillMarker.color = ColorRGBA(r=self.fillColor[0], g=self.fillColor[1], b=self.fillColor[2], a=self.fillColor[3])
 
-        for pointIndex in xrange(0, pointCount):
+        for pointIndex in range(0, pointCount):
             lineMarker.points.append( cartesianCoordinates[pointIndex] )
 
             if pointIndex < pointCount - 1:

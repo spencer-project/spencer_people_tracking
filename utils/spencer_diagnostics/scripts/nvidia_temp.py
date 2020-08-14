@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Software License Agreement (BSD License)
 #
@@ -35,7 +35,7 @@
 ##\author Kevin Watts
 ##\brief Publishes diagnostic data on temperature and usage for a Quadro 600 GPU
 
-from __future__ import with_statement, division
+
 
 PKG = 'pr2_computer_monitor'
 import roslib
@@ -59,7 +59,7 @@ class NVidiaTempMonitor(object):
             card_out = spencer_diagnostics.get_gpu_status()
             gpu_stat = spencer_diagnostics.parse_smi_output(card_out)
             stat = spencer_diagnostics.gpu_status_to_diag(gpu_stat)
-        except Exception, e:
+        except Exception as e:
             import traceback
             rospy.logerr('Unable to process nVidia GPU data')
             rospy.logerr(traceback.format_exc())

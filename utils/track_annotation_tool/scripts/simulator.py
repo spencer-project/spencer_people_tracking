@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
@@ -142,7 +142,7 @@ if __name__ == '__main__':
                 fullBlocks = int(percent/3)
                 emptyBlocks = int(100/3 - fullBlocks)
 
-                progressBar = u"[" + u"\u2588" * fullBlocks + u"\u2591" * emptyBlocks + "]   "
+                progressBar = "[" + "\u2588" * fullBlocks + "\u2591" * emptyBlocks + "]   "
                 sys.stderr.write("\rPlayback of track database: %s %d %% completed" % (progressBar, percent))
                 sys.stderr.flush()
 

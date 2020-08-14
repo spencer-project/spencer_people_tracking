@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Software License Agreement (BSD License)
 #
@@ -34,7 +34,7 @@
 
 ##\author Kevin Watts
 
-from __future__ import division
+
 
 PKG = 'pr2_computer_monitor'
 import roslib; roslib.load_manifest(PKG)

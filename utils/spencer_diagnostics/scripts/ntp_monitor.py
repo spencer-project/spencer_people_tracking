@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2008, Willow Garage, Inc.
@@ -81,7 +81,8 @@ def ntp_monitor(ntp_hostname, offset=500, self_offset=500, diag_hostname = None,
                 p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
                 res = p.wait()
                 (o,e) = p.communicate()
-            except OSError, (errno, msg):
+            except OSError as err:
+                (errno, msg) = err.args
                 if errno == 4:
                     break #ctrl-c interrupt
                 else:

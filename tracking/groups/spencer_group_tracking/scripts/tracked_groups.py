@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -75,7 +75,7 @@ def newDataAvailable(trackedPersons, socialRelations):
         socialRelationsMatrix[index1, index2] = min(socialRelationsMatrix[index1, index2], 1.0 - socialRelation.strength) # strong relation --> small distance
         socialRelationsMatrix[index2, index1] = min(socialRelationsMatrix[index2, index1], 1.0 - socialRelation.strength)
 
-    for i in xrange(0, trackCount):
+    for i in range(0, trackCount):
         socialRelationsMatrix[i,i] = 0.0 # diagonal elements have to be zero
 
     # Convert into condensed form
@@ -161,7 +161,7 @@ def trackGroups(groups, trackedPersons):
     assignedGroupIds = []
 
     # Sort groups by smallest track ID per group to ensure reproducible group ID assignments
-    sortedGroups = sorted(groups.iteritems(), key=lambda (clusterId, track_ids) : sorted(track_ids)[0])   
+    sortedGroups = sorted(iter(groups.items()), key=lambda clusterId_track_ids : sorted(clusterId_track_ids[1])[0])   
 
     # Used to calculate group centroids
     trackPositionsById = dict()
@@ -243,7 +243,7 @@ def calculateGroupCentroids(groups, trackedPersons):
 
     # Determine centroids
     centroids = []
-    for groupId, track_ids in groups.iteritems():
+    for groupId, track_ids in groups.items():
         positions = numpy.zeros( (len(track_ids), 2) )
         trackIndex = 0
         for track_id in track_ids:

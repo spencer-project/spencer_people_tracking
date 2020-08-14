@@ -1,12 +1,12 @@
 classifier_train_results:
   model: '/root/catkin_ws/src/spencer_people_tracking/detection/laser_detectors/srl_laser_detectors/models/learned_model_.random_forest'
-  accuracy: 0.978
-  precision: 0.959
-  recall: 0.854
-  f1_measure: 0.903
-  fp_rate: 0.005
-  tp: 15929
-  tn: 133322
-  fp: 689
-  fn: 2729
-  test_duration: 108.801
+  accuracy: 0.991
+  precision: 0.976
+  recall: 1.000
+  f1_measure: 0.988
+  fp_rate: 0.014
+  tp: 12018
+  tn: 20730
+  fp: 294
+  fn: 4
+  test_duration: 11.818

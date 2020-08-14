@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -49,7 +49,7 @@ def newMessageReceived(poseArray):
         detectedPerson.detection_id = detectionId
         detectedPerson.pose.pose = pose
 
-        for i in xrange(0, 6):
+        for i in range(0, 6):
             detectedPerson.pose.covariance[i*6 + i] = posVariance if i < 3 else rotVariance
 
         detectedPersons.detections.append(detectedPerson)

@@ -20,11 +20,11 @@ import argparse
 import numpy, numpy.linalg
 import rospy
 from munkres import Munkres
-from rect import Rect
-from importers import MOT_hypo_import
-from importers import MOT_groundtruth_import
-from formatchecker import FormatChecker
-from utilities import write_stderr_red
+from .rect import Rect
+from .importers import MOT_hypo_import
+from .importers import MOT_groundtruth_import
+from .formatchecker import FormatChecker
+from .utilities import write_stderr_red
 import logging
 import time
 LOG = logging.getLogger(__name__)
@@ -90,11 +90,11 @@ class MOTEvaluation:
 
         # Hypotheses frames which are chronologically close to timestamp 
         # Use binary search, if this is to slow for you :)P
-        hypotheses_frames = filter(hypothesis_frame_chronologically_close, self.hypotheses_["frames"])
+        hypotheses_frames = list(filter(hypothesis_frame_chronologically_close, self.hypotheses_["frames"]))
         
         # We expect at most one hypotheses timestamp.
         if len(hypotheses_frames) > 1:
-            raise Exception, "> 1 hypotheses timestamps found for timestamp %f with sync delta %f" % (timestamp, self.sync_delta_)
+            raise Exception("> 1 hypotheses timestamps found for timestamp %f with sync delta %f" % (timestamp, self.sync_delta_))
 
         if len(hypotheses_frames) == 0:
 #            write_stderr_red("Warning:", "No hypothesis timestamp found for timestamp %f with sync delta %f" % (timestamp, self.sync_delta_))
@@ -126,7 +126,7 @@ class MOTEvaluation:
             # Added for Mostly Tracked calculation
             temp_id = g["id"]
             # If gt already seen increment counter for gt_id
-            if temp_id in self.mostly_tracked_list.keys():            
+            if temp_id in self.mostly_tracked_list:            
                 if not g.get("dco",False):
                     self.mostly_tracked_list[temp_id]["gt_count"] += 1
             # For new gt track initialize a new dict
@@ -175,14 +175,14 @@ class MOTEvaluation:
         rospy.logdebug("STEP 1: KEEP CORRESPONDENCE")
 #            print "DIFF Keep correspondence"
             
-        for gt_id in self.mappings_.keys():
-            groundtruth = filter(lambda g: g["id"] == gt_id, groundtruths) # Get ground truths with given ground truth id in current frame
+        for gt_id in self.mappings_:
+            groundtruth = [g for g in groundtruths if g["id"] == gt_id] # Get ground truths with given ground truth id in current frame
             if len(groundtruth) > 1:
                 rospy.logwarn("found %d > 1 ground truth tracks for id %s", len(groundtruth), gt_id)
             elif len(groundtruth) < 1:
                 continue
             
-            hypothesis = filter(lambda h: h["id"] == self.mappings_[gt_id], hypotheses) # Get hypothesis with hypothesis id according to mapping
+            hypothesis = [h for h in hypotheses if h["id"] == self.mappings_[gt_id]] # Get hypothesis with hypothesis id according to mapping
             assert len(hypothesis) <= 1, "Multiple track hypotheses found with the same ID (#%s) at cycle no. %d! Make sure the tracker is outputting unique track IDs!" % (hypothesis[0]["id"] , int(timestamp))
             if len(hypothesis) != 1:
                 continue
@@ -203,8 +203,8 @@ class MOTEvaluation:
                 correspondences[gt_id] = hypothesis[0]["id"]
                 self.total_distance_ += distance
 
-        munk_hypotheses = filter(lambda h: h['id'] not in correspondences.values(), hypotheses)         
-        munk_gts = filter(lambda g: g['id'] not in correspondences.keys(), groundtruths) 
+        munk_hypotheses = [h for h in hypotheses if h['id'] not in list(correspondences.values())]         
+        munk_gts = [g for g in groundtruths if g['id'] not in list(correspondences.keys())] 
         for p in sorted(listofprints):
             rospy.logdebug(p)
 
@@ -222,7 +222,7 @@ class MOTEvaluation:
             groundtruth = munk_gts[i]
             
             # Skip groundtruth with correspondence from mapping
-            if groundtruth["id"] in correspondences.keys():
+            if groundtruth["id"] in correspondences:
                 rospy.logdebug("Groundtruth %s already in correspondence" % groundtruth["id"])
                 continue
             
@@ -231,7 +231,7 @@ class MOTEvaluation:
                 hypothesis = munk_hypotheses[j]
                 
                 # Skip hypotheses with correspondence from mapping
-                if hypothesis["id"] in correspondences.values():
+                if hypothesis["id"] in list(correspondences.values()):
                     rospy.logdebug("Hypothesis %s already in correspondence" % hypothesis["id"])
                     continue
                 
@@ -252,7 +252,7 @@ class MOTEvaluation:
             if self.use_lapjv:
                 np_array = numpy.array(munkres_matrix, dtype=numpy.float32 )
                 lap_result = self.lapjv.lap(np_array)
-                indices = zip(range(max(len(munk_hypotheses),len(munk_gts))), lap_result[1])
+                indices = list(zip(list(range(max(len(munk_hypotheses),len(munk_gts)))), lap_result[1]))
 #               elapsed = time.time() - t
 #               rospy.loginfo("LAPJV needed {}s".format(elapsed))
             else:
@@ -305,7 +305,7 @@ class MOTEvaluation:
             if hypo_id in self.hypo_map_ and self.hypo_map_[hypo_id] != gt_id:
                 # Do not count non-recoverable mismatch, if both old ground truth and current ground truth are DCO.
                 old_gt_id = self.hypo_map_[hypo_id]
-                old_gt_dco = filter(lambda g: g["id"] == old_gt_id and g.get("dco",False), groundtruths)
+                old_gt_dco = [g for g in groundtruths if g["id"] == old_gt_id and g.get("dco",False)]
 
                 assert len(old_gt_dco) <= 1;
                 if not (munk_gts[gt_index].get("dco",False) and len(old_gt_dco) == 1):
@@ -321,11 +321,11 @@ class MOTEvaluation:
             # Correspondence: A-1
             # Mapping: A-2, B-1
             # We have to detect both forms of conflicts
-            for mapping_gt_id, mapping_hypo_id in self.mappings_.items():
+            for mapping_gt_id, mapping_hypo_id in list(self.mappings_.items()):
                 
                 # CAVE: Other than in perl script:
                 # Do not consider for mismatch, if both old gt and new gt are DCO
-                gt_with_mapping_gt_id_dco = filter(lambda g: g["id"] == mapping_gt_id and g.get("dco",False), groundtruths)
+                gt_with_mapping_gt_id_dco = [g for g in groundtruths if g["id"] == mapping_gt_id and g.get("dco",False)]
                 if len (gt_with_mapping_gt_id_dco) == 1 and munk_gts[gt_index].get("dco",False):
                     rospy.logdebug("Ground truths %s and %s are DCO. Not considering for mismatch." % (mapping_gt_id, gt_id))
 #                    print "DIFF DCO %s" % (gt_id), groundtruths[gt_index]
@@ -340,8 +340,8 @@ class MOTEvaluation:
                         self.mismatches_ = self.mismatches_ + 1
 
                         # find groundtruth and hypothesis with given ids
-                        g = filter(lambda g: g["id"] == gt_id, groundtruths)
-                        h = filter(lambda h: h["id"] == hypo_id, hypotheses)
+                        g = [g for g in groundtruths if g["id"] == gt_id]
+                        h = [h for h in hypotheses if h["id"] == hypo_id]
 
                         #assert(len(g) == 1)
                         if len(g) != 1:
@@ -379,12 +379,12 @@ class MOTEvaluation:
 
         # Visual debug
         for g in groundtruths:
-            if g["class"] != "mismatch" and g["id"] in correspondences.keys():
+            if g["class"] != "mismatch" and g["id"] in list(correspondences.keys()):
                 g["class"] = "correspondence"
                 visualDebugAnnotations.append(g)
             
         for h in hypotheses:
-            if h["class"] != "mismatch" and h["id"] in correspondences.values():
+            if h["class"] != "mismatch" and h["id"] in list(correspondences.values()):
                 h["class"] = "correspondence"
                 visualDebugAnnotations.append(h)
 
@@ -398,7 +398,7 @@ class MOTEvaluation:
         # Count miss, when groundtruth has no correspondence and is not dco
         for groundtruth in groundtruths:
             rospy.logdebug("DCO:", groundtruth)
-            if groundtruth["id"] not in correspondences.keys() and groundtruth.get("dco", False) != True:
+            if groundtruth["id"] not in correspondences and groundtruth.get("dco", False) != True:
                 rospy.logdebug("Miss: %s" % groundtruth["id"])
                 rospy.logdebug("DEBUGMISS: %.2f" % timestamp)
                 rospy.logdebug("DIFF Miss %s" % groundtruth["id"])
@@ -408,7 +408,7 @@ class MOTEvaluation:
 
         # Count false positives
         for hypothesis in hypotheses:
-            if hypothesis["id"] not in correspondences.values():
+            if hypothesis["id"] not in list(correspondences.values()):
                 rospy.logdebug("False positive: %s" % hypothesis["id"])
                 rospy.logdebug("DIFF False positive %s" % hypothesis["id"])
                 self.false_positives_ += 1
@@ -420,12 +420,12 @@ class MOTEvaluation:
         # For counting matches, do not count groundtruths with "don't care"-flag
         self.total_matches_ += len(correspondences)
         for groundtruth in groundtruths:
-            if groundtruth.get("dco", False) and groundtruth["id"] in correspondences.keys():
+            if groundtruth.get("dco", False) and groundtruth["id"] in correspondences:
                 self.total_matches_ -= 1
 
         
         # FIXED: Count only groundtruth objects that don't carry a 'don't care' flag. Otherwise we can get high MOTA scores even if the track recall is 0.0!
-        self.total_groundtruths_ += len( filter(lambda groundtruth: not groundtruth.get("dco", False), groundtruths) )
+        self.total_groundtruths_ += len( [groundtruth for groundtruth in groundtruths if not groundtruth.get("dco", False)] )
         #self.total_groundtruths_ += len(groundtruths) # Number of objects (ground truths) in current frame
 
         visualDebugFrame = {
@@ -440,7 +440,7 @@ class MOTEvaluation:
         
         # Added for Mostly tracked support
         # Increment hyp count for each found correspondence
-        for gt_id, hyp_id in correspondences.iteritems():
+        for gt_id, hyp_id in correspondences.items():
             self.mostly_tracked_list[gt_id]['hyp_count'] += 1
 
 
@@ -485,7 +485,7 @@ class MOTEvaluation:
             "lonely hypothesis tracks":   len(lonely_hypotheses),
             "ground truth tracks": len(self.groundtruth_ids_),
             "hypothesis tracks":   len(self.hypothesis_ids_),
-            "covering hypothesis tracks": len(self.hypo_map_.keys())
+            "covering hypothesis tracks": len(list(self.hypo_map_.keys()))
         }
     
 
@@ -502,8 +502,8 @@ class MOTEvaluation:
             "mismatch rate":        float(self.mismatches_) / gt,
             "recoverable mismatch rate":   float(self.recoverable_mismatches_) / gt,
             "non-recoverable mismatch rate":    float(self.non_recoverable_mismatches_) / gt,
-            "track precision":      float(len(self.hypo_map_.keys())) / len(self.hypothesis_ids_) if len(self.hypothesis_ids_) != 0 else 0.0,
-            "track recall":         float(len(self.gt_map_.keys()))  / len(self.groundtruth_ids_) if len(self.groundtruth_ids_) != 0 else 0.0,
+            "track precision":      float(len(list(self.hypo_map_.keys()))) / len(self.hypothesis_ids_) if len(self.hypothesis_ids_) != 0 else 0.0,
+            "track recall":         float(len(list(self.gt_map_.keys())))  / len(self.groundtruth_ids_) if len(self.groundtruth_ids_) != 0 else 0.0,
             "relative ID switches": float(self.mismatches_) * gt / self.total_matches_  # relative to recovered track count (i.e. tracker with higher track recall is allowed to have more ID switches), see MOTChallenge 2015
         }
         
@@ -511,7 +511,7 @@ class MOTEvaluation:
         mostly_tracked = 0
         partial_tracked = 0
         mostly_lost = 0
-        for track in self.mostly_tracked_list.values():
+        for track in list(self.mostly_tracked_list.values()):
             percent = float(track['hyp_count'])/float(track['gt_count'])
             if percent >= 0.8:
                 mostly_tracked += 1
@@ -535,30 +535,30 @@ class MOTEvaluation:
     def printTrackStatistics(self):
         # Lonely ground truths (no single correspondence)
         lonely_ground_truths = self.groundtruth_ids_ - set(self.gt_map_.keys())
-        print "Lonely ground truth tracks %d" % len(lonely_ground_truths)
-        print "Total ground truth tracks  %d" % len(self.groundtruth_ids_)
+        print("Lonely ground truth tracks %d" % len(lonely_ground_truths))
+        print("Total ground truth tracks  %d" % len(self.groundtruth_ids_))
 #        print "    ", lonely_ground_truths
 
         # Dirty false positive tracks (no single correspondence)
         lonely_hypotheses = self.hypothesis_ids_ - set(self.hypo_map_.keys())
-        print "Lonely hypothesis tracks %d" % len(lonely_hypotheses)
-        print "Total hypothesis tracks  %d" % len(self.hypothesis_ids_)
+        print("Lonely hypothesis tracks %d" % len(lonely_hypotheses))
+        print("Total hypothesis tracks  %d" % len(self.hypothesis_ids_))
 #        print "    ", lonely_hypotheses
 
 
     def printResults(self):
         """Print out results"""
         # Additional statistics
-        print "Ground truths               %d" % self.total_groundtruths_
-        print "False positives             %d" % self.false_positives_
-        print "Misses                      %d" % self.misses_
-        print "Mismatches                  %d" % self.mismatches_
-        print "Recoverable mismatches      %d" % self.recoverable_mismatches_
-        print "Non recoverable mismatches  %d" % self.non_recoverable_mismatches_
-        print "Correspondences             %d" % self.total_correspondences_
-        print ""
-        print "MOTP", self.getMOTP()
-        print "MOTA", self.getMOTA()
+        print("Ground truths               %d" % self.total_groundtruths_)
+        print("False positives             %d" % self.false_positives_)
+        print("Misses                      %d" % self.misses_)
+        print("Mismatches                  %d" % self.mismatches_)
+        print("Recoverable mismatches      %d" % self.recoverable_mismatches_)
+        print("Non recoverable mismatches  %d" % self.non_recoverable_mismatches_)
+        print("Correspondences             %d" % self.total_correspondences_)
+        print("")
+        print("MOTP", self.getMOTP())
+        print("MOTA", self.getMOTA())
         
     def convertIDsToString(self):
         for f in self.groundtruth_["frames"]:

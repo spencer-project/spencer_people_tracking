@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2008, Willow Garage, Inc.
@@ -43,8 +43,6 @@
 import roslib; roslib.load_manifest('tf')
 import rospy
 from tf.msg import tfMessage
-from sets import Set
-
 
 class TfFilter:
     def buildHash(self, parentFrame, childFrame) :
@@ -52,7 +50,7 @@ class TfFilter:
 
     def __init__(self):
         excludeArgument = rospy.get_param('~exclude', [])
-        self.excludes = Set()
+        self.excludes = set()
         
         for exclude in excludeArgument:
             parentFrame = exclude["parentFrame"]
@@ -68,7 +66,7 @@ class TfFilter:
             + " except for the following transforms: ")
 
         for exclude in self.excludes:
-            print "  " + exclude
+            print("  " + exclude)
 
     def callback(self, tf_msg):
         for transform in tf_msg.transforms:

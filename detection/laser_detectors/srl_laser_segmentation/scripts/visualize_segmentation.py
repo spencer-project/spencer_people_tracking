@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
@@ -77,7 +77,7 @@ class LaserscanSegmentationVisualizer(object):
         centroidsOfLabel = dict()
         numIgnoredPoints = 0
 
-        for pointIndex in xrange(0, pointCount):
+        for pointIndex in range(0, pointCount):
             labelsOfPoint.append( set() )
             cartesianCoordinates.append( self.calculateCartesianCoordinates(laserscan, pointIndex) )
             numIgnoredPoints += 1 if laserscan.ranges[pointIndex] < self.minDistanceToSensor else 0
@@ -99,7 +99,7 @@ class LaserscanSegmentationVisualizer(object):
         cloud.fields.append( PointField(name="rgb", offset=12, datatype=PointField.FLOAT32, count=1) ) # or offset 16?
         markerArray = MarkerArray()
 
-        for pointIndex in xrange(0, pointCount):
+        for pointIndex in range(0, pointCount):
             # Skip wrong echoes very close to sensor
             if laserscan.ranges[pointIndex] < self.minDistanceToSensor:
                 continue
@@ -162,7 +162,7 @@ class LaserscanSegmentationVisualizer(object):
 
         # Delete old markers which are not needed any more
         currentMarkerCount = len(markerArray.markers)  # must be before creating delete markers
-        for markerId in xrange(len(markerArray.markers), self._lastMarkerCount):
+        for markerId in range(len(markerArray.markers), self._lastMarkerCount):
             deleteMarker = Marker(header=header)
             deleteMarker.id = markerId
             deleteMarker.action = Marker.DELETE

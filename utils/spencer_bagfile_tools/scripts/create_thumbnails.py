@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -57,7 +57,7 @@ if len(sys.argv) > 4:
 else:
     justShow = False
 
-print "Preparsing bag file..."
+print("Preparsing bag file...")
 info_dict = yaml.load(subprocess.Popen(['rosbag', 'info', '--yaml', infilename], stdout=subprocess.PIPE).communicate()[0])
 
 if info_dict is None:
@@ -93,7 +93,7 @@ def processImage(cv_image):
     cv2.imshow("Bagfile preview: %s" % topicName, cv_image)
     cv2.waitKey(1)
 
-print "Generating thumbnails in current working directory..."
+print("Generating thumbnails in current working directory...")
 for topic, msg, timestamp in rosbag.Bag(infilename).read_messages():
     # Check for correct topic
     if topic == topicName:
@@ -113,7 +113,7 @@ for topic, msg, timestamp in rosbag.Bag(infilename).read_messages():
     msg_index+=1
     if msg_index % (msg_count / 100) == 0:
         percent = int(100.0 * msg_index / msg_count + 0.5)
-        progressBar = u"[" + u"\u2588" * percent + u"\u2591" * (100-percent) + "]"
+        progressBar = "[" + "\u2588" * percent + "\u2591" * (100-percent) + "]"
         sys.stderr.write("\r%s %d %% completed" % (progressBar, percent))
         sys.stderr.flush()
 

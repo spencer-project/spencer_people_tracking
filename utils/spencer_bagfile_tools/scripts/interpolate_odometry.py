@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -52,7 +52,7 @@ infilename = sys.argv[1]
 outfilename = infilename + ".interpolated"
 
 if os.path.isfile(outfilename):
-    print COLOR_ERROR +  'Output file ' + outfilename + ' already exists, cannot proceed!!'
+    print(COLOR_ERROR +  'Output file ' + outfilename + ' already exists, cannot proceed!!')
     sys.exit(2) 
 
 info_dict = yaml.load(subprocess.Popen(['rosbag', 'info', '--yaml', infilename], stdout=subprocess.PIPE).communicate()[0])
@@ -71,10 +71,10 @@ for topicInfo in info_dict["topics"] :
     print("  %s (%d messages)" % (topic, topicInfo["messages"]))
 
 if not topicName in topics:
-    print COLOR_ERROR +  'Bag file does not contain any messages at additional_odom_data topic!'
+    print(COLOR_ERROR +  'Bag file does not contain any messages at additional_odom_data topic!')
     sys.exit(2) 
 
-print '\nInterpolating encoder ticks in AdditionalOdometryData messages of bagfile ' + infilename + ' to ' + str(desiredFrequency) + ' Hz!'
+print('\nInterpolating encoder ticks in AdditionalOdometryData messages of bagfile ' + infilename + ' to ' + str(desiredFrequency) + ' Hz!')
 
 newAdditionalOdomMsgs = 0
 msg_index = 0
@@ -88,7 +88,7 @@ try:
                 if actual_dt > 1.0 / desiredFrequency:
                     desired_dt = 1.0 / desiredFrequency
                     requiredAdditionalMessages = int(math.ceil(actual_dt / desired_dt))
-                    for i in xrange(1, requiredAdditionalMessages):
+                    for i in range(1, requiredAdditionalMessages):
                         progress = 1.0/requiredAdditionalMessages*i
                         additionalMsg = copy.deepcopy(lastAdditionalOdomMsg)
                         additionalMsg.header.stamp  = lastAdditionalOdomMsg.header.stamp + (msg.header.stamp - lastAdditionalOdomMsg.header.stamp)*progress
@@ -115,7 +115,7 @@ try:
         msg_index+=1
         if msg_index % (msg_count / 100) == 0:
             percent = int(100.0 * msg_index / msg_count + 0.5)
-            progressBar = u"[" + u"\u2588" * percent + u"\u2591" * (100-percent) + "]"
+            progressBar = "[" + "\u2588" * percent + "\u2591" * (100-percent) + "]"
             sys.stdout.write("\r%s %d %% completed" % (progressBar, percent))
             sys.stdout.flush()
 

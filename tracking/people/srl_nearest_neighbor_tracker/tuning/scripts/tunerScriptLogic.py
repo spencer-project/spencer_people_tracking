@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -92,16 +92,16 @@ def find_parameters():
                 params_in_file = yaml.load(open(param_file))
                 for param_key in parameters_to_optimize:
                     if param_key in params_in_file:
-                        print 'Found {} in {} paramfile {}'.format(param_key, param_file, parameters_to_optimize[param_key])
+                        print('Found {} in {} paramfile {}'.format(param_key, param_file, parameters_to_optimize[param_key]))
                         new_param = {'name':param_key, 'path':param_file, 'default':parameters_to_optimize[param_key][-1], 'current':50}
                         parameter_list.append(new_param)
             except:
                 pass    
        
 def write_parameters():
-    print "inside write parameters"
+    print("inside write parameters")
     for param in parameter_list:
-        print "current param {}".format(param)
+        print("current param {}".format(param))
         with open(param['path'], 'r') as param_file:
             params_in_file = yaml.load(param_file)   
         params_in_file[param['name']] = param['current']
@@ -109,7 +109,7 @@ def write_parameters():
             param_file.write(yaml.dump(params_in_file, default_flow_style=True) )
             
 def resultCallback(result):
-    print "PyMot results received {}".format(result)
+    print("PyMot results received {}".format(result))
     mota = result.data
     global mota_result     
     mota_result = mota
@@ -132,7 +132,7 @@ def start_node(child_conn, ros_command):
     t.start()
     node = rospy.init_node('tuning_node', anonymous=True)
     while rospy.is_shutdown():
-        print 'Waiting for ROS to start'
+        print('Waiting for ROS to start')
         sleep(1) 
     rospy.Subscriber("/pymot_result", Float32, resultCallback)
     rospy.spin()
@@ -154,13 +154,13 @@ def ExceededTimeThread(seconds, child_conn):
     subprocess.call(['rosnode','kill','--all'])
 
 def optimize_parameters(**kwargs):
-    print "Function was called with arguments: {}".format(kwargs)
+    print("Function was called with arguments: {}".format(kwargs))
     # Modify values in parameter list depending on passed values
-    for arg in kwargs.keys():
-        print "Current key argument: {}".format(arg)
+    for arg in list(kwargs.keys()):
+        print("Current key argument: {}".format(arg))
         if arg == "instance":
             roslaunch_command = roslaunch_commands[kwargs[arg]]
-            print "Current ROS Launch command is {}".format(roslaunch_command)
+            print("Current ROS Launch command is {}".format(roslaunch_command))
             continue
         try:
             current = next(param for param in parameter_list if param['name']==arg)
@@ -173,7 +173,7 @@ def optimize_parameters(**kwargs):
     p = Process(target=start_node, args=(child_conn,roslaunch_command,))
     p.start()
     result = parent_conn.recv()
-    print 'Received current result {}'.format(result['result'])
+    print('Received current result {}'.format(result['result']))
     p.join()
     p.terminate()
     return -result['result']     
@@ -182,7 +182,7 @@ def init_optimization():
     opt = pysmac.SMAC_optimizer(working_directory= '/home/fabian/tuning_aspket_logic',persistent_files=True, debug = False)
     parameter_definition= parameters_to_optimize
     
-    print parameter_definition
+    print(parameter_definition)
     value, parameters = opt.minimize(optimize_parameters        # the function to be minimized
                     , 400                                # the maximum number of function evaluations
                     , parameter_definition 
@@ -194,7 +194,7 @@ def init_optimization():
 
     print('The minimum value %f was found for the configurations %s'%(value, parameters))
 
-    for param_key in parameters.keys():
+    for param_key in list(parameters.keys()):
         try:
             current = next(param for param in parameter_list if param['name']==param_key)
             current['current'] = parameters[param_key]

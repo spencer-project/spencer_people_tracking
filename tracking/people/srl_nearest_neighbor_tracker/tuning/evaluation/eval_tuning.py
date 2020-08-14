@@ -40,12 +40,12 @@ vis = None
 def merge_runs(evaluation_folder):
     if not os.path.isdir(evaluation_folder +'/merged_state_runs'):
         subdirectories = [ os.path.join(evaluation_folder, name) for name in os.listdir(evaluation_folder) if os.path.isdir(os.path.join(evaluation_folder, name)) ]
-        print subdirectories
+        print(subdirectories)
         try:
     #         utils.state_merge(subdirectories, evaluation_folder+'/merged')
             call(["/home/fabian/tuning/pysmac/pysmac/smac/smac-v2.10.03-master-778/util/state-merge", "--directories", evaluation_folder, '--scenario-file', subdirectories[-1]+'/scenario.txt',  '--outdir' ,evaluation_folder +'/merged_state_runs/'])
         except:
-            print "Error raised by state merge"
+            print("Error raised by state merge")
             pass
     prepare_fanova(evaluation_folder+'/merged_state_runs')
         
@@ -57,28 +57,28 @@ def prepare_fanova(merged_folder):
     param_names = fanova.get_parameter_names()
     vis.create_all_plots(merged_folder)
     vis.create_most_important_pairwise_marginal_plots(merged_folder, len(param_names)**2)
-    print 'Param names : {}'.format(param_names)
-    print 'Integer Param names : {}'.format(fanova.get_config_space().get_integer_parameters())
+    print('Param names : {}'.format(param_names))
+    print('Integer Param names : {}'.format(fanova.get_config_space().get_integer_parameters()))
     for param in param_names:
         marginal = fanova.get_marginal(param)
-        print 'Param {} has marginal {}'.format(param, marginal)
+        print('Param {} has marginal {}'.format(param, marginal))
     
 def main(argv):
     scenario_folder = ''
     try:
         opts, args = getopt.getopt(argv,"hi:o:",["help","ifile=","ofile="])
     except getopt.GetoptError:
-        print 'eval_tuning.py -i <input_scenario_folder>'
+        print('eval_tuning.py -i <input_scenario_folder>')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ('-h',"--help"):
-            print 'eval_tuning.py -i <input_scenario_folder>'
+            print('eval_tuning.py -i <input_scenario_folder>')
             sys.exit()
         elif opt in ("-i", "--ifile"):
             scenario_folder = arg
-    print 'Input file is "', scenario_folder
+    print('Input file is "', scenario_folder)
     if not(os.path.isdir(scenario_folder)):
-        print "Folder {} does not exist".format(scenario_folder)
+        print("Folder {} does not exist".format(scenario_folder))
         sys.exit()
     merge_runs(scenario_folder)
    

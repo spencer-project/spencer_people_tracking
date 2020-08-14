@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -53,14 +53,14 @@ def newCompositeDetectedPersonsAvailable(compositeDetectedPersons):
 
         # Extract covariance matrix
         R = numpy.zeros((3,3))
-        for row in xrange(0, 3):
-            for col in xrange(0, 3):
+        for row in range(0, 3):
+            for col in range(0, 3):
                 R[row, col] = compositeDetectedPerson.pose.covariance[row*6 + col]
 
         # Check symmetry of covariance matrix
         symmetric = True
-        for row in xrange(0, 3):
-            for col in xrange(0, 3):
+        for row in range(0, 3):
+            for col in range(0, 3):
                 if abs(R[row, col] - R[col, row]) > 1e-6:
                     errors.append("Covariance matrix is not symmetric")
                     symmetric = False

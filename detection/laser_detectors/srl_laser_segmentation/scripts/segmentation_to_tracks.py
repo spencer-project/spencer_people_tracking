@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
@@ -79,7 +79,7 @@ class SegmentationToTrackConverter(object):
             self._lastDataStamp = laserscanSegmentation.header.stamp
 
         # Build lookup of cartesian coordinates per laser point
-        for pointIndex in xrange(0, pointCount):
+        for pointIndex in range(0, pointCount):
             cartesianCoordinates.append( self.calculateCartesianCoordinates(laserscan, pointIndex) )
 
         # For each labelled segment, create and append one TrackedPerson and DetectedPerson message
@@ -161,7 +161,7 @@ class SegmentationToTrackConverter(object):
             detectedPerson.confidence = 1.0
             detectedPerson.pose = copy.deepcopy(trackedPerson.pose)
             detectedPerson.pose.pose.orientation = Quaternion()
-            for i in xrange(0, 2):
+            for i in range(0, 2):
                 detectedPerson.pose.covariance[i * 6 + i] = 0.17 * 0.17
             detectedPerson.pose.covariance[5 * 6 + 5] = LARGE_VARIANCE  # yaw
 

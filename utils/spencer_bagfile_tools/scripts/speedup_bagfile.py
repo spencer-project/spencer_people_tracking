@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -46,7 +46,7 @@ infilename = sys.argv[2]
 outfilename = sys.argv[3]
 
 if os.path.isfile(outfilename):
-    print 'Output file ' + outfilename + ' already exists, cannot proceed!!'
+    print('Output file ' + outfilename + ' already exists, cannot proceed!!')
     sys.exit(2) 
 
 info_dict = yaml.load(subprocess.Popen(['rosbag', 'info', '--yaml', infilename], stdout=subprocess.PIPE).communicate()[0])
@@ -55,7 +55,7 @@ msg_count = 0
 for topic in info_dict["topics"] : 
     msg_count += topic["messages"]
 
-print '\nSpeeding up bag file ' + infilename + ' consisting of ' + str(msg_count) + ' messages by a factor of ' + str(rate)
+print('\nSpeeding up bag file ' + infilename + ' consisting of ' + str(msg_count) + ' messages by a factor of ' + str(rate))
 
 gotFirstTimestamp = False
 msg_index = 0
@@ -85,9 +85,9 @@ try:
         # Show status info
         msg_index+=1
         if msg_index % (msg_count / 10) == 0:
-            print str(int(100.0 * msg_index / msg_count + 0.5)) + '% completed'
+            print(str(int(100.0 * msg_index / msg_count + 0.5)) + '% completed')
 
 finally:
     outbag.close()
 
-print 'Bagfile processing complete!\n'
+print('Bagfile processing complete!\n')

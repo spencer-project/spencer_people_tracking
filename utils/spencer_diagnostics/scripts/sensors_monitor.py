@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -32,7 +32,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import with_statement, division
+
 
 import roslib
 import rospy
@@ -42,7 +42,7 @@ import socket, string
 import subprocess
 import math
 import re
-from StringIO import StringIO
+from io import StringIO
 
 class Sensor(object):
     def __init__(self):
@@ -113,7 +113,7 @@ def parse_sensor_line(line):
           sensor.name = name
           sensor.type = "Speed"
         else:
-          print name
+          print(name)
           [sensor.name, sensor.type] = name.rsplit(" ",1)
           #print line + " --> " + sensor.name + " [" + sensor.type + "]"
 
@@ -126,7 +126,7 @@ def parse_sensor_line(line):
 
     reading = reading.lstrip()
 
-    print sensor.type, sensor.name, reading.lstrip()
+    print(sensor.type, sensor.name, reading.lstrip())
     if "(" in reading:
         [reading, params] = reading.lstrip().split("(")
     else:
@@ -154,7 +154,7 @@ def parse_sensor_line(line):
             elif param.find("crit") != -1:
                 sensor.critical = float(m.group(0))
 
-    print str(sensor)
+    print(str(sensor))
     return sensor
 
 def _rads_to_rpm(rads):
@@ -224,7 +224,7 @@ class SensorsMonitor(object):
                         if sensor.getInput() < sensor.getMin():
                             stat.mergeSummary(DIAG.ERROR, "No Fan Speed")
                     stat.add(" ".join([sensor.getName(), sensor.getType()]), sensor.getInput())
-        except Exception, e:
+        except Exception as e:
             import traceback
             rospy.logerr('Unable to process lm-sensors data')
             rospy.logerr(traceback.format_exc())
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('sensors_monitor_%s'%hostname_clean)
     except rospy.ROSInitException:
-        print >> sys.stderr, 'Unable to initialize node. Master may not be running'
+        print('Unable to initialize node. Master may not be running', file=sys.stderr)
         sys.exit(0)
 
     monitor = SensorsMonitor(hostname)

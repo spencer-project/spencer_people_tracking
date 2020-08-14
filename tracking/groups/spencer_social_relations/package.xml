@@ -18,8 +18,8 @@
   <build_depend>spencer_tracking_msgs</build_depend> 
   <build_depend>spencer_social_relation_msgs</build_depend> 
   <build_depend>libsvm-dev</build_depend>
-  <build_depend>python-numpy</build_depend> 
-  <build_depend>python-scipy</build_depend> 
+  <build_depend>python3-numpy</build_depend> 
+  <build_depend>python3-scipy</build_depend> 
   <build_depend>cmake_modules</build_depend>
   <build_depend>eigen_conversions</build_depend>
 
@@ -30,7 +30,7 @@
   <run_depend>spencer_tracking_msgs</run_depend>
   <run_depend>spencer_social_relation_msgs</run_depend>
   <run_depend>libsvm-dev</run_depend>
-  <run_depend>python-numpy</run_depend> 
-  <run_depend>python-scipy</run_depend> 
+  <run_depend>python3-numpy</run_depend> 
+  <run_depend>python3-scipy</run_depend> 
   <run_depend>eigen_conversions</run_depend>
 </package>

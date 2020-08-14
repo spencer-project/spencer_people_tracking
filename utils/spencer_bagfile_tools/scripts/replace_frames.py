@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -49,7 +49,7 @@ infilename = sys.argv[1]
 outfilename = infilename + ".processed"
 
 if os.path.isfile(outfilename):
-    print COLOR_ERROR +  'Output file ' + outfilename + ' already exists, cannot proceed!!'
+    print(COLOR_ERROR +  'Output file ' + outfilename + ' already exists, cannot proceed!!')
     sys.exit(2) 
 
 info_dict = yaml.load(subprocess.Popen(['rosbag', 'info', '--yaml', infilename], stdout=subprocess.PIPE).communicate()[0])
@@ -62,10 +62,10 @@ for topicInfo in info_dict["topics"] :
 
 replacements = rospy.get_param("~replacements", dict())
 if not replacements:
-    print COLOR_ERROR + "No replacements have been specified!"
+    print(COLOR_ERROR + "No replacements have been specified!")
     sys.exit(3)
 
-print 'Replacing TF frames in bagfile ' + infilename + ': ' + str(replacements) + "\n"
+print('Replacing TF frames in bagfile ' + infilename + ': ' + str(replacements) + "\n")
 
 msg_index = 0
 outbag = rosbag.Bag(outfilename, 'w', chunk_threshold = 50*1024*1024)
@@ -75,7 +75,7 @@ try:
         # Fix header timestamps
         if msg._has_header :
             oldFrame = msg.header.frame_id
-            if oldFrame in replacements.keys():
+            if oldFrame in list(replacements.keys()):
                 newFrame = replacements[oldFrame].strip()
                 msg.header.frame_id = newFrame
 

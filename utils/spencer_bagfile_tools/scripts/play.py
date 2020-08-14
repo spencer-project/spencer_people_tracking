@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -42,7 +42,7 @@ rospy.init_node('play')
 ### Determine list of topic remapping arguments that need to be forwarded to rosbag play ###
 
 argsToForward = []
-for i in xrange(1, len(sys.argv)):
+for i in range(1, len(sys.argv)):
     arg = sys.argv[i]
     if arg and (not arg.startswith("_") or arg.startswith("__ns")):
         argsToForward.append(arg)
@@ -114,7 +114,7 @@ if folder:
                 rospy.logwarn("WARNING: Found both interpolated and non-interpolated data with same name in folder -- will IGNORE non-interpolated data:\n[1] %s *** IGNORED *** \n[2] %s" % (originalFilename, f))
                 filesToIgnore.append(originalFilename)
 
-    filesMatchingPattern = filter(lambda f: f not in filesToIgnore, filesMatchingPattern) 
+    filesMatchingPattern = [f for f in filesMatchingPattern if f not in filesToIgnore] 
 
     filesMatchingPattern = ['"%s"' % f for f in filesMatchingPattern]
     filesToPlay += filesMatchingPattern

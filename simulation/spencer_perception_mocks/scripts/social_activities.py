@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Author: Timm Linder, linder@cs.uni-freiburg.de
 #
 # Subscribes to /spencer/perception/tracked_groups and /spencer/perception/tracked_persons, and publishes at /spencer/perception/social_activities

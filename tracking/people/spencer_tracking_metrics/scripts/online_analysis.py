@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -105,7 +105,7 @@ def writeResults(results, filename):
     with open(filename, 'w') as f:
         # Clearmot results
         if type(results) is ClearMotResults:
-            sortedKeys = sorted(results.iterkeys())
+            sortedKeys = sorted(results.keys())
             for key in sortedKeys:
                 f.write(key.ljust(max(len(key)+1, 16)) + " ")
             f.write("\n")
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     evaluation_base_folder = expanduser("~") + "/tracking_evaluation/" + evaluationPrefix
     evaluation_folder = evaluation_base_folder + dateStamp + "/"
     if not os.path.exists(evaluation_folder):
-        print "Saving tracking metrics in folder: " + evaluation_folder
+        print("Saving tracking metrics in folder: " + evaluation_folder)
         os.makedirs(evaluation_folder)
 
     

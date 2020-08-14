@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -45,7 +45,7 @@ def newCompositeDetectedPersonsAvailable(compositeDetectedPersons):
     markerScale = rospy.get_param("~marker_scale", 1.0)
 
     # Delete old markers
-    for markerId in xrange(oldestActiveMarkerId, currentMarkerId):
+    for markerId in range(oldestActiveMarkerId, currentMarkerId):
         marker = Marker()
         marker.header = compositeDetectedPersons.header
         marker.id = markerId

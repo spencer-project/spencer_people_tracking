@@ -95,7 +95,7 @@ class LogfilePublisher(object):
         self._currentAnnotationMsg = dict()
 
         if self._paused:
-            print self.COLOR_YELLOW + "Paused! Press SPACE to continue, S for single step..." + self.COLOR_DEFAULT
+            print(self.COLOR_YELLOW + "Paused! Press SPACE to continue, S for single step..." + self.COLOR_DEFAULT)
 
         # Start clock generator if requested
         if self.publishClock:
@@ -105,7 +105,7 @@ class LogfilePublisher(object):
                 clockThread.daemon = True
                 clockThread.start()
                 time.sleep(1.0)
-                print self.COLOR_GREEN + "Press SPACE to pause playback!" + self.COLOR_DEFAULT
+                print(self.COLOR_GREEN + "Press SPACE to pause playback!" + self.COLOR_DEFAULT)
             else:
                 rospy.logfatal("You want to use simulated time for replaying this logfile. Therefore use_sim_time parameter has to bet set before initialization of the node."
                                + "Make sure you add following line at the top of your launchfile \n <param name=\"use_sim_time\" value=\"true\"\\> ")
@@ -120,7 +120,7 @@ class LogfilePublisher(object):
             self._createPublishers()
             self._process(filename)
             while not rospy.is_shutdown():
-                rospy. sleep(1)
+                rospy.sleep(1)
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_terminal_settings)  # restore console settings
 
@@ -162,7 +162,7 @@ class LogfilePublisher(object):
                         elif self._isImage(readingType):
                             self._numImages += 1
                             numSubImages = int(content[0])
-                            for i in xrange(0, numSubImages):
+                            for i in range(0, numSubImages):
                                 numFieldsPerImage = 22
                                 subImageContent = content[1+i*numFieldsPerImage:1+(i+1)*numFieldsPerImage]
                                 self._cameraIDs.add( self._getCameraID(readingType, subImageContent) )
@@ -192,7 +192,7 @@ class LogfilePublisher(object):
 
         rospy.loginfo("Laser ID(s) in logfile: %s" % ', '.join(self._laserIDs))
         rospy.loginfo("Camera ID(s) in logfile: %s" % ', '.join(self._cameraIDs))
-        rospy.loginfo("Found occlusions in {} frames".format(len(filter(lambda x: len(x) > 0, self._occludedIDsPerTimestamp.values()))))
+        rospy.loginfo("Found occlusions in {} frames".format(len([x for x in list(self._occludedIDsPerTimestamp.values()) if len(x) > 0])))
 
     def _parseReading(self, line, quiet=False):
         readingType = None
@@ -283,11 +283,13 @@ class LogfilePublisher(object):
                 if not line.startswith("#"):
                     readingType, timestamp, content = self._parseReading(line, quiet=True)
 
-                    if timestamp < self.startAt:
+                    if timestamp is None or timestamp < self.startAt:
                         continue
                     elif timestamp > self.endAt:
                         break
+
                     annotationRead = False 
+
                     # Different types of sensor readings
                     if self._isLaserscan(readingType):
                         laserID = self._getLaserID(readingType, content)
@@ -307,7 +309,7 @@ class LogfilePublisher(object):
                         self._processImage(readingType, self._remappedTimestamp, content)
                     
                     if (self.publishTracks and annotationRead):
-                        if (self._currentAnnotationMsg.has_key(self._lastLaserID) and self._currentLaserMsgs.has_key(self._lastLaserID)):
+                        if (self._lastLaserID in self._currentAnnotationMsg and self._lastLaserID in self._currentLaserMsgs):
                             self._toTrackConverter.newSegmentationReceived(self._currentLaserMsgs[self._lastLaserID], self._currentAnnotationMsg[self._lastLaserID], self._occludedIDsPerTimestamp.get(self._lastLogTimestamp, []))
 
         rospy.loginfo("Playback of logfile has finished!")
@@ -335,14 +337,14 @@ class LogfilePublisher(object):
                     if self.publishClock:
                         self._paused = not self._paused
                         if self._paused:
-                            print self.COLOR_YELLOW + "Paused! Press SPACE to continue, S for single step..." + self.COLOR_DEFAULT
+                            print(self.COLOR_YELLOW + "Paused! Press SPACE to continue, S for single step..." + self.COLOR_DEFAULT)
                         else:
-                            print self.COLOR_GREEN + "Continuing..." + self.COLOR_DEFAULT
+                            print(self.COLOR_GREEN + "Continuing..." + self.COLOR_DEFAULT)
                     else:
-                        print self.COLOR_RED + "Pause / single step mode requires publish_clock argument to be true" + self.COLOR_DEFAULT
+                        print(self.COLOR_RED + "Pause / single step mode requires publish_clock argument to be true" + self.COLOR_DEFAULT)
 
                 elif key == '\x73' and self._paused:  # s
-                    print self.COLOR_GREEN + "Proceeding one single step!" + self.COLOR_DEFAULT
+                    print(self.COLOR_GREEN + "Proceeding one single step!" + self.COLOR_DEFAULT)
                     self._singleStep = True
 
             if not self._paused or self._singleStep:
@@ -392,11 +394,11 @@ class LogfilePublisher(object):
             laserscan.range_max = float(content[4])
 
             numRanges = int(content[7])
-            for i in xrange(0, numRanges):
+            for i in range(0, numRanges):
                 laserscan.ranges.append( float(content[8 + i]) )
 
             numRemissions = int(content[8 + numRanges])
-            for i in xrange(0, numRemissions):
+            for i in range(0, numRemissions):
                 laserscan.intensities.append( float(content[9 + numRanges + i]) )
 
         else:
@@ -420,10 +422,10 @@ class LogfilePublisher(object):
         numAssignedTrackLabels = int(content[2 + numForegroundLabels])
 
         offset = 3 + numForegroundLabels
-        for laserPointIndex in xrange(0, numTrackLabels):
+        for laserPointIndex in range(0, numTrackLabels):
             numTrackLabelsForThisPoint = int(content[offset])
             offset += 1
-            for trackLabelIndex in xrange(0, numTrackLabelsForThisPoint):
+            for trackLabelIndex in range(0, numTrackLabelsForThisPoint):
                 trackLabel = int(content[offset])
                 offset += 1
                 if not trackLabel in segmentMap:
@@ -431,7 +433,7 @@ class LogfilePublisher(object):
                 segmentMap[trackLabel].add(laserPointIndex)
                 
         # Convert content of segmentMap into LaserscanSegment messages
-        for trackLabel, laserPointIndices in segmentMap.iteritems():
+        for trackLabel, laserPointIndices in segmentMap.items():
             laserscanSegment = LaserscanSegment(label=trackLabel)
             for laserPointIndex in laserPointIndices:
                 laserscanSegment.measurement_indices.append(laserPointIndex)
@@ -455,10 +457,10 @@ class LogfilePublisher(object):
         numAssignedTrackLabels = int(content[2 + numForegroundLabels])
 
         offset = 3 + numForegroundLabels
-        for laserPointIndex in xrange(0, numTrackLabels):
+        for laserPointIndex in range(0, numTrackLabels):
             numTrackLabelsForThisPoint = int(content[offset])
             offset += 1
-            for trackLabelIndex in xrange(0, numTrackLabelsForThisPoint):
+            for trackLabelIndex in range(0, numTrackLabelsForThisPoint):
                 trackLabel = int(content[offset])
                 offset += 1
                 if not trackLabel in segmentMap:
@@ -466,51 +468,45 @@ class LogfilePublisher(object):
                 segmentMap[trackLabel].add(laserPointIndex)
                 
         # Convert content of segmentMap into LaserscanSegment messages
-        if not self._occludedIDsPerTimestamp.has_key(timestamp):
+        if timestamp not in self._occludedIDsPerTimestamp:
             self._occludedIDsPerTimestamp[timestamp] = []
-        for trackLabel in segmentMap.keys():
-            if (not self._activeTrackIDs.has_key(trackLabel) and not self._deletetTrackIDs.has_key(trackLabel)):
+        for trackLabel in list(segmentMap.keys()):
+            if (trackLabel not in self._activeTrackIDs and trackLabel not in self._deletetTrackIDs):
                 self._activeTrackIDs[trackLabel] = timestamp
-            elif (self._activeTrackIDs.has_key(trackLabel)):
+            elif (trackLabel in self._activeTrackIDs):
                 self._activeTrackIDs[trackLabel] = timestamp
-            elif (self._deletetTrackIDs.has_key(trackLabel)):
+            elif (trackLabel in self._deletetTrackIDs):
                 occludedTrack = dict()
                 occludedTrack['t_begin'] = self._deletetTrackIDs[trackLabel]
                 occludedTrack['t_end'] = timestamp
                 occludedTrack['label'] = trackLabel
                 rospy.logdebug("Track is occluded from time {} to {}".format(occludedTrack['t_begin'],occludedTrack['t_end'] ))
-                if (self._occludedIDs.has_key(occludedTrack['t_begin'])):
+                if (occludedTrack['t_begin'] in self._occludedIDs):
                     self._occludedIDs[occludedTrack['t_begin']].append(occludedTrack)
                 else:
                     self._occludedIDs[occludedTrack['t_begin']] = [occludedTrack ,]
                 del self._deletetTrackIDs[trackLabel]
-                sorted_timestamps = self._occludedIDsPerTimestamp.keys()
+                sorted_timestamps = list(self._occludedIDsPerTimestamp.keys())
                 for t in sorted_timestamps:
                     if (t < occludedTrack['t_end'] and t >= occludedTrack['t_begin']):
                         self._occludedIDsPerTimestamp[t].append(occludedTrack['label'])
     
                 
 
-        disappearedLabels = filter(lambda g: self._activeTrackIDs[g] != timestamp, self._activeTrackIDs.keys())
+        disappearedLabels = [g for g in list(self._activeTrackIDs.keys()) if self._activeTrackIDs[g] != timestamp]
         if (len(disappearedLabels)):
             rospy.logdebug("{} track labels disappeared".format(len(disappearedLabels)))
         for disappearedLabel in disappearedLabels:
             self._deletetTrackIDs[disappearedLabel] = timestamp
             del self._activeTrackIDs[disappearedLabel]
-            
-                
-                
-                
-            
-            
-            
+
 
     def _processImage(self, readingType, remappedTimestamp, content):
         if self._binaryFile is None:
             return
             
         numSubImages = int(content[0])
-        for i in xrange(0, numSubImages):
+        for i in range(0, numSubImages):
             numFieldsPerImage = 22
             subImageContent = content[1+i*numFieldsPerImage:1+(i+1)*numFieldsPerImage]
 
@@ -523,7 +519,7 @@ class LogfilePublisher(object):
                 self._binaryFile.seek(imageStartsAtByte)
                 rawData = self._binaryFile.read(numBytes)
                 imageBuffer = numpy.fromstring(rawData, dtype=numpy.uint8)
-            except Exception, e:
+            except Exception as e:
                 rospy.logwarn("Failed to read binary data of image #%d in line %d. Reason: %s" % (i, self._lineCounter, e) )
                 continue
 
@@ -539,8 +535,8 @@ class LogfilePublisher(object):
             self._imageCounter += 1
 
     def _publishClock(self, clockRate):
-        print 'Starting to publish simulated time on /clock and setting /use_sim_time to true.'
-        print 'Simulated time is running at %fx speed.' % clockRate
+        print('Starting to publish simulated time on /clock and setting /use_sim_time to true.')
+        print('Simulated time is running at %fx speed.' % clockRate)
         clockPublisher = rospy.Publisher( "/clock", Clock, queue_size=1 )
 
         if self.timingMode == LogfilePublisher.TimingMode.use_timestamps:
@@ -564,7 +560,7 @@ class LogfilePublisher(object):
             try:
                 clockPublisher.publish(clock)
             except Exception:
-                print 'Publisher closed' 
+                print('Publisher closed') 
             time.sleep(0.01)
 
     def _keyPressed(self):
@@ -614,7 +610,7 @@ class SegmentationToTrackConverter(object):
             self._lastDataStamp = laserscanSegmentation.header.stamp
 
         # Build lookup of cartesian coordinates per laser point
-        for pointIndex in xrange(0, pointCount):
+        for pointIndex in range(0, pointCount):
             cartesianCoordinates.append( self.calculateCartesianCoordinates(laserscan, pointIndex) )
 
         # For each labelled segment, create and append one TrackedPerson and DetectedPerson message       
@@ -699,7 +695,7 @@ class SegmentationToTrackConverter(object):
             detectedPerson.confidence = 1.0
             detectedPerson.pose = copy.deepcopy(trackedPerson.pose)
             detectedPerson.pose.pose.orientation = Quaternion()
-            for i in xrange(0, 2):
+            for i in range(0, 2):
                 detectedPerson.pose.covariance[i * 6 + i] = 0.17 * 0.17
             detectedPerson.pose.covariance[5 * 6 + 5] = LARGE_VARIANCE  # yaw
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -66,13 +66,13 @@ for topic, msg, timestamp in rosbag.Bag(infilename).read_messages():
     if topic == topicName:
         # Dump header timestamps
         if msg._has_header :
-            print msg.header.stamp.to_sec()        
+            print(msg.header.stamp.to_sec())        
 
     # Show status info
     msg_index+=1
     if msg_index % (msg_count / 100) == 0:
         percent = int(100.0 * msg_index / msg_count + 0.5)
-        progressBar = u"[" + u"\u2588" * percent + u"\u2591" * (100-percent) + "]"
+        progressBar = "[" + "\u2588" * percent + "\u2591" * (100-percent) + "]"
         sys.stderr.write("\r%s %d %% completed" % (progressBar, percent))
         sys.stderr.flush()
 

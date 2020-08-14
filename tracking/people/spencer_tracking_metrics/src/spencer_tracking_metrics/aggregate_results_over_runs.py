@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -29,7 +29,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from __future__ import print_function
+
 import sys, os, numpy, re
 
 
@@ -87,7 +87,7 @@ def aggregateResults(resultsPath, numExpectedGTCycles):
                     pymotKeys = lines[0].split()
                     pymotValues = lines[1].split()
 
-                    for i in xrange(0, len(pymotKeys)):
+                    for i in range(0, len(pymotKeys)):
                         pymotKey = pymotKeys[i]
                         pymotValue = num(pymotValues[i])
 
@@ -97,7 +97,7 @@ def aggregateResults(resultsPath, numExpectedGTCycles):
                                 ignoreThisRun = True
 
                     if not ignoreThisRun:
-                        for i in xrange(0, len(pymotKeys)):
+                        for i in range(0, len(pymotKeys)):
                             pymotKey = pymotKeys[i]
                             pymotValue = num(pymotValues[i])
 
@@ -139,10 +139,10 @@ def aggregateResults(resultsPath, numExpectedGTCycles):
                         if not key in timingStatistics:
                             timingStatistics[key] = []
 
-                    for row in xrange(1, len(lines)):
+                    for row in range(1, len(lines)):
                         valuesInRow = lines[row].split(";")
 
-                        for col in xrange(0, len(valuesInRow)):
+                        for col in range(0, len(valuesInRow)):
                             key = timingKeys[col]
                             timingStatistics[key].append( num(valuesInRow[col]) )
 

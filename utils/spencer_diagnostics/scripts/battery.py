@@ -46,5 +46,5 @@ while not rospy.is_shutdown():
   rate.sleep()
 
 
-print "Closing battery monitor"
+print("Closing battery monitor")
 proxy.close()

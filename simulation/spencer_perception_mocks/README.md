@@ -9,7 +9,7 @@ Prerequisites
 -------------
 The SciPy package needs to be installed for all scripts to run:
 
-    sudo apt-get install python-scipy
+    sudo apt-get install python3-scipy
     
 Usage
 -----

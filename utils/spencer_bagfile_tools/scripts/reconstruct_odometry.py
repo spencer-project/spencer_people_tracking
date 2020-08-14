@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -168,8 +168,8 @@ class OdometryController(object):
         odom.pose.pose.position.x = self.previousState.x
         odom.pose.pose.position.y = self.previousState.y
 
-        for row in xrange(0, 6):
-            for col in xrange(0, 6):
+        for row in range(0, 6):
+            for col in range(0, 6):
                 odom.pose.covariance[6*row+col] = 0 if row != col else 0.1
                 odom.twist.covariance[6*row+col] = 0 if row != col else 999999
 
@@ -234,7 +234,7 @@ class OdometryController(object):
 
         # Delete old markers
         currentTimestampMarkerCount = len(markerArray.markers)
-        for i in xrange(0, self.previousTimestampMarkerCount - currentTimestampMarkerCount):
+        for i in range(0, self.previousTimestampMarkerCount - currentTimestampMarkerCount):
             timestampMarker = Marker()
             timestampMarker.header = waypointMarker.header
             timestampMarker.ns = "Timestamps"

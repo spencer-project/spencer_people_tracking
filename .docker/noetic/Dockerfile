@@ -1,10 +1,11 @@
 # ROS base image without GPU support
-FROM ros:melodic-perception
+FROM ros:noetic-perception
 
 # Install build tools
 RUN apt-get update && apt-get install -y \
-      python-catkin-tools python-rosdep tmux vim \
+      python3-catkin-tools python3-rosdep python3-pip tmux vim \
     && rm -rf /var/lib/apt/lists/*
+RUN pip3 install osrf-pycommon
 
 # Setup workspace
 ENV CATKIN_WS=/root/catkin_ws

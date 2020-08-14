@@ -189,7 +189,7 @@ class TrackSynchronizer(message_filters.SimpleFilter):
         self.lock = threading.Lock()
 
     def signalMessage(self, *msg):
-        for (cb, args) in self.callbacks.values():
+        for (cb, args) in list(self.callbacks.values()):
             cb(*( (self.trackAssociation,) + msg + args) )
 
     def connectInput(self, inputFilter):

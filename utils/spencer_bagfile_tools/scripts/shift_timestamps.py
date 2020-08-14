@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 # 
@@ -49,7 +49,7 @@ infilename = sys.argv[1]
 outfilename = infilename + ".shifted"
 
 if os.path.isfile(outfilename):
-    print COLOR_ERROR +  'Output file ' + outfilename + ' already exists, cannot proceed!!'
+    print(COLOR_ERROR +  'Output file ' + outfilename + ' already exists, cannot proceed!!')
     sys.exit(2) 
 
 info_dict = yaml.load(subprocess.Popen(['rosbag', 'info', '--yaml', infilename], stdout=subprocess.PIPE).communicate()[0])
@@ -61,7 +61,7 @@ for topicInfo in info_dict["topics"] :
     print("  %s (%d messages)" % (topic, topicInfo["messages"]))
 
 
-print '\nShifting timestamps in bagfile ' + infilename + ' by ' + str(delaySeconds) + ' seconds!'
+print('\nShifting timestamps in bagfile ' + infilename + ' by ' + str(delaySeconds) + ' seconds!')
 
 msg_index = 0
 outbag = rosbag.Bag(outfilename, 'w', chunk_threshold = 50*1024*1024)
@@ -84,7 +84,7 @@ try:
         msg_index+=1
         if msg_index % (msg_count / 100) == 0:
             percent = int(100.0 * msg_index / msg_count + 0.5)
-            progressBar = u"[" + u"\u2588" * percent + u"\u2591" * (100-percent) + "]"
+            progressBar = "[" + "\u2588" * percent + "\u2591" * (100-percent) + "]"
             sys.stdout.write("\r%s %d %% completed" % (progressBar, percent))
             sys.stdout.flush()
 

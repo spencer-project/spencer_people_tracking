@@ -18,7 +18,7 @@ echo "${YELLOW}Extracting bagfiles ...${NOCOLOR}"
 echo
 
 # Not using unzip here as it may not be installed on all systems
-python -c "import zipfile; zipfile.PyZipFile('bagfiles.zip').extractall()"
+python3 -c "import zipfile; zipfile.PyZipFile('bagfiles.zip').extractall()"
 
 echo
 echo "${YELLOW}Cleaning up ...${NOCOLOR}"

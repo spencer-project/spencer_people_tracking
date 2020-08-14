@@ -137,7 +137,7 @@ bool OpenCvDetector::loadModel(const std::string& filename)
 
     // Check type of detector that was used to train the model
     cv::FileNode detectorTypeNode = fileStorage["detector_type"];
-    std::string detectorType = (std::string) detectorTypeNode[0];
+    std::string detectorType = (std::string) detectorTypeNode;
     if(detectorType != getName()) {
         ROS_ERROR_STREAM("Detector of type '" << getName() << "' cannot load a model learned for detector of type '" << detectorType << "'!");
         throw std::exception();

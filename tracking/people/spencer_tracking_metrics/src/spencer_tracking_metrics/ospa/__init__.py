@@ -1,6 +1,6 @@
 import numpy, rospy
 from spencer_tracking_msgs.msg import TrackedPersons
-import ospa as ospa_implementation
+from . import ospa as ospa_implementation
 from std_msgs.msg import Float32 as ResultMsg
 
 

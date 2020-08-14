@@ -1,4 +1,4 @@
-from utilities import write_stderr_red
+from .utilities import write_stderr_red
 
 class FormatChecker:
 
@@ -48,7 +48,7 @@ class FormatChecker:
         for f in self.groundtruth_["frames"]:
             for g in f["annotations"]:
                 
-                if not "id" in g.keys():
+                if not "id" in list(g.keys()):
                     write_stderr_red("Warning:", "Groundtruth without ID found, timestamp %f, frame %d!" % (f["timestamp"], f["num"] if "num" in f else -1))
                     result &= False
                     continue
@@ -61,7 +61,7 @@ class FormatChecker:
         # Hypotheses without ids or with empty ids
         for f in self.hypotheses_["frames"]:
             for h in f["hypotheses"]:
-                if not "id" in h.keys():
+                if not "id" in list(h.keys()):
                     write_stderr_red("Warning:", "Hypothesis without ID found, timestamp %f, frame %d!" % (f["timestamp"], f["num"] if "num" in f else -1))
                     result &= False
                     continue
@@ -83,7 +83,7 @@ class FormatChecker:
         for f in self.groundtruth_["frames"]:
             for g in f["annotations"]:
                 for key in expectedKeys:
-                    if not key in g.keys():
+                    if not key in list(g.keys()):
                         write_stderr_red("Warning:", "Groundtruth without key %s found, timestamp %f, frame %d!" % (key, f["timestamp"], f["num"] if "num" in f else -1))
                         result &= False
 
@@ -91,7 +91,7 @@ class FormatChecker:
         for f in self.hypotheses_["frames"]:
             for h in f["hypotheses"]:
                 for key in expectedKeys:
-                    if not key in h.keys():
+                    if not key in list(h.keys()):
                         write_stderr_red("Warning:", "Hypothesis without key %s found, timestamp %f, frame %d!" % (key, f["timestamp"], f["num"] if "num" in f else -1))
                         result &= False
 

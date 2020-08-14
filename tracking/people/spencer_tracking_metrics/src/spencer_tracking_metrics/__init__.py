@@ -41,7 +41,7 @@ def calculatePyMot(clearMotInput):
     hypotheses = dict()
     hypotheses["frames"] = []
     
-    for cycleIdx in xrange(0, len(clearMotInput.groundTruthArray)):
+    for cycleIdx in range(0, len(clearMotInput.groundTruthArray)):
         # Make sure input data is in the same coordinate frame
         assert(clearMotInput.groundTruthArray[cycleIdx].header.frame_id == clearMotInput.trackedPersonsArray[cycleIdx].header.frame_id)
             

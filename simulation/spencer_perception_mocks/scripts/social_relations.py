@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Author: Timm Linder, linder@cs.uni-freiburg.de
 #
 # Subscribes to /spencer/perception/tracked_persons and publishes at /spencer/perception/social_relations
@@ -29,8 +29,8 @@ def newDataAvailable(trackedPersons):
     socialRelations.header = trackedPersons.header
 
     # Generate one SocialRelation per pair of tracks
-    for t1index in xrange(0, trackCount):
-        for t2index in xrange(t1index+1, trackCount):
+    for t1index in range(0, trackCount):
+        for t2index in range(t1index+1, trackCount):
             distanceIndex = scipy.misc.comb(trackCount, 2) - scipy.misc.comb(trackCount - t1index, 2) + (t2index - t1index - 1) # see docs on squareform()
             trackDistance = trackDistances[distanceIndex]
             mappedTrackDistance = 1.0 - min(trackDistance, maxDistance) / maxDistance 
@@ -50,7 +50,7 @@ def extractTrackPositions(trackedPersons):
     # This assumes that data arrives in "odom" frame (x, y = coordinates on groundplane)
     trackPositionsMatrix = numpy.zeros( (len(trackedPersons.tracks), 2) )
 
-    for i in xrange(0, len(trackedPersons.tracks)) :
+    for i in range(0, len(trackedPersons.tracks)) :
         pos = trackedPersons.tracks[i].pose.pose.position            
         trackPositionsMatrix[i, :] = [ pos.x, pos.y ]
 

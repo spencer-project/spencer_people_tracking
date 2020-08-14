@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+# !/usr/bin/env python3
 
 #  Software License Agreement (BSD License)
 #
@@ -77,14 +77,14 @@ def find_parameters():
     rospack = rospkg.RosPack()
     for package_name in packages_for_paramteres:
         package_path = rospack.get_path(package_name)
-        print 'Searching for parameters in package: {}'.format(package_path) 
+        print('Searching for parameters in package: {}'.format(package_path)) 
         for file in parameter_files_to_search:
             param_file = package_path + file
             try:
                 params_in_file = yaml.load(open(param_file))
                 for param_key in parameters_to_optimize:
                     if param_key in params_in_file:
-                        print 'Found {} in {} paramfile {}'.format(param_key, param_file, parameters_to_optimize[param_key])
+                        print('Found {} in {} paramfile {}'.format(param_key, param_file, parameters_to_optimize[param_key]))
                         new_param = {'name':param_key, 'path':param_file, 'default':parameters_to_optimize[param_key][-1], 'current':50}
                         parameter_list.append(new_param)
             except:
@@ -99,7 +99,7 @@ def write_parameters():
             param_file.write(yaml.dump(params_in_file, default_flow_style=True) )
             
 def resultCallback(result):
-    print "PyMot results received {}".format(result)
+    print("PyMot results received {}".format(result))
     mota = result.data
     global mota_result     
     mota_result = mota
@@ -120,7 +120,7 @@ def start_node(child_conn):
     process_sim = subprocess.Popen(roslauch_command, preexec_fn=os.setsid) 
     node = rospy.init_node('tuning_node', anonymous=True)
     while rospy.is_shutdown():
-        print 'Waiting for ROS to start'
+        print('Waiting for ROS to start')
         sleep(1) 
     rospy.Subscriber("/pymot_mismatches", Float32, resultCallback)
     rospy.spin()
@@ -130,13 +130,13 @@ def start_node(child_conn):
     child_conn.send(tuning_object)
 
 def optimize_parameters(**kwargs):
-    print "Function was called with arguments: {}".format(kwargs)
+    print("Function was called with arguments: {}".format(kwargs))
     #Modify values in parameter list depending on passed values
-    for arg in kwargs.keys():
+    for arg in list(kwargs.keys()):
         try:
             current = next(param for param in parameter_list if param['name']==arg)
             current['current'] = kwargs[arg]
-            print "Parameter {} has current value={}".format(current['name'], current['current'])
+            print("Parameter {} has current value={}".format(current['name'], current['current']))
         except:
             pass
     write_parameters()
@@ -145,7 +145,7 @@ def optimize_parameters(**kwargs):
     p = Process(target=start_node, args=(child_conn,))
     p.start()
     result = parent_conn.recv()
-    print 'Received current result {}'.format(result['result'])
+    print('Received current result {}'.format(result['result']))
     p.join()
     p.terminate()   
     return result['result']
@@ -154,7 +154,7 @@ def init_optimization():
     opt = pysmac.SMAC_optimizer(deterministic=True, working_directory= '/home/fabian/tmp/',persistent_files=True, debug = False)
     parameter_definition= parameters_to_optimize
     
-    print parameter_definition
+    print(parameter_definition)
     
     value, parameters = opt.minimize(optimize_parameters        # the function to be minimized
                     , 300                                       # the maximum number of function evaluations

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Software License Agreement (BSD License)
 #
@@ -34,7 +34,7 @@
 
 ##\author Kevin Watts
 
-from __future__ import with_statement
+
 import roslib
 
 import rospy
@@ -105,7 +105,7 @@ def check_ipmi():
             if words[0].startswith('CPU') and words[0].strip().endswith('Temp'):
                 if words[1].strip().endswith('degrees C'):
                     tmp = ipmi_val.rstrip(' degrees C').lstrip()
-                    if unicode(tmp).isnumeric():
+                    if str(tmp).isnumeric():
                         temperature = float(tmp)
                         diag_vals.append(KeyValue(key = name + ' (C)', value = tmp))
 
@@ -133,7 +133,7 @@ def check_ipmi():
                     diag_vals.append(KeyValue(key = name + ' (C)', value = tmp))
                     # Give temp warning
                     dev_name = name.split()[0]
-                    if unicode(tmp).isnumeric():
+                    if str(tmp).isnumeric():
                         temperature = float(tmp)
 
                         if temperature >= 60 and temperature < 75:
@@ -153,7 +153,7 @@ def check_ipmi():
             if (name.startswith('CPU') and name.endswith('Fan')) or name == 'MB Fan':
                 if ipmi_val.endswith('RPM'):
                     rpm = ipmi_val.rstrip(' RPM').lstrip()
-                    if unicode(rpm).isnumeric():
+                    if str(rpm).isnumeric():
                         if int(rpm) == 0:
                             diag_level = max(diag_level, DiagnosticStatus.ERROR)
                             diag_msgs.append('CPU Fan Off')
@@ -172,7 +172,7 @@ def check_ipmi():
                     diag_level = max(diag_level, DiagnosticStatus.ERROR)
                     diag_msgs.append('CPU Hot Alarm')
 
-    except Exception, e:
+    except Exception as e:
         diag_vals.append(KeyValue(key = 'Exception', value = traceback.format_exc()))
         diag_level = DiagnosticStatus.ERROR
         diag_msgs.append('Exception')
@@ -207,7 +207,7 @@ def check_core_temps(sys_temp_strings):
             return diag_vals, diag_msgs, diag_level
   
         tmp = stdout.strip()
-        if unicode(tmp).isnumeric():
+        if str(tmp).isnumeric():
             temp = float(tmp) / 1000
             diag_vals.append(KeyValue(key = 'Core %d Temp' % index, value = str(temp)))
 
@@ -251,7 +251,7 @@ def check_clock_speed(enforce_speed):
 
             speed = words[1].strip().split('.')[0] # Conversion to float doesn't work with decimal
             vals.append(KeyValue(key = 'Core %d MHz' % index, value = speed))
-            if unicode(speed).isnumeric():
+            if str(speed).isnumeric():
                 mhz = float(speed)
                 
                 if mhz < 2240 and mhz > 2150:
@@ -270,7 +270,7 @@ def check_clock_speed(enforce_speed):
         elif lvl == DiagnosticStatus.ERROR and enforce_speed:
             msgs = [ 'Core throttled' ]
 
-    except Exception, e:
+    except Exception as e:
         rospy.logerr(traceback.format_exc())
         lvl = DiagnosticStatus.ERROR
         msgs.append('Exception')
@@ -315,7 +315,7 @@ def check_uptime(load1_threshold, load5_threshold):
         vals.append(KeyValue(key = '15 min Load Average', value = load15))
         vals.append(KeyValue(key = 'Number of Users', value = num_users))
 
-    except Exception, e:
+    except Exception as e:
         rospy.logerr(traceback.format_exc())
         level = DiagnosticStatus.ERROR
         vals.append(KeyValue(key = 'Load Average Status', value = traceback.format_exc()))
@@ -360,7 +360,7 @@ def check_memory():
         values.append(KeyValue(key = 'Free Memory', value = free_mem))
 
         msg = mem_dict[level]
-    except Exception, e:
+    except Exception as e:
         rospy.logerr(traceback.format_exc())
         msg = 'Memory Usage Check Error'
         values.append(KeyValue(key = msg, value = str(e)))
@@ -463,7 +463,7 @@ def check_mpstat(core_count = -1):
                 has_error_core_count = True
             return DiagnosticStatus.ERROR, 'Incorrect number of CPU cores', vals
             
-    except Exception, e:
+    except Exception as e:
         mp_level = DiagnosticStatus.ERROR
         vals.append(KeyValue(key = 'mpstat Exception', value = str(e)))
 
@@ -592,7 +592,7 @@ class CPUMonitor():
                     self._temps_timer.cancel()
                 
             self.check_temps()
-        except Exception, e:
+        except Exception as e:
             rospy.logerr('Unable to restart temp thread. Error: %s' % traceback.format_exc())
             
 
@@ -661,7 +661,7 @@ class CPUMonitor():
                 vals.append(KeyValue(
                         key = '%s Write Blks srv/s' % file_sys, value=w_blk_srv))
                 
-        except Exception, e:
+        except Exception as e:
             rospy.logerr(traceback.format_exc())
             nfs_level = DiagnosticStatus.ERROR
             msg = 'Exception'
@@ -820,7 +820,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('cpu_monitor_%s' % hostname)
     except rospy.exceptions.ROSInitException:
-        print >> sys.stderr, 'CPU monitor is unable to initialize node. Master may not be running.'
+        print('CPU monitor is unable to initialize node. Master may not be running.', file=sys.stderr)
         sys.exit(0)
 
     cpu_node = CPUMonitor(hostname, options.diag_hostname)
@@ -832,7 +832,7 @@ if __name__ == '__main__':
             cpu_node.publish_stats()
     except KeyboardInterrupt:
         pass
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc()
         rospy.logerr(traceback.format_exc())
 

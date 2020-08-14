@@ -72,14 +72,14 @@ class OSPADistance():
         existing_Y_ids = []
         total_loc = 0
         
-        for gt_id in self.gt_mappings.keys():
-            groundtruth = filter(lambda g: g['id'] == gt_id, Y_GT) # Get ground truths with given ground truth id in current frame
+        for gt_id in self.gt_mappings:
+            groundtruth = [g for g in Y_GT if g['id'] == gt_id] # Get ground truths with given ground truth id in current frame
             if len(groundtruth) > 1:
                 rospy.loginfo("found %d > 1 ground truth tracks for id %s", len(groundtruth), gt_id)
             elif len(groundtruth) < 1:
                 continue
             
-            hypothesis = filter(lambda h: h['id'] == self.gt_mappings[gt_id], X_Tracks) # Get hypothesis with hypothesis id according to mapping
+            hypothesis = [h for h in X_Tracks if h['id'] == self.gt_mappings[gt_id]] # Get hypothesis with hypothesis id according to mapping
             assert len(hypothesis) <= 1
             if len(hypothesis) != 1:
                 continue
@@ -96,10 +96,10 @@ class OSPADistance():
                 existing_Y_ids.append(groundtruth[0]['id'])
                 #Removing found correspondences from SETS
         if len(existing_X_ids) > 0:
-            X_Tracks = filter(lambda h: h['id'] not in existing_X_ids, X_Tracks) 
+            X_Tracks = [h for h in X_Tracks if h['id'] not in existing_X_ids] 
         
         if len(existing_Y_ids) > 0:
-            Y_GT = filter(lambda g: g['id'] not in existing_Y_ids, Y_GT) 
+            Y_GT = [g for g in Y_GT if g['id'] not in existing_Y_ids] 
 
 
 
@@ -114,11 +114,11 @@ class OSPADistance():
             munkres_matrix = numpy.copy(dists)
             # Only run munkres on non-empty matrix
             if munkres_matrix.min() == self.c:
-                indices = zip(range(max(len(X_Tracks),len(Y_GT))), range(max(len(X_Tracks),len(Y_GT))))
+                indices = list(zip(list(range(max(len(X_Tracks),len(Y_GT)))), list(range(max(len(X_Tracks),len(Y_GT))))))
             elif len(munkres_matrix) > 1:
                 if self.use_lapjv:
                     lap_result = self.lapjv.lap(numpy.array(munkres_matrix, dtype=numpy.float32 ))
-                    indices = zip(range(max(len(X_Tracks),len(Y_GT))), lap_result[1])
+                    indices = list(zip(list(range(max(len(X_Tracks),len(Y_GT)))), lap_result[1]))
                 else:
                     munkres = Munkres()
                     #rospy.logdebug(munkres_matrix)
@@ -135,10 +135,10 @@ class OSPADistance():
             for [t,g] in indices:
                 total_loc += min(dists[t][g],self.c)**self.p
                 if dists[t][g] < self.c:
-                    if Y_GT[g]['id'] in self.gt_mappings.keys() and self.gt_mappings[Y_GT[g]['id']] != X_Tracks[t]['id']:
+                    if Y_GT[g]['id'] in list(self.gt_mappings.keys()) and self.gt_mappings[Y_GT[g]['id']] != X_Tracks[t]['id']:
                         rospy.logdebug("Detected id switch for ground truth track {} assigned before to {} now assigned to {}".format(Y_GT[g]['id'], self.gt_mappings[Y_GT[g]['id']],X_Tracks[t]['id'] ))
                         fragments += 1
-                        if X_Tracks[t]['id'] in self.gt_mappings.values():
+                        if X_Tracks[t]['id'] in list(self.gt_mappings.values()):
                             wrong_labels += 1
                     new_mappings[Y_GT[g]['id']] = X_Tracks[t]['id']
                     rospy.logdebug("Found new mapping for gt_id {} to track_id {}".format(Y_GT[g]['id'], X_Tracks[t]['id']))

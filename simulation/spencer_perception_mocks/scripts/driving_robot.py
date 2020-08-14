@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Author: Timm Linder, linder@cs.uni-freiburg.de
 #
 # Simulates a driving robot and publishes the corresponding odom --> base_footprint transform on /tf

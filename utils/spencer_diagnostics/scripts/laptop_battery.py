@@ -102,5 +102,5 @@ while not rospy.is_shutdown():
 
   rate.sleep()
 
-print "Closing laptop battery monitor"
+print("Closing laptop battery monitor")
 

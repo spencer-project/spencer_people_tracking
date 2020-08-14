@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -40,7 +40,7 @@ import svgwrite
 
 import roslib, rospy; roslib.load_manifest('srl_tracking_exporter')
 from spencer_tracking_msgs.msg import TrackedGroups, TrackedGroup
-from tracks_to_svg import *
+from .tracks_to_svg import *
 
 ### Database for storing information ###
 class GroupDatabase(TrackDatabase):

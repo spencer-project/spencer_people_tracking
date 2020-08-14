@@ -1,11 +1,12 @@
 # GPU support (only works if nvidia-container-toolkit is installed on the docker host)!
-FROM nvidia/cudagl:10.1-runtime-ubuntu18.04
+# FIXME: 20.04 image with GL support is not yet available. Update this file once it is ready
+FROM nvidia/cudagl:10.1-runtime-ubuntu20.04
 RUN apt-get update && apt-get install -y lsb-release curl && rm -rf /var/lib/apt/lists/*
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-# Following block originates from https://github.com/osrf/docker_images/blob/master/ros/melodic/ubuntu/bionic/ros-core/Dockerfile
-# and http://wiki.ros.org/melodic/Installation/Ubuntu
+# Following block originates from https://github.com/osrf/docker_images/blob/master/ros/noetic/ubuntu/bionic/ros-core/Dockerfile
+# and http://wiki.ros.org/noetic/Installation/Ubuntu
 # Copyright 2020 Open Source Robotics Foundation (CC-BY 3.0 license)
 # setup timezone, otherwise we get prompted for it during docker build
 RUN echo 'Etc/UTC' > /etc/timezone && \
@@ -15,15 +16,16 @@ RUN echo 'Etc/UTC' > /etc/timezone && \
     rm -rf /var/lib/apt/lists/*
 RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros1-latest.list
 RUN curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | apt-key add -
-RUN apt-get update && apt-get install -y --no-install-recommends ros-melodic-perception && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ros-noetic-perception && rm -rf /var/lib/apt/lists/*
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV ROS_DISTRO melodic
+ENV ROS_DISTRO noetic
 
 # Install build tools
 RUN apt-get update && apt-get install -y \
-      python-catkin-tools python-rosdep tmux vim \
+      python3-catkin-tools python3-rosdep python3-pip tmux vim \
     && rm -rf /var/lib/apt/lists/*
+RUN pip3 install osrf-pycommon
 
 # Setup workspace
 ENV CATKIN_WS=/root/catkin_ws
