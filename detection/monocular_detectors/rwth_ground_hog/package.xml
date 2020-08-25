@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>rwth_ground_hog</name>
-  <version>1.0.8</version>
+  <version>1.0.10</version>
   <description>The ground_hog package</description>
 
   <maintainer email="cdondrup@lincoln.ac.uk">Christian Dondrup</maintainer>
