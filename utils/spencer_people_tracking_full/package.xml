@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_people_tracking_full</name>
-  <version>1.0.8</version>
+  <version>1.0.10</version>
   
   <description>
     A metapackage which depends on all subpackages of the SPENCER People Tracking Framework.

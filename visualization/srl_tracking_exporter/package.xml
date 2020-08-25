@@ -1,6 +1,6 @@
 <package>
   <name>srl_tracking_exporter</name>
-  <version>1.0.8</version>
+  <version>1.0.10</version>
   <description>
      Various exporters e.g. for SVG renderings
   </description>
