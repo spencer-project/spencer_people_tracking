@@ -2,8 +2,8 @@
 Changelog for package spencer_detected_person_association
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Various smaller fixes for ROS Kinetic
   - Reduce logging level at nodelet startup to remove logging clutter
   - Bugfix for `#78 <https://github.com/spencer-project/spencer_people_tracking/issues/78>`_, blocked aggregator nodelets due to detector stall. Fix by monitoring if any message are actually received on detections topic, before advertising publisher.

@@ -2,8 +2,8 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Various smaller fixes for ROS Kinetic
   - Configurable odom and base footprint frame IDs (fixes `#53 <https://github.com/spencer-project/spencer_people_tracking/issues/53>`_)
 * Restore functionality of srl_laser_detectors by replacing old trained models (broken due to changes in Eigen and OpenCV) with new ones.

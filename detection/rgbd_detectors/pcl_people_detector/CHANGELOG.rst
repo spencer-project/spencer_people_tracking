@@ -2,8 +2,8 @@
 Changelog for package pcl_people_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Use find_package(Eigen3) instead of find_package(Eigen)
 * Contributors: Timm Linder
 

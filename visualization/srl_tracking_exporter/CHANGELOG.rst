@@ -2,8 +2,8 @@
 Changelog for package srl_tracking_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Merge pull request `#65 <https://github.com/spencer-project/spencer_people_tracking/issues/65>`_ from dandedrick/fix-logerror
   job_monitor: replace logerror with logerr
 * job_monitor: replace logerror with logerr

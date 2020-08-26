@@ -2,8 +2,8 @@
 Changelog for package spencer_vision_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Merge pull request `#1 <https://github.com/spencer-project/spencer_people_tracking/issues/1>`_ from spencer-project/master
   Adding confidence field to PersonROI message
 * Contributors: Manuel Fernandez-Carmona, Timm Linder

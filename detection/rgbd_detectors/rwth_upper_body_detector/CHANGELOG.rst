@@ -2,8 +2,8 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Adapt stability fixes to upper-body detector + config changes from LCAS (provided by Manuel in pull request `#59 <https://github.com/spencer-project/spencer_people_tracking/issues/59>`_, commit e5ca86b28c99) to the SPENCER version.
 * Merge branch 'master' of https://github.com/MFernandezCarmona/spencer_people_tracking into master
 * Merge pull request `#52 <https://github.com/spencer-project/spencer_people_tracking/issues/52>`_ from Sangheli/patch-1

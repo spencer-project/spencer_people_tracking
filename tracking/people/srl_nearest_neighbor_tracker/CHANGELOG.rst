@@ -2,8 +2,8 @@
 Changelog for package srl_nearest_neighbor_tracker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Various smaller fixes for ROS Kinetic
   - Use find_package(Eigen3) instead of find_package(Eigen)
   - Configurable odom and base footprint frame IDs (fixes `#53 <https://github.com/spencer-project/spencer_people_tracking/issues/53>`_)

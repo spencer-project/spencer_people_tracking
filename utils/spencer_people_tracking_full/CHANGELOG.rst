@@ -2,8 +2,8 @@
 Changelog for package spencer_people_tracking_full
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Contributors: Timm Linder
 
 1.0.10 (2018-09-22)

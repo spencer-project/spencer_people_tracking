@@ -2,8 +2,8 @@
 Changelog for package rwth_ground_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Various smaller fixes for ROS Kinetic
   - Fix build warnings in laser_features and rwth_ground_plane
   - Configurable odom and base footprint frame IDs (fixes `#53 <https://github.com/spencer-project/spencer_people_tracking/issues/53>`_)

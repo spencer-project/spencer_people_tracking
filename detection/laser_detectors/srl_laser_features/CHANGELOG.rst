@@ -2,8 +2,8 @@
 Changelog for package srl_laser_features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2020-08-26)
+-------------------
 * Restore functionality of srl_laser_detectors by replacing old trained models (broken due to changes in Eigen and OpenCV) with new ones.
   Training functionality restored by slight revision of training ROS node according to new protocol.
   Improved error handling in laser detectors.
