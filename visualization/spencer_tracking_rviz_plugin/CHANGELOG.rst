@@ -2,8 +2,8 @@
 Changelog for package spencer_tracking_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.1 (2020-08-26)
+------------------
 * Fix Qt5 cmake module not being found
 * Contributors: Timm Linder
 
