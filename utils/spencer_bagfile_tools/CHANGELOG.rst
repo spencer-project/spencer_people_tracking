@@ -2,6 +2,9 @@
 Changelog for package spencer_bagfile_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.3.0 (2020-08-26)
 ------------------
 * Merge branch 'melodic' into noetic

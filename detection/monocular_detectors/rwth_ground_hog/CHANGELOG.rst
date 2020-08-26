@@ -2,6 +2,9 @@
 Changelog for package rwth_ground_hog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.3.0 (2020-08-26)
 ------------------
 * Merge branch 'melodic' into noetic

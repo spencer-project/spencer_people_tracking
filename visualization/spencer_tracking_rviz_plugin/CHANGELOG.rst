@@ -2,6 +2,11 @@
 Changelog for package spencer_tracking_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix Qt5 cmake module not being found
+* Contributors: Timm Linder
+
 1.3.0 (2020-08-26)
 ------------------
 * Merge branch 'melodic' into noetic
