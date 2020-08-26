@@ -2,6 +2,22 @@
 Changelog for package spencer_detected_person_association
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2020-08-26)
+------------------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+  - Replace deprecated pluginlib macro
+  - Add boost namespace for shared_ptr
+* Contributors: Timm Linder
+
+1.0.11 (2020-08-26)
+-------------------
+* Various smaller fixes for ROS Kinetic
+  - Reduce logging level at nodelet startup to remove logging clutter
+  - Bugfix for `#78 <https://github.com/spencer-project/spencer_people_tracking/issues/78>`_, blocked aggregator nodelets due to detector stall. Fix by monitoring if any message are actually received on detections topic, before advertising publisher.
+  - Configurable odom and base footprint frame IDs (fixes `#53 <https://github.com/spencer-project/spencer_people_tracking/issues/53>`_)
+* Contributors: Timm Linder
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master

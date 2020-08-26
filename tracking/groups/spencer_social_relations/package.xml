@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_social_relations</name>
-  <version>1.0.10</version>
+  <version>1.2.0</version>
   <description>
     Calculates various kinds of spencer_social_relation_msgs/SocialRelations from spencer_tracking_msgs/TrackedPersons
   </description>

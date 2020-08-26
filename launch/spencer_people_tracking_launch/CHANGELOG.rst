@@ -2,6 +2,21 @@
 Changelog for package spencer_people_tracking_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2020-08-26)
+------------------
+* Merge branch 'master' into melodic
+* Contributors: Timm Linder
+
+1.0.11 (2020-08-26)
+-------------------
+* Various smaller fixes for ROS Kinetic
+  - Configurable odom and base footprint frame IDs (fixes `#53 <https://github.com/spencer-project/spencer_people_tracking/issues/53>`_)
+* Restore functionality of srl_laser_detectors by replacing old trained models (broken due to changes in Eigen and OpenCV) with new ones.
+* Merge pull request `#54 <https://github.com/spencer-project/spencer_people_tracking/issues/54>`_ from rpg711/fix_openni1
+  Fixing detection remapping so detections are actually published to rviz for openni 1
+* Fixing detection remapping so detections are actually published to rviz correctly
+* Contributors: Timm Linder, rpg711
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master
