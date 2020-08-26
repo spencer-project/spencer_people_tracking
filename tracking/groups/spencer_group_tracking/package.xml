@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spencer_group_tracking</name>
-  <version>1.0.11</version>
+  <version>1.2.0</version>
   <description>
     SPENCER components for tracking groups of persons
   </description>

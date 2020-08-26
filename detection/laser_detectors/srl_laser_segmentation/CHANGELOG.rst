@@ -2,8 +2,8 @@
 Changelog for package srl_laser_segmentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2020-08-26)
+------------------
 * Merge branch 'master' into melodic
 * Contributors: Timm Linder
 

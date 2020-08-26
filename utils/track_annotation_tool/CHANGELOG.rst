@@ -2,8 +2,8 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2020-08-26)
+------------------
 * Merge branch 'master' into melodic
 * Fixes required for ROS Melodic support
 * Contributors: Timm Linder

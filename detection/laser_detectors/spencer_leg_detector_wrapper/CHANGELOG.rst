@@ -2,8 +2,8 @@
 Changelog for package spencer_leg_detector_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2020-08-26)
+------------------
 * Merge branch 'master' into melodic
 * Contributors: Timm Linder
 
