@@ -2,6 +2,9 @@
 Changelog for package pcl_people_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.0 (2020-08-26)
 ------------------
 * Merge branch 'master' into melodic
