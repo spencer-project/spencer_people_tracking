@@ -2,6 +2,15 @@
 Changelog for package srl_nearest_neighbor_tracker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Various smaller fixes for ROS Kinetic
+  - Use find_package(Eigen3) instead of find_package(Eigen)
+  - Configurable odom and base footprint frame IDs (fixes `#53 <https://github.com/spencer-project/spencer_people_tracking/issues/53>`_)
+* Revert added params for topic remapping introduced in pull request `#59 <https://github.com/spencer-project/spencer_people_tracking/issues/59>`_ (commits e5ca86b28c and 6255cfe76).
+  The naming of these parameters is a bit inconsistent and support was added to only few selected ROS nodes. Therefore, it is better to rely on traditional topic remappings for now.
+* Contributors: Timm Linder
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master

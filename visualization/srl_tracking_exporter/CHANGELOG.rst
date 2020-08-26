@@ -2,6 +2,15 @@
 Changelog for package srl_tracking_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#65 <https://github.com/spencer-project/spencer_people_tracking/issues/65>`_ from dandedrick/fix-logerror
+  job_monitor: replace logerror with logerr
+* job_monitor: replace logerror with logerr
+  rospy doesn't export a logerror symbol only logerr. If this was ever hit it
+  would have caused an exception instead of logging.
+* Contributors: Dan Dedrick, Timm Linder
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master

@@ -2,6 +2,11 @@
 Changelog for package pcl_people_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use find_package(Eigen3) instead of find_package(Eigen)
+* Contributors: Timm Linder
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master

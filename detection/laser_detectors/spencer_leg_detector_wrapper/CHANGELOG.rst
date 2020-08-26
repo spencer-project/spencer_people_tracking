@@ -2,6 +2,11 @@
 Changelog for package spencer_leg_detector_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add missing install targets for spencer_leg_detector_wrapper (fix for `#64 <https://github.com/spencer-project/spencer_people_tracking/issues/64>`_)
+* Contributors: Timm Linder
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master
