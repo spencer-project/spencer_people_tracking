@@ -2,6 +2,15 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.11 (2020-08-26)
+-------------------
+* Adapt stability fixes to upper-body detector + config changes from LCAS (provided by Manuel in pull request `#59 <https://github.com/spencer-project/spencer_people_tracking/issues/59>`_, commit e5ca86b28c99) to the SPENCER version.
+* Merge branch 'master' of https://github.com/MFernandezCarmona/spencer_people_tracking into master
+* Merge pull request `#52 <https://github.com/spencer-project/spencer_people_tracking/issues/52>`_ from Sangheli/patch-1
+  In upper-body detector, use correct dimensions of depth image (important when not using VGA resolution; otherwise part of image might not be used for detection)
+* Fixed depth image converting to matrix when resolution!=640x480
+* Contributors: Manuel Fernandez-Carmona, Timm Linder, Андрей Савельев
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master

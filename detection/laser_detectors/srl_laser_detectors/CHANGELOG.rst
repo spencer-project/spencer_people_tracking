@@ -2,6 +2,15 @@
 Changelog for package srl_laser_detectors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.11 (2020-08-26)
+-------------------
+* Restore functionality of srl_laser_detectors by replacing old trained models (broken due to changes in Eigen and OpenCV) with new ones.
+  Training functionality restored by slight revision of training ROS node according to new protocol.
+  Improved error handling in laser detectors.
+  Include boundary dist feature to ensure compatibility of trained models.
+  Fix compiler warnings in getDescription() method of laser features.
+* Contributors: Timm Linder
+
 1.0.10 (2018-09-22)
 -------------------
 * Merge pull request `#47 <https://github.com/LCAS/spencer_people_tracking/issues/47>`_ from LCAS/master
