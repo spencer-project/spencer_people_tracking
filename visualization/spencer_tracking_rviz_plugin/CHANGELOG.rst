@@ -2,8 +2,8 @@
 Changelog for package spencer_tracking_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.0 (2020-08-26)
+------------------
 * Merge branch 'melodic' into noetic
 * Changes required for compatibility with ROS Noetic
   - Migrate scripts from Python 2.7 to Python 3 via 2to3 converter + manual editing
