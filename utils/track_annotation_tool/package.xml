@@ -64,6 +64,11 @@ and http://p.yusukekamiyamane.com/ for details on the icons.
   <depend>pluginlib</depend>
   <depend>python_qt_binding</depend>
 
+  <build_depend>qtbase5-dev</build_depend>
+  <exec_depend>libqt5-core</exec_depend>
+  <exec_depend>libqt5-gui</exec_depend>
+  <exec_depend>libqt5-widgets</exec_depend>
+
   <export>
       <rviz plugin="${prefix}/rviz_plugin.xml"/>
       <rqt_gui plugin="${prefix}/rqt_plugin.xml"/>
