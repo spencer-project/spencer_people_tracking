@@ -2,6 +2,11 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'melodic' into noetic
+* Contributors: Timm Linder
+
 1.2.0 (2020-08-26)
 ------------------
 * Merge branch 'master' into melodic

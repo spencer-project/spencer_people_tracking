@@ -2,6 +2,15 @@
 Changelog for package srl_tracking_logfile_import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'melodic' into noetic
+* Changes required for compatibility with ROS Noetic
+  - Migrate scripts from Python 2.7 to Python 3 via 2to3 converter + manual editing
+  - Update package dependencies from Python 2 to Python 3
+  - Fix regression in logfile playback caused by switch to Python 3
+* Contributors: Timm Linder
+
 1.2.0 (2020-08-26)
 ------------------
 * Merge branch 'master' into melodic
