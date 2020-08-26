@@ -2,6 +2,11 @@
 Changelog for package spencer_social_relations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Various smaller fixes for ROS Kinetic

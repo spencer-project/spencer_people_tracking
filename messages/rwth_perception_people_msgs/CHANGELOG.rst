@@ -2,6 +2,11 @@
 Changelog for package rwth_perception_people_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Merge pull request `#81 <https://github.com/spencer-project/spencer_people_tracking/issues/81>`_ from LCAS/master

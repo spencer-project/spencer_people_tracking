@@ -2,6 +2,13 @@
 Changelog for package pcl_people_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+  - OpenCV2 to 3 migration
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Use find_package(Eigen3) instead of find_package(Eigen)

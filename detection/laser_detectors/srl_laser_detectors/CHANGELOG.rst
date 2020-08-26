@@ -2,6 +2,14 @@
 Changelog for package srl_laser_detectors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+  - OpenCV2 to 3 migration
+  - Retrain laser detector after OpenCV migration, as old models are incompatible
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Restore functionality of srl_laser_detectors by replacing old trained models (broken due to changes in Eigen and OpenCV) with new ones.

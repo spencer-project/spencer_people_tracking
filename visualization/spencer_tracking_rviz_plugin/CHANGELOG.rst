@@ -2,6 +2,16 @@
 Changelog for package spencer_tracking_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+  - Replace deprecated pluginlib macro
+  - Qt5 support for Rviz plugins
+  - Replace tf by tf2 message_filter in rviz plugin (contributed by user @f-fl0 in srl-freiburg/spencer_tracking_rviz_plugin)
+  - Add boost namespace for shared_ptr (for rviz plugin, this was contributed by @makokal in srl-freiburg/spencer_tracking_rviz_plugin)
+* Contributors: Timm Linder, Billy Okal, f-fl0
+
 1.0.11 (2020-08-26)
 -------------------
 * Various smaller fixes for ROS Kinetic

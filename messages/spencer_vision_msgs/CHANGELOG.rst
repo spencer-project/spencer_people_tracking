@@ -2,6 +2,11 @@
 Changelog for package spencer_vision_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Merge pull request `#1 <https://github.com/spencer-project/spencer_people_tracking/issues/1>`_ from spencer-project/master

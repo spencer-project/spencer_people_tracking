@@ -2,6 +2,12 @@
 Changelog for package rwth_upper_body_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Adapt stability fixes to upper-body detector + config changes from LCAS (provided by Manuel in pull request `#59 <https://github.com/spencer-project/spencer_people_tracking/issues/59>`_, commit e5ca86b28c99) to the SPENCER version.

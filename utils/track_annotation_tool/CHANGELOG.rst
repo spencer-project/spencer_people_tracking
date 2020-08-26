@@ -2,6 +2,12 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Merge pull request `#81 <https://github.com/spencer-project/spencer_people_tracking/issues/81>`_ from LCAS/master

@@ -2,6 +2,12 @@
 Changelog for package srl_nearest_neighbor_tracker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Various smaller fixes for ROS Kinetic

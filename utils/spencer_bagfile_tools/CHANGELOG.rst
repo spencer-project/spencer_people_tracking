@@ -2,6 +2,14 @@
 Changelog for package spencer_bagfile_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into melodic
+* Fixes required for ROS Melodic support
+  - OpenCV2 to 3 migration
+  - Add boost namespace for shared_ptr
+* Contributors: Timm Linder
+
 1.0.11 (2020-08-26)
 -------------------
 * Contributors: Timm Linder
