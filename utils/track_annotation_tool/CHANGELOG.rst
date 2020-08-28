@@ -2,8 +2,8 @@
 Changelog for package track_annotation_tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.1 (2020-08-28)
+------------------
 * Fix Qt5 cmake module not being found
 * Contributors: Timm Linder
 
