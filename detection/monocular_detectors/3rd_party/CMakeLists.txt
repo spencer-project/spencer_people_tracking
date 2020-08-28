@@ -17,8 +17,11 @@ ExternalProject_Add(
     libcudaHOG
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/libcudaHOG
     URL ${groundHOG_tar}
-		PATCH_COMMAND patch -p0 <SOURCE_DIR>/cudaHOG/cudaHOG.cpp < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/cudaHOG.cpp.diff
-    CONFIGURE_COMMAND qmake -makefile <SOURCE_DIR>
+    PATCH_COMMAND patch -p0 <SOURCE_DIR>/cudaHOG/cudaHOG.cpp < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/cudaHOG.cpp.diff
+    COMMAND patch -p0 <SOURCE_DIR>/cudaHOG/cudaHOG.pro < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/cudaHOG.pro.diff
+    COMMAND patch -p0 <SOURCE_DIR>/cudaHOG/global.h < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/global.h.diff
+    COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/fix_boost_dependency.sh <SOURCE_DIR>
+    CONFIGURE_COMMAND /usr/lib/x86_64-linux-gnu/qt5/bin/qmake -makefile <SOURCE_DIR>
     BUILD_COMMAND make
     INSTALL_COMMAND "" #Skipp install step. See below
 )

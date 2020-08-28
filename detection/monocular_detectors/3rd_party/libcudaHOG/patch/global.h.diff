@@ -1,0 +1,11 @@
+--- global.h	2012-07-10 10:27:01.000000000 +0200
++++ global.h.patched	2020-08-28 21:06:18.847194030 +0200
+@@ -71,7 +71,7 @@
+ 
+ #ifdef VERBOSE_CUDA_FAILS
+ #define ONFAIL(S) { cudaError_t e = cudaGetLastError(); \
+-					if(e) { printf("%s:%s:"S":%s\n", __FILE__, __FUNCTION__ , cudaGetErrorString(e));\
++					if(e) { printf("%s:%s:" #S ":%s\n", __FILE__, __FUNCTION__ , cudaGetErrorString(e));\
+ 					return -2; } }
+ #else
+ #define ONFAIL(S)
