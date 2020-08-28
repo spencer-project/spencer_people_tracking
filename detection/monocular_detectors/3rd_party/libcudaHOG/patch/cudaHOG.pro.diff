@@ -1,0 +1,16 @@
+--- cudaHOG.pro	2020-08-28 21:03:07.901335922 +0200
++++ cudaHOG.pro.patched	2020-08-28 21:42:16.280595822 +0200
+@@ -17,10 +17,11 @@
+ cu.CONFIG += no_link
+ cu.variable_out = OBJECTS
+ 
+-INCLUDEPATH += $(CUDA_INC_PATH)
++#INCLUDEPATH += $(CUDA_INC_PATH)
++#INCPATH = $$replace(INCPATH, -I ,)
+ QMAKE_CUFLAGS += $$QMAKE_CFLAGS
+ ## QMAKE_CUEXTRAFLAGS += -arch=sm_11 --ptxas-options=-v -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
+-QMAKE_CUEXTRAFLAGS += -arch=sm_11 -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
++QMAKE_CUEXTRAFLAGS += -arch=sm_35 -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
+ QMAKE_CUEXTRAFLAGS += $(DEFINES) $(INCPATH) $$join(QMAKE_COMPILER_DEFINES, " -D", -D)
+ QMAKE_CUEXTRAFLAGS += -c
+ 
