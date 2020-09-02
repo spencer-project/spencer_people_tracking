@@ -13,7 +13,7 @@ RUN mkdir -p $CATKIN_WS/src
 WORKDIR $CATKIN_WS/src
 
 # Acquire source
-#RUN git clone https://github.com/spencer-project/spencer_people_tracking.git
+#RUN git clone -b $ROS_DISTRO https://github.com/spencer-project/spencer_people_tracking.git
 COPY . spencer_people_tracking/
 
 # Install dependencies
