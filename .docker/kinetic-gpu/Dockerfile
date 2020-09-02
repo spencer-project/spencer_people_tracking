@@ -1,5 +1,5 @@
 # GPU support (only works if nvidia-container-toolkit is installed on the docker host)!
-FROM nvidia/cudagl:10.1-runtime-ubuntu16.04
+FROM nvidia/cudagl:10.1-devel-ubuntu16.04
 RUN apt-get update && apt-get install -y lsb-release && rm -rf /var/lib/apt/lists/*
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
@@ -36,6 +36,14 @@ RUN apt-get update && \
     rosdep update && \
     rosdep install -y -r --from-paths . --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false && \
     rm -rf /var/lib/apt/lists/*
+
+# Build libcudahog dependency (only in GPU docker file!)
+ENV CUDAHOG_DIR=$CATKIN_WS/src/spencer_people_tracking/detection/monocular_detectors/3rd_party
+WORKDIR ${CUDAHOG_DIR}
+RUN mkdir build
+WORKDIR ${CUDAHOG_DIR}/build
+RUN cmake ..
+RUN make && make install
 
 # Build repo
 WORKDIR $CATKIN_WS
