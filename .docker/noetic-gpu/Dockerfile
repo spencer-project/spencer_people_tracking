@@ -1,6 +1,6 @@
 # GPU support (only works if nvidia-container-toolkit is installed on the docker host)!
-# FIXME: 20.04 image with GL support is not yet available. Update this file once it is ready
-FROM nvidia/cudagl:10.1-runtime-ubuntu20.04
+# FIXME: 20.04 image with GL support (for rviz) is not yet available. Update next line once cudagl image exists
+FROM nvidia/cuda:11.0-devel-ubuntu20.04
 RUN apt-get update && apt-get install -y lsb-release curl && rm -rf /var/lib/apt/lists/*
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
@@ -44,6 +44,14 @@ RUN apt-get update && \
     rosdep update && \
     rosdep install -y -r --from-paths . --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false && \
     rm -rf /var/lib/apt/lists/*
+
+# Build libcudahog dependency (only in GPU docker file!)
+ENV CUDAHOG_DIR=$CATKIN_WS/src/spencer_people_tracking/detection/monocular_detectors/3rd_party
+WORKDIR ${CUDAHOG_DIR}
+RUN mkdir build
+WORKDIR ${CUDAHOG_DIR}/build
+RUN cmake ..
+RUN make && make install
 
 # Build repo
 WORKDIR $CATKIN_WS
