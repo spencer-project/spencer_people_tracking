@@ -18,6 +18,8 @@ ExternalProject_Add(
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/libcudaHOG
     URL ${groundHOG_tar}
 		PATCH_COMMAND patch -p0 <SOURCE_DIR>/cudaHOG/cudaHOG.cpp < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/cudaHOG.cpp.diff
+    COMMAND patch -p0 <SOURCE_DIR>/cudaHOG/cudaHOG.pro < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/cudaHOG.pro.diff
+    COMMAND patch -p0 -l <SOURCE_DIR>/cudaHOG.pro < ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/cudaHOG.pro.diff2
     COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/libcudaHOG/patch/fix_boost_dependency.sh <SOURCE_DIR>
     CONFIGURE_COMMAND qmake -makefile <SOURCE_DIR>
     BUILD_COMMAND make

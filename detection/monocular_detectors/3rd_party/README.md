@@ -5,7 +5,7 @@ This directory contains a cmake wrapper file that will take care of downloading,
 At the moment this library is only needed to build the ground_hog package.
 
 ## Dependencies
-* NVIDIA - CUDA: Please follow instructions: http://developer.download.nvidia.com/compute/cuda/5_5/rel/docs/CUDA_Getting_Started_Linux.pdf or go directly to: https://developer.nvidia.com/cuda-downloads to find the latest version (tested with version 5.5)
+* NVIDIA - CUDA: Please go to: https://developer.nvidia.com/cuda-downloads to find the latest version (tested with version 10.1 under Ubuntu 16.04)
 	* This requires a NVIDIA graphics card
 	* Make sure to follow the instructions especially the part about exporting the PATH and LD_LIBRARY_PATH variables. Add these statements to your `.bashrc`.
 * qmake (Qt4)
@@ -26,31 +26,13 @@ As mentioned the cmake file will take care of almost everything. Just follow the
 	* Find the line that says: `LIBS += -lcudart -L/usr/local/cuda/lib64` and change it to: `LIBS += -lcudart -L/usr/local/cuda/lib`.
 	* Now run `make` again.
 
-## FURTHER CUDA SDK INSTALLATIONS NOTES FOR UBUNTU 12.04
-* Use SDK 5.5. Versions 6.0 or 6.5 will not work, as they require a newer graphics driver which is not available for 12.04.
-* CORRECTION: Version 6.5 works when removing all nvidia-* drivers and installing the 340 driver supplied with the SDK. Tested on 3.13 kernel. Requires the driver to be re-installed each time a new kernel update is installed.
-* If laptop has Optimus, disable it in the BIOS and set to "discrete graphics"! With Optimus, it is hard to get even the CUDA samples running!
-* Install the graphics driver "nvidia-331-updates" using the "Additional drivers" panel in the system settings GUI.
-* After restart, make sure that the driver is actually in use. If it is activated but not in use according to GUI, make sure it is not blacklisted by checking "sudo modprobe nvidia". Also, running "nvidia-settings" should show info such as GPU frequency, temperature etc.
-* Then install the CUDA SDK 5.5, but when asked if the graphics driver shall be installed, answer "no".
-* vim /etc/ld.so.conf.d/cuda.conf, paste following lines:
-    /usr/local/cuda-5.5/lib64
-    /usr/local/cuda-5.5/lib
-    /usr/lib/nvidia-331-updates/
-* Then run "sudo ldconfig", and next run:
-* cd /usr/lib && sudo ln -s /usr/lib/nvidia-331-updates/libcuda.so libcuda.so
-* To verify, cd ~/NVIDIA_CUDA-5.5_Samples/NVIDIA_CUDA-5.5_Samples/1_Utilities/deviceQueryDrv/ && make && ../../bin/x86_64/linux/release/deviceQueryDrv.exe
-* export PATH=/usr/local/cuda/bin:$PATH
-
-Now perform installation as described above. If there is an error like "missing reference to __cudaInitModule", make sure CUDA SDK version is correct and remove the "build" folder, re-create it & run cmake again! It seems the nvcc compiler is run only once, and if you initially have got a wrong CUDA version, the libcudaHOG.so file is never re-built if you do not first delete the "build" folder!
-
 ## IMPORTANT!
 
-* If there is an error "undefined reference to 'QString::fromAscii_helper" while running "make", edit "build/libcudaHOG/src/libcudaHOG/cudaHOG.pro" and remove the lines with the "cudaHOGDetect" and "cudaHOGDump" subdirs!
+* If there is an error "undefined reference to 'QString::fromAscii_helper" while running "make", edit "build/libcudaHOG/src/libcudaHOG/cudaHOG.pro" and remove the lines with the "cudaHOGDetect" and "cudaHOGDump" subdirs! (NOTE: This is now automatically patched by CMakeLists.txt).
 
-* If there is an error "/usr/bin/ld: cannot find -lboost_program_options-mt", please make sure you have "libboost_program_options*.*" in your "/usr/lib" directory (use command `locate libboost_program_options`). If you have not yet installed Boost, you can try command `sudo apt-get install libboost_program_options-dev`. Else if you have "libboost_program_options*.*", change 'boost_program_options-mt' to 'boost_program_options' in your Makefile and other files (use command `grep 'boost_program_options-mt' -nr` in the build dir to find these files)
+* If there is an error "/usr/bin/ld: cannot find -lboost_program_options-mt", please make sure you have "libboost_program_options*.*" in your "/usr/lib" directory (use command `locate libboost_program_options`). If you have not yet installed Boost, you can try command `sudo apt-get install libboost_program_options-dev`. Else if you have "libboost_program_options*.*", change 'boost_program_options-mt' to 'boost_program_options' in your Makefile and other files (use command `grep 'boost_program_options-mt' -nr` in the build dir to find these files) (NOTE: This is now automatically done through the script fix_boost_dependency.sh, which is executed as part of CMakeLists.txt.)
 
-* If there is an error "nvcc fatal   : Value 'sm_11' is not defined for option 'gpu-architecture'", please make sure the CUDA SDK has been installed and use the command `nvcc --help|grep "Allowed values for this option" -n` to see which gpu architecture is supported (eg. 'compute_20' or 'sm_20'), and change 'sm_11' to others in the files (use command `grep 'sm_11' -nr` in the build dir to find these files)
+* If there is an error "nvcc fatal   : Value 'sm_11' is not defined for option 'gpu-architecture'", please make sure the CUDA SDK has been installed and use the command `nvcc --help|grep "Allowed values for this option" -n` to see which gpu architecture is supported (eg. 'compute_20' or 'sm_20'), and change 'sm_11' to others in the files (use command `grep 'sm_11' -nr` in the build dir to find these files) (NOTE: CMakeLists.txt will now automatically apply a patch to change this to sm_30 in order to avoid this error.)
 
 * In case of CUDA Error 999 when launching sample applications from the CUDA SDK, this might be a permissions problem! Try if the samples work when run via sudo. In that case, a dirty workaround is to call one of the applications (e.g. deviceQueryDrv) once in an /etc/init/ script at login-session-start.
 
