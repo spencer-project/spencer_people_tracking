@@ -1,0 +1,10 @@
+--- cudaHOG.pro 2012-07-10 08:27:02.000000000 +0000
++++ cudaHOG.pro.patched 2020-09-02 23:34:13.080814110 +0000
+@@ -1,6 +1,4 @@
+
+ TEMPLATE = subdirs
+
+-SUBDIRS = cudaHOG \
+-               src/cudaHOGDetect \
+-               src/cudaHOGDump
++SUBDIRS = cudaHOG
