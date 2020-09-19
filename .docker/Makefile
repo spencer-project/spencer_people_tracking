@@ -16,5 +16,5 @@ build:
 
 build_gpu:
  		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking_gpu:melodic-gpu --file=.docker/melodic-gpu/Dockerfile .
+		docker build --tag=spencer/spencer_people_tracking:melodic-gpu --file=.docker/melodic-gpu/Dockerfile .
 
