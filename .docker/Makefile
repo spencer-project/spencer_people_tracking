@@ -16,5 +16,5 @@ build:
 
 build_gpu:
 		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking_gpu:kinetic-gpu --file=.docker/kinetic-gpu/Dockerfile .
+		docker build --tag=spencer/spencer_people_tracking:kinetic-gpu --file=.docker/kinetic-gpu/Dockerfile .
 
