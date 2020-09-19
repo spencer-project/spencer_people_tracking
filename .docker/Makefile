@@ -16,5 +16,5 @@ build:
 
 build_gpu:
  		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking_gpu:noetic-gpu --file=.docker/noetic-gpu/Dockerfile .
+		docker build --tag=spencer/spencer_people_tracking:noetic-gpu --file=.docker/noetic-gpu/Dockerfile .
 
