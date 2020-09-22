@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_python_setup()
 
 catkin_package(
+  DEPENDS roscpp diagnostic_updater tf diagnostic_msgs spencer_control_msgs
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
 )
