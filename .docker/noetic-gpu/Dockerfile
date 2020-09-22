@@ -1,6 +1,5 @@
 # GPU support (only works if nvidia-container-toolkit is installed on the docker host)!
-# FIXME: 20.04 image with GL support (for rviz) is not yet available. Update next line once cudagl image exists
-FROM nvidia/cuda:11.0-devel-ubuntu20.04
+FROM nvidia/cudagl:11.0-devel-ubuntu20.04
 RUN apt-get update && apt-get install -y lsb-release curl && rm -rf /var/lib/apt/lists/*
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
