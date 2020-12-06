@@ -11,10 +11,10 @@ help:
 	@echo ""
 
 build:
-		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking:noetic --file=.docker/noetic/Dockerfile
+	cd .. && \
+	docker build --tag=spencer/spencer_people_tracking:noetic --file=.docker/noetic/Dockerfile .
 
 build_gpu:
- 		cd .. && \
-		docker build --tag=spencer/spencer_people_tracking:noetic-gpu --file=.docker/noetic-gpu/Dockerfile .
+	cd .. && \
+	docker build --tag=spencer/spencer_people_tracking:noetic-gpu --file=.docker/noetic-gpu/Dockerfile .
 
