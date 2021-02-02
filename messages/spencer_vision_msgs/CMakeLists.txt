@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(spencer_vision_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  roslib
   std_msgs
   sensor_msgs
   geometry_msgs
@@ -40,5 +38,5 @@ generate_messages(
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs message_runtime 
+  CATKIN_DEPENDS std_msgs sensor_msgs geometry_msgs message_runtime 
 )
